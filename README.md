@@ -1,0 +1,2 @@
+# GenericScriptableObjects
+Generic ScriptableObjects
