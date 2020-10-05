@@ -1,0 +1,22 @@
+{
+  "name": "com.solidalloy.generic-scriptable-objects",
+  "version": "1.0.0",
+  "displayName": "Generic ScriptableObjects",
+  "description": "Generic ScriptableObjects.",
+  "dependencies": {
+    "com.solidalloy.util": "1.2.0",
+	"com.solidalloy.type.references": "2.2.3"
+  },
+  "keywords": [
+    "scriptable",
+    "object",
+    "ScriptableObject",
+    "generic",
+    "utility",
+    "util"
+  ],
+  "author": {
+    "name": "SolidAlloy",
+    "url": "https://github.com/SolidAlloy/"
+  }
+}
