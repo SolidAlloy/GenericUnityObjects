@@ -64,7 +64,7 @@
             if (!AssetDatabase.IsValidFolder("Assets/Scripts/GenericScriptableObjects"))
                 AssetDatabase.CreateFolder("Assets/Scripts", "GenericScriptableObjects");
 
-            string template = GenericDerivativesDatabase.Template.text;
+            string template = GenericDerivativesDatabase.Template;
             string fullTypeName = GetTypeNameWithoutAssembly(type.FullName);
             string classSafeTypeName = GetClassSafeTypeName(fullTypeName);
             template = template.Replace("#TYPE_NAME", classSafeTypeName);

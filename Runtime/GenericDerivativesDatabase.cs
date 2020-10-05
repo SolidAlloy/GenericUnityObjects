@@ -6,11 +6,17 @@
     using TypeReferences;
     using UnityEngine;
 
-    public class GenericDerivativesDatabase : SingletonScriptableObject<GenericDerivativesDatabase>, ISerializationCallbackReceiver, IDeserializationCallback, ISerializable
+    public class GenericDerivativesDatabase :
+        SingletonScriptableObject<GenericDerivativesDatabase>,
+        ISerializationCallbackReceiver,
+        IDeserializationCallback,
+        ISerializable
     {
-        [SerializeField] private TextAsset _template = null;
+        public const string Template = "namespace GenericScriptableObjectsTypes { public class " +
+                                               "Generic_#TYPE_NAME : GenericScriptableObjects.Generic<#TYPE> { } }";
 
-        private readonly Dictionary<TypeReference, TypeReference> _dict = new Dictionary<TypeReference, TypeReference>(new TypeReferenceComparer());
+        private readonly Dictionary<TypeReference, TypeReference> _dict =
+            new Dictionary<TypeReference, TypeReference>(new TypeReferenceComparer());
 
         [SerializeField, TypeOptions(ExcludeNone = true, ShortName = true)]
         // [HideInInspector] // TODO: hide fields
@@ -20,19 +26,19 @@
         // [HideInInspector]
         private TypeReference[] _values;
 
-        public static TextAsset Template => Instance._template;
-
         public TypeReference this[TypeReference key]
         {
             get => _dict[key];
             set => _dict[key] = value;
         }
 
-        public static void Add(Type key, Type value) => Instance._dict.Add(new TypeReference(key), new TypeReference(value));
+        public static void Add(Type key, Type value) =>
+            Instance._dict.Add(new TypeReference(key), new TypeReference(value));
 
         public static bool ContainsKey(Type key) => Instance._dict.ContainsKey(new TypeReference(key));
 
-        public static bool TryGetValue(TypeReference key, out TypeReference value) => Instance._dict.TryGetValue(key, out value);
+        public static bool TryGetValue(TypeReference key, out TypeReference value) =>
+            Instance._dict.TryGetValue(key, out value);
 
         public static bool TryGetValue(Type key, out Type value)
         {

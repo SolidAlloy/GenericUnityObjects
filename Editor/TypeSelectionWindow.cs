@@ -25,11 +25,7 @@
             Show();
 
             EditorApplication.projectChanged += Close;
-            AssemblyReloadEvents.beforeAssemblyReload += () =>
-            {
-                Close();
-                Debug.Log("editor window closed");
-            };
+            AssemblyReloadEvents.beforeAssemblyReload += Close;
         }
 
         private void OnGUI()

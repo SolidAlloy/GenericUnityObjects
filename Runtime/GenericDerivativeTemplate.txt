@@ -1,1 +1,1 @@
-﻿namespace GenericScriptableObjectsTypes { public class Generic_#TYPE_NAME : Prototype.GenericScriptableObjects.Generic<#TYPE> { } }
+﻿namespace GenericScriptableObjectsTypes { public class Generic_#TYPE_NAME : GenericScriptableObjects.Generic<#TYPE> { } }
