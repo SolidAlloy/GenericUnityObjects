@@ -73,7 +73,7 @@
             File.WriteAllText($"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs", template);
             Instance._pendingCreationType = type;
             AssetDatabase.Refresh();
-            CompilationPipeline.RequestScriptCompilation();
+            // CompilationPipeline.RequestScriptCompilation(); // TODO: enable after testing
         }
 
         private static string GetClassSafeTypeName(string rawTypeName)
