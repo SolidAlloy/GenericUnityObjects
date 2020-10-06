@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using GenericScriptableObjects;
+    using SolidUtilities.Editor.Extensions;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
@@ -28,7 +29,8 @@
                 GenericDerivativesDatabase.Add(Instance._pendingCreationType, type);
                 var asset = Generic.Create(Instance._pendingCreationType);
                 Assert.IsNotNull(asset);
-                ProjectWindowUtil.CreateAsset(asset, $"New Generic_{typeName}.asset");
+                // ProjectWindowUtil.CreateAsset(asset, $"New Generic_{typeName}.asset");
+                DummyWindow.Create(asset, $"New Generic_{typeName}.asset");
             }
             finally
             {
@@ -85,6 +87,45 @@
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
         {
             return fullTypeName.Split('[')[0];
+        }
+    }
+
+    public class DummyWindow : EditorWindow
+    {
+        private ScriptableObject _asset;
+        private string _name;
+        private bool _calledOnGuiOnce;
+
+        public static void Create(ScriptableObject asset, string name)
+        {
+            var window = CreateInstance<DummyWindow>();
+            window.OnCreate(asset, name);
+        }
+
+        private void OnCreate(ScriptableObject asset, string name)
+        {
+            _asset = asset;
+            _name = name;
+            this.Resize(1f, 1f);
+            EditorApplication.projectChanged += Close;
+
+            Show();
+            Focus();
+        }
+
+        private void OnGUI()
+        {
+            if (_calledOnGuiOnce)
+                return;
+
+            _calledOnGuiOnce = true;
+            ProjectWindowUtil.CreateAsset(_asset, _name);
+            position = new Rect(Screen.currentResolution.width + 10f, Screen.currentResolution.height + 10f, 0f, 0f);
+        }
+
+        private void OnDestroy()
+        {
+            EditorApplication.projectChanged -= Close;
         }
     }
 }
