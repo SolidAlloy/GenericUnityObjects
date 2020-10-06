@@ -5,7 +5,6 @@
     using GenericScriptableObjects;
     using TypeReferences;
     using UnityEditor;
-    using UnityEditor.Compilation;
     using UnityEngine;
     using UnityEngine.Assertions;
     using Assembly = System.Reflection.Assembly;

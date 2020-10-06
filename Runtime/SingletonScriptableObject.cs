@@ -1,11 +1,7 @@
 ﻿namespace GenericScriptableObjects
 {
-    using System;
-    using SolidUtilities;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.Assertions;
-    using Object = System.Object;
 
 #if UNITY_EDITOR
 #endif
@@ -15,7 +11,6 @@
     /// Returns the asset created on the editor, or null if there is none.
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
-
     public abstract class SingletonScriptableObject<T> : ScriptableObject
         where T : ScriptableObject
     {
@@ -28,50 +23,36 @@
                 if (_instance != null)
                     return _instance;
 
-                var assets = Resources.LoadAll<T>(string.Empty);
+                const string assetsFolder = "Assets";
+                const string resourcesFolder = "Resources";
 
-                if (assets.Length > 1)
-                    Debug.Log($"Multiple assets of type {typeof(T)} found. Please leave only one.");
+                string assetPath = assetsFolder + '/' + resourcesFolder + '/' + typeof(T).Name + ".asset";
+                T instance = AssetDatabase.LoadAssetAtPath<T>(assetPath);
 
-                if (assets.Length == 0)
+                if (instance != null)
                 {
-                    T[] allInstances = null; //
-                    Timer.LogTime("Object.FindObject", () =>
-                    {
-                        allInstances = FindObjectsOfType<T>(true);
-                    });
+                    _instance = instance;
+                    return _instance;
+                }
 
-                    Timer.LogTime("Resources.Find", () =>
-                    {
-                        var otherInstances = Resources.FindObjectsOfTypeAll<T>();
-                    });
+                var allInstances = FindObjectsOfType<T>(true);
 
-                    const string assetsFolder = "Assets";
-                    const string resourcesFolder = "Resources";
+                if (allInstances.Length == 0)
+                {
+                    _instance = CreateInstance<T>();
+                    return _instance;
+                }
 
-                    if (allInstances.Length == 0)
-                    {
-                        _instance = CreateInstance<T>();
-                    }
-                    else
-                    {
-                        _instance = allInstances[0];
-                        // throw new IndexOutOfRangeException($"Expected to see 0 or 1 loaded instances of type {typeof(T)}, found {loadedInstances.Length}.");
-                    }
+                _instance = allInstances[0];
 
 #if UNITY_EDITOR
-                    if (!AssetDatabase.IsValidFolder($"{assetsFolder}/{resourcesFolder}"))
-                        AssetDatabase.CreateFolder(assetsFolder, resourcesFolder);
+                if (!AssetDatabase.IsValidFolder($"{assetsFolder}/{resourcesFolder}"))
+                    AssetDatabase.CreateFolder(assetsFolder, resourcesFolder);
 
-                    AssetDatabase.CreateAsset(_instance, assetsFolder + '/' + resourcesFolder + '/' + typeof(T).Name + ".asset");
+                AssetDatabase.CreateAsset(_instance, assetPath);
 #else
                     Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
 #endif
-                }
-                else
-                {
-                    _instance = assets[0];
-                }
 
                 return _instance;
             }
