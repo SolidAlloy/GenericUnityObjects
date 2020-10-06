@@ -1,1 +1,0 @@
-﻿namespace GenericScriptableObjectsTypes { public class Generic_#TYPE_NAME : GenericScriptableObjects.Generic<#TYPE> { } }

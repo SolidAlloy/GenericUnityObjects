@@ -70,8 +70,8 @@
             template = template.Replace("#TYPE_NAME", classSafeTypeName);
             template = template.Replace("#TYPE", fullTypeName);
 
-            File.WriteAllText($"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs", template);
             Instance._pendingCreationType = type;
+            File.WriteAllText($"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs", template);
             AssetDatabase.Refresh();
             // CompilationPipeline.RequestScriptCompilation(); // TODO: enable after testing
         }

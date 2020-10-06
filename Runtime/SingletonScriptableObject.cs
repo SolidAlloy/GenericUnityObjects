@@ -1,7 +1,12 @@
 ﻿namespace GenericScriptableObjects
 {
+    using System;
+    using SolidUtilities;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Assertions;
+    using Object = System.Object;
+
 #if UNITY_EDITOR
 #endif
 
@@ -30,11 +35,32 @@
 
                 if (assets.Length == 0)
                 {
+                    T[] allInstances = null; //
+                    Timer.LogTime("Object.FindObject", () =>
+                    {
+                        allInstances = FindObjectsOfType<T>(true);
+                    });
+
+                    Timer.LogTime("Resources.Find", () =>
+                    {
+                        var otherInstances = Resources.FindObjectsOfTypeAll<T>();
+                    });
+
                     const string assetsFolder = "Assets";
                     const string resourcesFolder = "Resources";
-                    _instance = CreateInstance<T>();
+
+                    if (allInstances.Length == 0)
+                    {
+                        _instance = CreateInstance<T>();
+                    }
+                    else
+                    {
+                        _instance = allInstances[0];
+                        // throw new IndexOutOfRangeException($"Expected to see 0 or 1 loaded instances of type {typeof(T)}, found {loadedInstances.Length}.");
+                    }
+
 #if UNITY_EDITOR
-                    if (!AssetDatabase.IsValidFolder(resourcesFolder))
+                    if (!AssetDatabase.IsValidFolder($"{assetsFolder}/{resourcesFolder}"))
                         AssetDatabase.CreateFolder(assetsFolder, resourcesFolder);
 
                     AssetDatabase.CreateAsset(_instance, assetsFolder + '/' + resourcesFolder + '/' + typeof(T).Name + ".asset");
