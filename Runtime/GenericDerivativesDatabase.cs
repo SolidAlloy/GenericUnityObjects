@@ -2,15 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
+    using Sirenix.OdinInspector;
     using TypeReferences;
+    using UnityEditor;
     using UnityEngine;
 
     public class GenericDerivativesDatabase :
         SingletonScriptableObject<GenericDerivativesDatabase>,
-        ISerializationCallbackReceiver,
-        IDeserializationCallback,
-        ISerializable
+        ISerializationCallbackReceiver
     {
         public const string Template = "namespace GenericScriptableObjectsTypes { public class " +
                                                "Generic_#TYPE_NAME : GenericScriptableObjects.Generic<#TYPE> { } }";
@@ -18,24 +17,35 @@
         private readonly Dictionary<TypeReference, TypeReference> _dict =
             new Dictionary<TypeReference, TypeReference>(new TypeReferenceComparer());
 
-        [SerializeField, TypeOptions(ExcludeNone = true, ShortName = true)]
+        [SerializeField]
+        // [TypeOptions(ExcludeNone = true, ShortName = true)]
         // [HideInInspector] // TODO: hide fields
         private TypeReference[] _keys;
 
-        [SerializeField, Inherits(typeof(Generic<>), ExcludeNone = true, ShortName = true, ExpandAllFolders = true)]
+        [SerializeField]
+        // [Inherits(typeof(Generic<>), ExcludeNone = true, ShortName = true, ExpandAllFolders = true)]
         // [HideInInspector]
         private TypeReference[] _values;
 
         public TypeReference this[TypeReference key]
         {
             get => _dict[key];
-            set => _dict[key] = value;
+            set
+            {
+                _dict[key] = value;
+                EditorUtility.SetDirty(this);
+            }
         }
 
         public static void Add(Type key, Type value) =>
             Instance._dict.Add(new TypeReference(key), new TypeReference(value));
 
-        public static bool ContainsKey(Type key) => Instance._dict.ContainsKey(new TypeReference(key));
+        public static bool ContainsKey(Type key)
+        {
+            bool containsKey = Instance._dict.ContainsKey(new TypeReference(key));
+            EditorUtility.SetDirty(Instance);
+            return containsKey;
+        }
 
         public static bool TryGetValue(TypeReference key, out TypeReference value) =>
             Instance._dict.TryGetValue(key, out value);
@@ -80,10 +90,5 @@
                 ++keysIndex;
             }
         }
-
-        public void OnDeserialization(object sender) => _dict.OnDeserialization(sender);
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context) =>
-            _dict.GetObjectData(info, context);
     }
 }

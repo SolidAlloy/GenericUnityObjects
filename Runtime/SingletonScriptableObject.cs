@@ -1,10 +1,11 @@
 ﻿namespace GenericScriptableObjects
 {
+#if UNITY_EDITOR
     using UnityEditor;
+#endif
     using UnityEngine;
 
-#if UNITY_EDITOR
-#endif
+
 
     /// <summary>
     /// Abstract class for making reload-proof singletons out of ScriptableObjects
@@ -43,8 +44,9 @@
                     AssetDatabase.CreateFolder(assetsFolder, resourcesFolder);
 
                 AssetDatabase.CreateAsset(_instance, assetPath);
+                EditorUtility.SetDirty(_instance);
 #else
-                    Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
+                Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
 #endif
 
                 return _instance;
