@@ -14,7 +14,7 @@
                 return (Generic<T>) CreateInstance(concreteType);
 
             Debug.LogWarning($"There is no {nameof(Generic<T>)} derivative of type {typeof(T)}. Please add " +
-                             $"it to GenericDerivatives Database.");
+                             "it to GenericDerivatives Database.");
             return null;
         }
     }
@@ -26,9 +26,8 @@
             if (GenericDerivativesDatabase.TryGetValue(type, out Type concreteType))
                 return CreateInstance(concreteType);
 
-            Debug.LogWarning($"There is no {nameof(Generic)} derivative of type {type}. Please add " +
-                             $"it to GenericDerivatives Database.");
-            return null;
+            throw new ArgumentOutOfRangeException($"There is no {nameof(Generic)} derivative of type " +
+                                                  $"{type}. Please add it to GenericDerivatives Database.");
         }
     }
 }

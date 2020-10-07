@@ -36,7 +36,6 @@
             var windowPos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             position = new Rect(windowPos, position.size);
 
-            // TODO : check edge cases: type is null, etc.
             var dropdownDrawer = new TypeDropdownDrawer(null, new TypeOptionsAttribute { ExcludeNone = true }, null);
             dropdownDrawer.Draw(type => _onTypeSelected(type));
 

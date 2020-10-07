@@ -23,14 +23,12 @@
 
             try
             {
-                var csharpAssembly = Assembly.Load("Assembly-CSharp");
                 string typeName = GetClassSafeTypeName(GetTypeNameWithoutAssembly(Instance._pendingCreationType.Type.FullName));
+                var csharpAssembly = Assembly.Load("Assembly-CSharp");
                 Type type = csharpAssembly.GetType($"GenericScriptableObjectsTypes.Generic_{typeName}");
                 Assert.IsNotNull(type);
                 GenericDerivativesDatabase.Add(Instance._pendingCreationType, type);
-                var asset = Generic.Create(Instance._pendingCreationType);
-                Assert.IsNotNull(asset);
-                AssetCreator.Create(asset, $"New Generic_{typeName}.asset");
+                CreateAssetInteractively(Instance._pendingCreationType, typeName);
             }
             finally
             {
@@ -44,36 +42,54 @@
         {
             TypeSelectionWindow.Create(selectedType =>
             {
+                string fullTypeName = GetTypeNameWithoutAssembly(selectedType.FullName);
+                string classSafeTypeName = GetClassSafeTypeName(fullTypeName);
+
                 if (GenericDerivativesDatabase.ContainsKey(selectedType))
                 {
-                    var asset = Generic.Create(selectedType);
-                    string typeName = GetClassSafeTypeName(GetTypeNameWithoutAssembly(selectedType.FullName));
-                    ProjectWindowUtil.CreateAsset(asset, $"New Generic_{typeName}.asset");
+                    CreateAssetInteractively(selectedType, classSafeTypeName);
                 }
                 else
                 {
-                    CreateNewType(selectedType);
+                    string template = GenericDerivativesDatabase.Template;
+                    template = template.Replace("#TYPE_NAME", classSafeTypeName);
+                    template = template.Replace("#TYPE", fullTypeName);
+
+                    string fullAssetPath =
+                        $"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs";
+
+                    if (File.Exists(fullAssetPath))
+                    {
+                        string oldFileContent = File.ReadAllText(fullAssetPath);
+                        if (oldFileContent == template)
+                        {
+                            var csharpAssembly = Assembly.Load("Assembly-CSharp");
+                            Type assetType = csharpAssembly.GetType($"GenericScriptableObjectsTypes.Generic_{classSafeTypeName}");
+                            Assert.IsNotNull(assetType);
+                            GenericDerivativesDatabase.Add(selectedType, assetType);
+                            CreateAssetInteractively(selectedType, classSafeTypeName);
+                            return;
+                        }
+                    }
+
+                    if (!AssetDatabase.IsValidFolder("Assets/Scripts"))
+                        AssetDatabase.CreateFolder("Assets", "Scripts");
+
+                    if (!AssetDatabase.IsValidFolder("Assets/Scripts/GenericScriptableObjects"))
+                        AssetDatabase.CreateFolder("Assets/Scripts", "GenericScriptableObjects");
+
+                    Instance._pendingCreationType = selectedType;
+                    File.WriteAllText($"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs", template);
+                    AssetDatabase.Refresh();
                 }
             });
         }
 
-        private static void CreateNewType(Type type)
+        private static void CreateAssetInteractively(Type selectedType, string classSafeTypeName)
         {
-            if (!AssetDatabase.IsValidFolder("Assets/Scripts"))
-                AssetDatabase.CreateFolder("Assets", "Scripts");
-
-            if (!AssetDatabase.IsValidFolder("Assets/Scripts/GenericScriptableObjects"))
-                AssetDatabase.CreateFolder("Assets/Scripts", "GenericScriptableObjects");
-
-            string template = GenericDerivativesDatabase.Template;
-            string fullTypeName = GetTypeNameWithoutAssembly(type.FullName);
-            string classSafeTypeName = GetClassSafeTypeName(fullTypeName);
-            template = template.Replace("#TYPE_NAME", classSafeTypeName);
-            template = template.Replace("#TYPE", fullTypeName);
-
-            Instance._pendingCreationType = type;
-            File.WriteAllText($"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs", template);
-            AssetDatabase.Refresh();
+            var asset = Generic.Create(selectedType);
+            Assert.IsNotNull(asset);
+            AssetCreator.Create(asset, $"New Generic_{classSafeTypeName}.asset");
         }
 
         private static string GetClassSafeTypeName(string rawTypeName)
