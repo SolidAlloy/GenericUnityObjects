@@ -36,14 +36,7 @@
                 }
 
                 var allInstances = FindObjectsOfType<T>(true);
-
-                if (allInstances.Length == 0)
-                {
-                    _instance = CreateInstance<T>();
-                    return _instance;
-                }
-
-                _instance = allInstances[0];
+                _instance = allInstances.Length == 0 ? CreateInstance<T>() : allInstances[0];
 
 #if UNITY_EDITOR
                 if (!AssetDatabase.IsValidFolder($"{assetsFolder}/{resourcesFolder}"))

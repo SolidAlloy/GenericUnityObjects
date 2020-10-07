@@ -6,16 +6,17 @@
     using SolidUtilities.Editor.Extensions;
     using TypeReferences;
     using UnityEditor;
+    using UnityEditor.Callbacks;
     using UnityEngine;
     using UnityEngine.Assertions;
     using Assembly = System.Reflection.Assembly;
 
-    [InitializeOnLoad]
     public class GenericScriptableObjectCreator : SingletonScriptableObject<GenericScriptableObjectCreator>
     {
         [SerializeField] private TypeReference _pendingCreationType; // TODO: hide in inspector
 
-        private void OnEnable()
+        [DidReloadScripts]
+        private static void OnScriptsReload()
         {
             if (Instance._pendingCreationType.Type == null)
                 return;
