@@ -11,9 +11,6 @@
         SingletonScriptableObject<GenericDerivativesDatabase>,
         ISerializationCallbackReceiver
     {
-        public const string Template = "namespace GenericScriptableObjectsTypes { public class " +
-                                               "Generic_#TYPE_NAME : GenericScriptableObjects.Generic<#TYPE> { } }";
-
         private readonly Dictionary<TypeReference, TypeReference> _dict =
             new Dictionary<TypeReference, TypeReference>(new TypeReferenceComparer());
 

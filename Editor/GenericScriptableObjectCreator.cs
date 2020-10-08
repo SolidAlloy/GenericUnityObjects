@@ -4,6 +4,7 @@
     using System.IO;
     using GenericScriptableObjects;
     using SolidUtilities.Editor.EditorWindows;
+    using SolidUtilities.Editor.Helpers;
     using TypeReferences;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -13,6 +14,10 @@
 
     public class GenericScriptableObjectCreator : SingletonScriptableObject<GenericScriptableObjectCreator>
     {
+        private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
+        private const string NamespaceName = "GenericScriptableObjectsTypes";
+        private const string GenericTypeName = nameof(Generic);
+
         [SerializeField] private TypeReference _pendingCreationType; // TODO: hide in inspector
 
         [DidReloadScripts]
@@ -24,11 +29,7 @@
             try
             {
                 string typeName = GetClassSafeTypeName(GetTypeNameWithoutAssembly(Instance._pendingCreationType.Type.FullName));
-                var csharpAssembly = Assembly.Load("Assembly-CSharp");
-                Type type = csharpAssembly.GetType($"GenericScriptableObjectsTypes.Generic_{typeName}");
-                Assert.IsNotNull(type);
-                GenericDerivativesDatabase.Add(Instance._pendingCreationType, type);
-                CreateAssetInteractively(Instance._pendingCreationType, typeName);
+                CreateAssetFromExistingType(Instance._pendingCreationType, typeName);
             }
             finally
             {
@@ -48,41 +49,56 @@
                 if (GenericDerivativesDatabase.ContainsKey(selectedType))
                 {
                     CreateAssetInteractively(selectedType, classSafeTypeName);
+                    return;
                 }
-                else
+
+                string fullAssetPath = $"{Application.dataPath}/{GenericSOTypesPath}/Generic_{classSafeTypeName}.cs";
+
+                string scriptContent = GetScriptContent(NamespaceName, GenericTypeName,
+                    classSafeTypeName, typeof(Generic<>).Namespace, fullTypeName);
+
+                if (FileContentMatches(fullAssetPath, scriptContent))
                 {
-                    string template = GenericDerivativesDatabase.Template;
-                    template = template.Replace("#TYPE_NAME", classSafeTypeName);
-                    template = template.Replace("#TYPE", fullTypeName);
-
-                    string fullAssetPath =
-                        $"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs";
-
-                    if (File.Exists(fullAssetPath))
-                    {
-                        string oldFileContent = File.ReadAllText(fullAssetPath);
-                        if (oldFileContent == template)
-                        {
-                            var csharpAssembly = Assembly.Load("Assembly-CSharp");
-                            Type assetType = csharpAssembly.GetType($"GenericScriptableObjectsTypes.Generic_{classSafeTypeName}");
-                            Assert.IsNotNull(assetType);
-                            GenericDerivativesDatabase.Add(selectedType, assetType);
-                            CreateAssetInteractively(selectedType, classSafeTypeName);
-                            return;
-                        }
-                    }
-
-                    if (!AssetDatabase.IsValidFolder("Assets/Scripts"))
-                        AssetDatabase.CreateFolder("Assets", "Scripts");
-
-                    if (!AssetDatabase.IsValidFolder("Assets/Scripts/GenericScriptableObjects"))
-                        AssetDatabase.CreateFolder("Assets/Scripts", "GenericScriptableObjects");
-
-                    Instance._pendingCreationType = selectedType;
-                    File.WriteAllText($"{Application.dataPath}/Scripts/GenericScriptableObjects/Generic_{classSafeTypeName}.cs", template);
-                    AssetDatabase.Refresh();
+                    CreateAssetFromExistingType(selectedType, classSafeTypeName);
+                    return;
                 }
+
+                Instance._pendingCreationType = selectedType;
+                AssetDatabaseHelper.MakeSureFolderExists(GenericSOTypesPath);
+                File.WriteAllText(fullAssetPath, scriptContent);
+                AssetDatabase.Refresh();
             });
+        }
+
+        private static bool FileContentMatches(string filePath, string contentToCompareTo)
+        {
+            if (File.Exists(filePath))
+            {
+                string oldFileContent = File.ReadAllText(filePath);
+                if (oldFileContent == contentToCompareTo)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static string GetScriptContent(
+            string namespaceName,
+            string genericName,
+            string typeName,
+            string genericNamespace,
+            string type)
+        {
+            return $"namespace {namespaceName} {{ public class {genericName}_{typeName} : {genericNamespace}.{genericName}<{type}> {{ }} }}";
+        }
+
+        private static void CreateAssetFromExistingType(Type selectedType, string classSafeTypeName)
+        {
+            var csharpAssembly = Assembly.Load("Assembly-CSharp");
+            Type assetType = csharpAssembly.GetType($"GenericScriptableObjectsTypes.Generic_{classSafeTypeName}");
+            Assert.IsNotNull(assetType);
+            GenericDerivativesDatabase.Add(selectedType, assetType);
+            CreateAssetInteractively(selectedType, classSafeTypeName);
         }
 
         private static void CreateAssetInteractively(Type selectedType, string classSafeTypeName)

@@ -3,6 +3,7 @@
 #if UNITY_EDITOR
     using UnityEditor;
 #endif
+    using SolidUtilities.Editor.Helpers;
     using UnityEngine;
 
 
@@ -40,8 +41,7 @@
                 _instance = allInstances.Length == 0 ? CreateInstance<T>() : allInstances[0];
 
 #if UNITY_EDITOR
-                if (!AssetDatabase.IsValidFolder($"{assetsFolder}/{resourcesFolder}"))
-                    AssetDatabase.CreateFolder(assetsFolder, resourcesFolder);
+                AssetDatabaseHelper.MakeSureFolderExists(resourcesFolder);
 
                 AssetDatabase.CreateAsset(_instance, assetPath);
                 EditorUtility.SetDirty(_instance);
