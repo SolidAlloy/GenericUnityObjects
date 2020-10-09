@@ -1,17 +1,8 @@
-﻿using SolidUtilities.Editor.EditorWindows;
-using UnityEditor;
-using UnityEngine;
-
-namespace GenericScriptableObjects
+﻿﻿namespace GenericScriptableObjects
 {
-    public class CustomGeneric<T> : Generic<T>
+
+    public class CustomGeneric<T> : ScriptableObject<T>
     {
         public T VariableTypeField;
-
-        [MenuItem("test")]
-        protected override void CreateAsset()
-        {
-            base.CreateAsset();
-        }
     }
 }

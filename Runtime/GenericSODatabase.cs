@@ -6,8 +6,8 @@
     using UnityEditor;
     using UnityEngine;
 
-    public class GenericDerivativesDatabase :
-        SingletonScriptableObject<GenericDerivativesDatabase>,
+    public abstract class GenericSODatabase :
+        SingletonScriptableObject<GenericSODatabase>,
         ISerializationCallbackReceiver
     {
         private readonly Dictionary<TypeReference, TypeReference> _dict =
