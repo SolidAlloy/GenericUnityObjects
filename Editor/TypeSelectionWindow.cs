@@ -7,28 +7,50 @@
     using UnityEditor;
     using UnityEngine;
 
-    public class TypeSelectionWindow : EditorWindow
+    public abstract class TypeSelectionWindow : EditorWindow
+    {
+        public static void Create(Action<Type> onTypeSelected)
+        {
+            var window = CreateInstance<OneTypeSelectionWindow>();
+            window.OnCreate(onTypeSelected);
+            SetupAndShow(window);
+        }
+
+        public static void Create(Action<Type, Type> onTwoTypesSelected)
+        {
+            var window = CreateInstance<TwoTypeSelectionWindow>();
+            window.OnCreate(onTwoTypesSelected);
+            SetupAndShow(window);
+        }
+
+        protected abstract void OnGUI();
+
+        protected void OnDestroy()
+        {
+            EditorApplication.projectChanged -= Close;
+            AssemblyReloadEvents.beforeAssemblyReload -= Close;
+        }
+
+        private static void SetupAndShow(TypeSelectionWindow window)
+        {
+            EditorApplication.projectChanged += window.Close;
+            AssemblyReloadEvents.beforeAssemblyReload += window.Close;
+            window.Show();
+        }
+    }
+
+    public class OneTypeSelectionWindow : TypeSelectionWindow
     {
         private Action<Type> _onTypeSelected;
         private bool _guiWasSetUp;
 
-        public static void Create(Action<Type> onTypeSelected)
-        {
-            var window = CreateInstance<TypeSelectionWindow>();
-            window.OnCreate(onTypeSelected);
-        }
-
-        private void OnCreate(Action<Type> onTypeSelected)
+        public void OnCreate(Action<Type> onTypeSelected)
         {
             _onTypeSelected = onTypeSelected;
             this.Resize(1f, 1f);
-            Show();
-
-            EditorApplication.projectChanged += Close;
-            AssemblyReloadEvents.beforeAssemblyReload += Close;
         }
 
-        private void OnGUI()
+        protected override void OnGUI()
         {
             if (_guiWasSetUp)
                 return;
@@ -41,11 +63,21 @@
 
             _guiWasSetUp = true;
         }
+    }
 
-        private void OnDestroy()
+    public class TwoTypeSelectionWindow : TypeSelectionWindow
+    {
+        private Action<Type, Type> _onTypesSelected;
+
+        public void OnCreate(Action<Type, Type> onTypesSelected)
         {
-            EditorApplication.projectChanged -= Close;
-            AssemblyReloadEvents.beforeAssemblyReload -= Close;
+            _onTypesSelected = onTypesSelected;
+            this.Resize(300f, 300f);
+        }
+
+        protected override void OnGUI()
+        {
+            throw new NotImplementedException();
         }
     }
 }

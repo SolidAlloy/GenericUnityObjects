@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using Sirenix.OdinInspector;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
@@ -49,8 +48,7 @@
 
         public static bool TryGetValue(Type key, out Type value)
         {
-            var typeRef = new TypeReference();
-            bool result = TryGetValue(new TypeReference(key), out typeRef);
+            bool result = TryGetValue(new TypeReference(key), out TypeReference typeRef);
             value = typeRef;
             return result;
         }
