@@ -5,9 +5,6 @@
 
     public class Generic<T> : Generic
     {
-        public string StringField;
-        public T Field;
-
         public static Generic<T> Create()
         {
             if (GenericDerivativesDatabase.TryGetValue(typeof(T), out Type concreteType))
@@ -16,6 +13,11 @@
             Debug.LogWarning($"There is no {nameof(Generic<T>)} derivative of type {typeof(T)}. Please add " +
                              "it to GenericDerivatives Database.");
             return null;
+        }
+
+        protected virtual void CreateAsset()
+        {
+            // GenericScriptableObjectCreator.CreateAsset();
         }
     }
 
