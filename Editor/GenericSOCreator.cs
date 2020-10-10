@@ -6,6 +6,7 @@
     using GenericScriptableObjects;
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Extensions;
     using TypeReferences;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -16,6 +17,7 @@
     [TypeDescriptionProvider(typeof(GenericSODescriptionProvider))]
     public class GenericSOCreator : SingletonScriptableObject<GenericSOCreator>
     {
+        protected const string AssetCreatePath = "Assets/Create/";
         private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
         private const string NamespaceName = "GenericScriptableObjectsTypes";
 
@@ -43,10 +45,13 @@
 
         protected static void CreateAsset(Type genericSOType)
         {
+            genericSOType = genericSOType.MakeSureIsGenericTypeDefinition();
+            int typeParamCount = genericSOType.GetGenericArguments().Length;
+            string classSafeGenericTypeName = GetClassSafeTypeName(genericSOType.Name);
+            string genericTypeNameWithoutParam = genericSOType.Name.Split('`')[0];
+
             TypeSelectionWindow.Create(selectedParamType =>
             {
-                string classSafeGenericTypeName = GetClassSafeTypeName(genericSOType.Name);
-                string genericTypeNameWithoutParam = genericSOType.Name.Split('`')[0];
                 string fullParamTypeName = GetTypeNameWithoutAssembly(selectedParamType.FullName);
                 string classSafeParamTypeName = GetClassSafeTypeName(fullParamTypeName);
 
@@ -56,7 +61,7 @@
                     return;
                 }
 
-                string fullAssetPath = $"{Application.dataPath}/{GenericSOTypesPath}/Generic_{classSafeParamTypeName}.cs";
+                string fullAssetPath = $"{Application.dataPath}/{GenericSOTypesPath}/{classSafeGenericTypeName}_{classSafeParamTypeName}.cs";
 
                 string scriptContent = GetScriptContent(NamespaceName, classSafeGenericTypeName, classSafeParamTypeName,
                     genericSOType.Namespace, genericTypeNameWithoutParam, fullParamTypeName);
@@ -103,7 +108,7 @@
         private static void CreateAssetFromExistingType(Type genericSOType, Type selectedType, string classSafeGenericTypeName, string classSafeTypeName)
         {
             var csharpAssembly = Assembly.Load("Assembly-CSharp");
-            Type assetType = csharpAssembly.GetType($"GenericScriptableObjectsTypes.Generic_{classSafeTypeName}");
+            Type assetType = csharpAssembly.GetType($"{NamespaceName}.{classSafeGenericTypeName}_{classSafeTypeName}");
             Assert.IsNotNull(assetType);
             GenericSODatabase.Add(genericSOType, selectedType, assetType);
             CreateAssetInteractively(genericSOType, selectedType, classSafeGenericTypeName, classSafeTypeName);
@@ -111,7 +116,7 @@
 
         private static void CreateAssetInteractively(Type genericSOType, Type selectedType, string classSafeGenericTypeName, string classSafeTypeName)
         {
-            var asset = GenericScriptableObject.Create(genericSOType, selectedType);
+            var asset = GenericScriptableObject.CreateInstance(genericSOType, selectedType);
             Assert.IsNotNull(asset);
             AssetCreator.Create(asset, $"New {classSafeGenericTypeName}_{classSafeTypeName}.asset");
         }
@@ -126,15 +131,6 @@
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
         {
             return fullTypeName.Split('[')[0];
-        }
-    }
-
-    public class CustomSOCreator : GenericSOCreator
-    {
-        [CreateCustomAssetMenu("Custom Generic SO")]
-        private static void CreateAsset()
-        {
-            CreateAsset(typeof(CustomGeneric<>));
         }
     }
 }

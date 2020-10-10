@@ -1,32 +1,33 @@
 ﻿namespace GenericScriptableObjects
 {
     using System;
-    using System.CodeDom;
-    using System.ComponentModel;
+    using System.Linq;
     using UnityEngine;
-
-    public abstract class ScriptableObject<T> : GenericScriptableObject
-    {
-        public static ScriptableObject<T> Create(Type genericSOType)
-        {
-            if (GenericSODatabase.TryGetValue(genericSOType, typeof(T), out Type concreteType))
-                return (ScriptableObject<T>) CreateInstance(concreteType);
-
-            Debug.LogWarning($"There is no {nameof(ScriptableObject<T>)} derivative of type {typeof(T)}. Please add " +
-                             "it to GenericDerivatives Database."); // TODO: change the message.
-            return null;
-        }
-    }
 
     public class GenericScriptableObject : ScriptableObject
     {
-        public static ScriptableObject Create(Type genericSOType, Type type)
+        public static new GenericScriptableObject CreateInstance(Type genericSOType)
         {
-            if (GenericSODatabase.TryGetValue(genericSOType, type, out Type concreteType)) // TODO: Replace with a dedicated database
-                return CreateInstance(concreteType);
+            if (GenericSODatabase.TryGetValue(genericSOType, out Type concreteType))
+                return (GenericScriptableObject) ScriptableObject.CreateInstance(concreteType);
 
-            throw new ArgumentOutOfRangeException($"There is no {nameof(GenericScriptableObject)} derivative of type " +
-                                                  $"{type}. Please add it to GenericDerivatives Database.");
+            Debug.LogWarning($"There is no {genericSOType.GetGenericTypeDefinition()} derivative with type parameters " +
+                             $"{string.Join(", ", genericSOType.GetGenericParameterConstraints().Select(type => type.Name))}. " +
+                             $"Please create an asset with such type parameters once to be able to create it from code.");
+
+            return null;
+        }
+
+        public static new TGenericSO CreateInstance<TGenericSO>()
+            where TGenericSO : GenericScriptableObject
+        {
+            return (TGenericSO) CreateInstance(typeof(TGenericSO));
+        }
+
+        public static GenericScriptableObject CreateInstance(Type genericSOTypeWithoutTypeParams, params Type[] paramTypes)
+        {
+            Type genericSOType = genericSOTypeWithoutTypeParams.MakeGenericType(paramTypes);
+            return CreateInstance(genericSOType);
         }
     }
 }

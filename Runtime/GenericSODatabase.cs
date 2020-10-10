@@ -2,9 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using SolidUtilities.Extensions;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Assertions;
 
     public class GenericSODatabase :
         SingletonScriptableObject<GenericSODatabase>,
@@ -45,10 +47,13 @@
             return assetDict.ContainsKey(key);
         }
 
-        public static bool TryGetValue(Type genericAssetType, Type key, out Type value)
+        public static bool TryGetValue(Type genericAssetType, out Type value)
         {
-            TypeDictionary assetDict = GetAssetDict(genericAssetType);
-            bool result = assetDict.TryGetValue(key, out TypeReference typeRef);
+            var paramTypes = genericAssetType.GetGenericParameterConstraints();
+            Assert.IsFalse(paramTypes.Length == 0);
+            Type genericSOTypeWithoutTypeParams = genericAssetType.GetGenericTypeDefinition();
+            TypeDictionary assetDict = GetAssetDict(genericSOTypeWithoutTypeParams);
+            bool result = assetDict.TryGetValue(paramTypes[0], out TypeReference typeRef);  // TODO: This will be changed later to array.
             value = typeRef;
             return result;
         }
