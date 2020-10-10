@@ -5,7 +5,7 @@
 #endif
     using SolidUtilities.Editor.Helpers;
     using UnityEngine;
-
+    using UnityEngine.Assertions;
 
 
     /// <summary>
@@ -39,6 +39,7 @@
 
                 var allInstances = FindObjectsOfType<T>(true);
                 _instance = allInstances.Length == 0 ? CreateInstance<T>() : allInstances[0];
+                Assert.IsNotNull(_instance);
 
 #if UNITY_EDITOR
                 AssetDatabaseHelper.MakeSureFolderExists(resourcesFolder);
