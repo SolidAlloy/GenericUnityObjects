@@ -50,14 +50,14 @@
             string classSafeGenericTypeName = GetClassSafeTypeName(genericSOType.Name);
             string genericTypeNameWithoutParam = genericSOType.Name.Split('`')[0];
 
-            TypeSelectionWindow.Create(selectedParamType =>
+            TypeSelectionWindow.Create(typeParamCount, selectedParamTypes =>
             {
-                string fullParamTypeName = GetTypeNameWithoutAssembly(selectedParamType.FullName);
+                string fullParamTypeName = GetTypeNameWithoutAssembly(selectedParamTypes.FullName);
                 string classSafeParamTypeName = GetClassSafeTypeName(fullParamTypeName);
 
-                if (GenericSODatabase.ContainsKey(genericSOType, selectedParamType))
+                if (GenericSODatabase.ContainsKey(genericSOType, selectedParamTypes))
                 {
-                    CreateAssetInteractively(genericSOType, selectedParamType, classSafeGenericTypeName, classSafeParamTypeName);
+                    CreateAssetInteractively(genericSOType, selectedParamTypes, classSafeGenericTypeName, classSafeParamTypeName);
                     return;
                 }
 
@@ -68,11 +68,11 @@
 
                 if (FileContentMatches(fullAssetPath, scriptContent))
                 {
-                    CreateAssetFromExistingType(genericSOType, selectedParamType, classSafeGenericTypeName, classSafeParamTypeName);
+                    CreateAssetFromExistingType(genericSOType, selectedParamTypes, classSafeGenericTypeName, classSafeParamTypeName);
                     return;
                 }
 
-                Instance._pendingCreationType = selectedParamType;
+                Instance._pendingCreationType = selectedParamTypes;
                 Instance._genericSOType = genericSOType;
                 AssetDatabaseHelper.MakeSureFolderExists(GenericSOTypesPath);
                 File.WriteAllText(fullAssetPath, scriptContent);

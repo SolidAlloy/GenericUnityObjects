@@ -9,19 +9,23 @@
 
     public abstract class TypeSelectionWindow : EditorWindow
     {
-        public static void Create(Action<Type> onTypeSelected)
+        public static void Create(int typesCount, Action<Type[]> onTypesSelected)
         {
-            var window = CreateInstance<OneTypeSelectionWindow>();
-            window.OnCreate(onTypeSelected);
+            TypeSelectionWindow window;
+            if (typesCount == 1)
+            {
+                window = CreateInstance<OneTypeSelectionWindow>();
+            }
+            else
+            {
+                window = CreateInstance<MultipleTypeSelectionWindow>();
+            }
+
+            window.OnCreate(onTypesSelected);
             SetupAndShow(window);
         }
 
-        public static void Create(Action<Type, Type> onTwoTypesSelected)
-        {
-            var window = CreateInstance<TwoTypeSelectionWindow>();
-            window.OnCreate(onTwoTypesSelected);
-            SetupAndShow(window);
-        }
+        protected abstract void OnCreate(Action<Type[]> onTypesSelected);
 
         protected abstract void OnGUI();
 
@@ -41,10 +45,10 @@
 
     public class OneTypeSelectionWindow : TypeSelectionWindow
     {
-        private Action<Type> _onTypeSelected;
+        private Action<Type[]> _onTypeSelected;
         private bool _guiWasSetUp;
 
-        public void OnCreate(Action<Type> onTypeSelected)
+        protected override void OnCreate(Action<Type[]> onTypeSelected)
         {
             _onTypeSelected = onTypeSelected;
             this.Resize(1f, 1f);
@@ -59,17 +63,17 @@
             position = new Rect(windowPos, position.size);
 
             var dropdownDrawer = new TypeDropdownDrawer(null, new TypeOptionsAttribute { ExcludeNone = true }, null);
-            dropdownDrawer.Draw(type => _onTypeSelected(type));
+            dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
 
             _guiWasSetUp = true;
         }
     }
 
-    public class TwoTypeSelectionWindow : TypeSelectionWindow
+    public class MultipleTypeSelectionWindow : TypeSelectionWindow
     {
-        private Action<Type, Type> _onTypesSelected;
+        private Action<Type[]> _onTypesSelected;
 
-        public void OnCreate(Action<Type, Type> onTypesSelected)
+        protected override void OnCreate(Action<Type[]> onTypesSelected)
         {
             _onTypesSelected = onTypesSelected;
             this.Resize(300f, 300f);
