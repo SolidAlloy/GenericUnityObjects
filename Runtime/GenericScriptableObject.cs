@@ -12,8 +12,8 @@
                 return (GenericScriptableObject) ScriptableObject.CreateInstance(concreteType);
 
             Debug.LogWarning($"There is no {genericSOType.GetGenericTypeDefinition()} derivative with type parameters " +
-                             $"{string.Join(", ", genericSOType.GetGenericParameterConstraints().Select(type => type.Name))}. " +
-                             $"Please create an asset with such type parameters once to be able to create it from code.");
+                             $"{string.Join(", ", genericSOType.GetGenericArguments().Select(type => type.Name))}. " +
+                             "Please create an asset with such type parameters once to be able to create it from code.");
 
             return null;
         }

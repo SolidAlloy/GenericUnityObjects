@@ -22,36 +22,25 @@
         // [HideInInspector]
         private TypeDictionary[] _values;
 
-        private static TypeDictionary GetAssetDict(Type genericAssetType)
+        public static void Add(Type genericType, Type[] key, Type value)
         {
-            if (Instance._dict.TryGetValue(genericAssetType, out TypeDictionary assetDict))
-                return assetDict;
-
-            assetDict = new TypeDictionary();
-            Instance._dict.Add(genericAssetType, assetDict);
-            EditorUtility.SetDirty(Instance);
-            return assetDict;
-        }
-
-        public static void Add(Type genericAssetType, Type[] key, Type value)
-        {
-            TypeDictionary assetDict = GetAssetDict(genericAssetType);
-            assetDict.Add(key, new TypeReference(value));
+            TypeDictionary assetDict = GetAssetDict(genericType);
+            assetDict.Add(key, value);
             EditorUtility.SetDirty(Instance);
         }
 
-        public static bool ContainsKey(Type genericAssetType, Type[] key)
+        public static bool ContainsKey(Type genericType, Type[] key)
         {
-            TypeDictionary assetDict = GetAssetDict(genericAssetType);
+            TypeDictionary assetDict = GetAssetDict(genericType);
             return assetDict.ContainsKey(key);
         }
 
-        public static bool TryGetValue(Type genericAssetType, out Type value)
+        public static bool TryGetValue(Type genericType, out Type value)
         {
-            var paramTypes = genericAssetType.GetGenericParameterConstraints();
+            var paramTypes = genericType.GetGenericArguments();
             Assert.IsFalse(paramTypes.Length == 0);
-            Type genericSOTypeWithoutTypeParams = genericAssetType.GetGenericTypeDefinition();
-            TypeDictionary assetDict = GetAssetDict(genericSOTypeWithoutTypeParams);
+            Type genericTypeWithoutParams = genericType.GetGenericTypeDefinition();
+            TypeDictionary assetDict = GetAssetDict(genericTypeWithoutParams);
             bool result = assetDict.TryGetValue(paramTypes, out value);
             return result;
         }
@@ -84,6 +73,17 @@
                 _values[keysIndex] = pair.Value;
                 ++keysIndex;
             }
+        }
+
+        private static TypeDictionary GetAssetDict(Type genericType)
+        {
+            if (Instance._dict.TryGetValue(genericType, out TypeDictionary assetDict))
+                return assetDict;
+
+            assetDict = new TypeDictionary();
+            Instance._dict.Add(genericType, assetDict);
+            EditorUtility.SetDirty(Instance);
+            return assetDict;
         }
     }
 }

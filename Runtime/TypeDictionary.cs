@@ -5,6 +5,7 @@
     using System.Linq;
     using TypeReferences;
     using UnityEngine;
+    using Util;
 
     [Serializable]
     public class TypeDictionary : ISerializationCallbackReceiver
@@ -22,19 +23,19 @@
 
         public void Add(Type[] key, Type value)
         {
-            _dict.Add(key.Cast<TypeReference>().ToArray(), value);
+            _dict.Add(key.CastToTypeReference(), value);
         }
 
         public bool ContainsKey(Type[] key)
         {
-            return _dict.ContainsKey(key.Cast<TypeReference>().ToArray()); // TODO: shorten the cast
+            return _dict.ContainsKey(key.CastToTypeReference()); // TODO: shorten the cast
         }
 
         public bool TryGetValue(TypeReference[] key, out TypeReference value) => _dict.TryGetValue(key, out value);
 
         public bool TryGetValue(Type[] key, out Type value)
         {
-            bool result = TryGetValue(key.Cast<TypeReference>().ToArray(), out TypeReference typeRef);
+            bool result = TryGetValue(key.CastToTypeReference(), out TypeReference typeRef);
             value = typeRef;
             return result;
         }

@@ -2,135 +2,56 @@
 {
     using System;
     using System.ComponentModel;
-    using System.IO;
     using GenericScriptableObjects;
-    using SolidUtilities.Editor.EditorWindows;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
+    using JetBrains.Annotations;
+    using SolidUtilities.Helpers;
     using TypeReferences;
-    using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
-    using UnityEngine.Assertions;
-    using Assembly = System.Reflection.Assembly;
+    using Util;
 
     [TypeDescriptionProvider(typeof(GenericSODescriptionProvider))]
     public class GenericSOCreator : SingletonScriptableObject<GenericSOCreator>
     {
         protected const string AssetCreatePath = "Assets/Create/";
-        private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
-        private const string NamespaceName = "GenericScriptableObjectsTypes";
 
-        [SerializeField] private TypeReference _pendingCreationType; // TODO: hide in inspector
-        [SerializeField] private TypeReference _genericSOType;
+        [SerializeField] private TypeReference _genericType; // TODO: hide in inspector
+        [SerializeField] private TypeReference[] _paramTypes;
 
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if (Instance._pendingCreationType.Type == null)
+            if (Instance._genericType == null || Instance._genericType.Type == null) // TODO: check if TypeReference can be null at all.
                 return;
 
             try
             {
-                string classSafeGenericTypeName = GetClassSafeTypeName(Instance._genericSOType.Type.Name);
-                string typeName = GetClassSafeTypeName(GetTypeNameWithoutAssembly(Instance._pendingCreationType.Type.FullName));
-                CreateAssetFromExistingType(Instance._genericSOType, Instance._pendingCreationType, classSafeGenericTypeName, typeName);
+                var paramTypes = Instance._paramTypes.CastToType();
+                var creator = new Creator(Instance._genericType, paramTypes);
+                creator.CreateAssetFromExistingType();
             }
             finally
             {
-                Instance._pendingCreationType.Type = null;
-                Instance._genericSOType = null;
+                Instance.SetAssetToCreate(null, null);
             }
         }
 
-        protected static void CreateAsset(Type genericSOType)
+        public void SetAssetToCreate([CanBeNull] Type genericType, [CanBeNull] Type[] paramTypes)
         {
-            genericSOType = genericSOType.MakeSureIsGenericTypeDefinition();
-            int typeParamCount = genericSOType.GetGenericArguments().Length;
-            string classSafeGenericTypeName = GetClassSafeTypeName(genericSOType.Name);
-            string genericTypeNameWithoutParam = genericSOType.Name.Split('`')[0];
+            _genericType = genericType;
+            _paramTypes = paramTypes?.CastToTypeReference();
+        }
 
-            TypeSelectionWindow.Create(typeParamCount, selectedParamTypes =>
+        protected static void CreateAsset(Type genericType)
+        {
+            genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
+            int typeParamCount = genericType.GetGenericArguments().Length;
+
+            TypeSelectionWindow.Create(typeParamCount, paramTypes =>
             {
-                string fullParamTypeName = GetTypeNameWithoutAssembly(selectedParamTypes.FullName);
-                string classSafeParamTypeName = GetClassSafeTypeName(fullParamTypeName);
-
-                if (GenericSODatabase.ContainsKey(genericSOType, selectedParamTypes))
-                {
-                    CreateAssetInteractively(genericSOType, selectedParamTypes, classSafeGenericTypeName, classSafeParamTypeName);
-                    return;
-                }
-
-                string fullAssetPath = $"{Application.dataPath}/{GenericSOTypesPath}/{classSafeGenericTypeName}_{classSafeParamTypeName}.cs";
-
-                string scriptContent = GetScriptContent(NamespaceName, classSafeGenericTypeName, classSafeParamTypeName,
-                    genericSOType.Namespace, genericTypeNameWithoutParam, fullParamTypeName);
-
-                if (FileContentMatches(fullAssetPath, scriptContent))
-                {
-                    CreateAssetFromExistingType(genericSOType, selectedParamTypes, classSafeGenericTypeName, classSafeParamTypeName);
-                    return;
-                }
-
-                Instance._pendingCreationType = selectedParamTypes;
-                Instance._genericSOType = genericSOType;
-                AssetDatabaseHelper.MakeSureFolderExists(GenericSOTypesPath);
-                File.WriteAllText(fullAssetPath, scriptContent);
-                AssetDatabase.Refresh();
+                var creator = new Creator(genericType, paramTypes);
+                creator.CreateAsset();
             });
-        }
-
-        private static bool FileContentMatches(string filePath, string contentToCompareTo)
-        {
-            if (File.Exists(filePath))
-            {
-                string oldFileContent = File.ReadAllText(filePath);
-                if (oldFileContent == contentToCompareTo)
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static string GetScriptContent(
-            string namespaceName,
-            string classSafeGenericTypeName,
-            string classSafeTypeName,
-            string genericNamespace,
-            string genericTypeNameWithoutParam,
-            string type)
-        {
-            return $"namespace {namespaceName} {{ " +
-                   $"public class {classSafeGenericTypeName}_{classSafeTypeName} : " +
-                   $"{genericNamespace}.{genericTypeNameWithoutParam}<{type}> {{ }} }}";
-        }
-
-        private static void CreateAssetFromExistingType(Type genericSOType, Type selectedType, string classSafeGenericTypeName, string classSafeTypeName)
-        {
-            var csharpAssembly = Assembly.Load("Assembly-CSharp");
-            Type assetType = csharpAssembly.GetType($"{NamespaceName}.{classSafeGenericTypeName}_{classSafeTypeName}");
-            Assert.IsNotNull(assetType);
-            GenericSODatabase.Add(genericSOType, selectedType, assetType);
-            CreateAssetInteractively(genericSOType, selectedType, classSafeGenericTypeName, classSafeTypeName);
-        }
-
-        private static void CreateAssetInteractively(Type genericSOType, Type selectedType, string classSafeGenericTypeName, string classSafeTypeName)
-        {
-            var asset = GenericScriptableObject.CreateInstance(genericSOType, selectedType);
-            Assert.IsNotNull(asset);
-            AssetCreator.Create(asset, $"New {classSafeGenericTypeName}_{classSafeTypeName}.asset");
-        }
-
-        private static string GetClassSafeTypeName(string rawTypeName)
-        {
-            return rawTypeName
-                .Replace('.', '_')
-                .Replace('`', '_');
-        }
-
-        private static string GetTypeNameWithoutAssembly(string fullTypeName)
-        {
-            return fullTypeName.Split('[')[0];
         }
     }
 }
