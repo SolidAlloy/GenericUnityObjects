@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using TypeReferences;
     using UnityEngine;
     using Util;
@@ -15,7 +14,7 @@
 
         [SerializeField]
         // [HideInInspector] // TODO: hide fields
-        private TypeReference[][] _keys;
+        private TypeReferenceCollection[] _keys;
 
         [SerializeField]
         // [HideInInspector]
@@ -28,7 +27,7 @@
 
         public bool ContainsKey(Type[] key)
         {
-            return _dict.ContainsKey(key.CastToTypeReference()); // TODO: shorten the cast
+            return _dict.ContainsKey(key.CastToTypeReference());
         }
 
         public bool TryGetValue(TypeReference[] key, out TypeReference value) => _dict.TryGetValue(key, out value);
@@ -61,7 +60,7 @@
         public void OnBeforeSerialize()
         {
             int dictLength = _dict.Count;
-            _keys = new TypeReference[dictLength][];
+            _keys = new TypeReferenceCollection[dictLength];
             _values = new TypeReference[dictLength];
 
             int keysIndex = 0;
@@ -71,6 +70,26 @@
                 _values[keysIndex] = pair.Value;
                 ++keysIndex;
             }
+        }
+
+        [Serializable]
+        private class TypeReferenceCollection // TODO: check if struct will give more performance
+        {
+            [SerializeField] private TypeReference[] _array;
+
+            public TypeReferenceCollection(TypeReference[] collection) => _array = collection;
+
+            public TypeReferenceCollection() : this((TypeReference[]) null) { }
+
+            public TypeReferenceCollection(Type[] collection) : this(collection.CastToTypeReference()) { }
+
+            public static implicit operator TypeReferenceCollection(Type[] typeCollection) =>
+                new TypeReferenceCollection(typeCollection);
+
+            public static implicit operator TypeReferenceCollection(TypeReference[] typeRefCollection) => new TypeReferenceCollection(typeRefCollection);
+
+            public static implicit operator TypeReference[](TypeReferenceCollection typeRefCollection) =>
+                typeRefCollection._array;
         }
     }
 }

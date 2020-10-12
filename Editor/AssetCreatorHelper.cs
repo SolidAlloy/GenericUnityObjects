@@ -10,7 +10,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 
-    internal class Creator // TODO: rename to a more meaningful name
+    internal class AssetCreatorHelper // TODO: rename to a more meaningful name
     {
         private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
         private const string NamespaceName = "GenericScriptableObjectsTypes";
@@ -20,7 +20,7 @@
         private readonly string[] _paramTypeNamesWithoutAssembly;
         private readonly string _className;
 
-        public Creator(Type genericType, Type[] paramTypes)
+        public AssetCreatorHelper(Type genericType, Type[] paramTypes)
         {
             _genericType = genericType;
             _paramTypes = paramTypes;

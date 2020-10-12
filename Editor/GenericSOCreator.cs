@@ -21,13 +21,13 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if (Instance._genericType == null || Instance._genericType.Type == null) // TODO: check if TypeReference can be null at all.
+            if (Instance._genericType.Type == null)
                 return;
 
             try
             {
                 var paramTypes = Instance._paramTypes.CastToType();
-                var creator = new Creator(Instance._genericType, paramTypes);
+                var creator = new AssetCreatorHelper(Instance._genericType, paramTypes);
                 creator.CreateAssetFromExistingType();
             }
             finally
@@ -49,7 +49,7 @@
 
             TypeSelectionWindow.Create(typeParamCount, paramTypes =>
             {
-                var creator = new Creator(genericType, paramTypes);
+                var creator = new AssetCreatorHelper(genericType, paramTypes);
                 creator.CreateAsset();
             });
         }
