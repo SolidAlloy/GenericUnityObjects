@@ -1,7 +1,6 @@
 ﻿namespace GenericScriptableObjects.Editor
 {
     using System;
-    using System.ComponentModel;
     using GenericScriptableObjects;
     using JetBrains.Annotations;
     using SolidUtilities.Helpers;
@@ -10,31 +9,12 @@
     using UnityEngine;
     using Util;
 
-    [TypeDescriptionProvider(typeof(GenericSODescriptionProvider))]
     public class GenericSOCreator : SingletonScriptableObject<GenericSOCreator>
     {
         protected const string AssetCreatePath = "Assets/Create/";
 
         [SerializeField] [HideInInspector] private TypeReference _genericType;
         [SerializeField] [HideInInspector] private TypeReference[] _paramTypes;
-
-        [DidReloadScripts]
-        private static void OnScriptsReload()
-        {
-            if (Instance._genericType.Type == null)
-                return;
-
-            try
-            {
-                var paramTypes = Instance._paramTypes.CastToType();
-                var creator = new AssetCreatorHelper(Instance._genericType, paramTypes);
-                creator.CreateAssetFromExistingType();
-            }
-            finally
-            {
-                Instance.SetAssetToCreate(null, null);
-            }
-        }
 
         public void SetAssetToCreate([CanBeNull] Type genericType, [CanBeNull] Type[] paramTypes)
         {
@@ -52,6 +32,24 @@
                 var creator = new AssetCreatorHelper(genericType, paramTypes);
                 creator.CreateAsset();
             });
+        }
+
+        [DidReloadScripts]
+        private static void OnScriptsReload()
+        {
+            if (Instance._genericType.Type == null)
+                return;
+
+            try
+            {
+                var paramTypes = Instance._paramTypes.CastToType();
+                var creator = new AssetCreatorHelper(Instance._genericType, paramTypes);
+                creator.CreateAssetFromExistingType();
+            }
+            finally
+            {
+                Instance.SetAssetToCreate(null, null);
+            }
         }
     }
 }

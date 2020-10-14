@@ -3,7 +3,7 @@
     using System;
     using UnityEditor;
 
-    public abstract class TypeSelectionWindow : EditorWindow
+    internal abstract class TypeSelectionWindow : EditorWindow
     {
         public static void Create(int typesCount, Action<Type[]> onTypesSelected)
         {

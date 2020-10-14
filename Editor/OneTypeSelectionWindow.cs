@@ -6,7 +6,7 @@
     using TypeReferences.Editor.Drawers;
     using UnityEngine;
 
-    public class OneTypeSelectionWindow : TypeSelectionWindow
+    internal class OneTypeSelectionWindow : TypeSelectionWindow
     {
         private Action<Type[]> _onTypeSelected;
         private bool _guiWasSetUp;

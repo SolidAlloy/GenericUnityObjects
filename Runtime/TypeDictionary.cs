@@ -7,28 +7,18 @@
     using Util;
 
     [Serializable]
-    public class TypeDictionary : ISerializationCallbackReceiver
+    internal class TypeDictionary : ISerializationCallbackReceiver
     {
         private readonly Dictionary<TypeReference[], TypeReference> _dict =
             new Dictionary<TypeReference[], TypeReference>(new TypeReferenceArrayComparer());
 
-        [SerializeField]
-        // [HideInInspector] // TODO: hide fields
-        private TypeReferenceCollection[] _keys;
+        [SerializeField] private TypeReferenceCollection[] _keys;
 
-        [SerializeField]
-        // [HideInInspector]
-        private TypeReference[] _values;
+        [SerializeField] private TypeReference[] _values;
 
-        public void Add(Type[] key, Type value)
-        {
-            _dict.Add(key.CastToTypeReference(), value);
-        }
+        public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), value);
 
-        public bool ContainsKey(Type[] key)
-        {
-            return _dict.ContainsKey(key.CastToTypeReference());
-        }
+        public bool ContainsKey(Type[] key) => _dict.ContainsKey(key.CastToTypeReference());
 
         public bool TryGetValue(TypeReference[] key, out TypeReference value) => _dict.TryGetValue(key, out value);
 

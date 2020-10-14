@@ -2,10 +2,12 @@
 {
     using System;
     using System.Linq;
+    using JetBrains.Annotations;
     using UnityEngine;
 
     public class GenericScriptableObject : ScriptableObject
     {
+        [PublicAPI, CanBeNull]
         public static new GenericScriptableObject CreateInstance(Type genericSOType)
         {
             if (GenericSODatabase.TryGetValue(genericSOType, out Type concreteType))
@@ -18,12 +20,14 @@
             return null;
         }
 
+        [PublicAPI, CanBeNull]
         public static new TGenericSO CreateInstance<TGenericSO>()
             where TGenericSO : GenericScriptableObject
         {
             return (TGenericSO) CreateInstance(typeof(TGenericSO));
         }
 
+        [PublicAPI, CanBeNull]
         public static GenericScriptableObject CreateInstance(Type genericSOTypeWithoutTypeParams, params Type[] paramTypes)
         {
             Type genericSOType = genericSOTypeWithoutTypeParams.MakeGenericType(paramTypes);

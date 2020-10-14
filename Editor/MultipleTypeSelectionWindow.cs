@@ -2,17 +2,14 @@
 {
     using System;
     using System.Linq;
-    using SolidUtilities.Editor.EditorIconsRelated;
     using SolidUtilities.Editor.Extensions;
     using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
     using TypeReferences;
-    using TypeReferences.Editor.TypeDropdown;
     using UnityEditor;
     using UnityEngine;
     using Util;
 
-    public class MultipleTypeSelectionWindow : TypeSelectionWindow
+    internal class MultipleTypeSelectionWindow : TypeSelectionWindow
     {
         [SerializeField, UseDefaultAssembly(ExcludeNone = true, SerializableOnly = true)]
         private TypeReference[] _typeRefs;
