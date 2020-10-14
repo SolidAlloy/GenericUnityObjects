@@ -35,7 +35,7 @@
         {
             EditorApplication.projectChanged += window.Close;
             AssemblyReloadEvents.beforeAssemblyReload += window.Close;
-            window.ShowPopup();
+            window.Show();
         }
     }
 }
