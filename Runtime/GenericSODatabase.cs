@@ -14,13 +14,8 @@
         private readonly Dictionary<TypeReference, TypeDictionary> _dict =
             new Dictionary<TypeReference, TypeDictionary>(new TypeReferenceComparer());
 
-        [SerializeField]
-        // [HideInInspector] // TODO: hide fields
-        private TypeReference[] _keys;
-
-        [SerializeField]
-        // [HideInInspector]
-        private TypeDictionary[] _values;
+        [SerializeField] [HideInInspector] private TypeReference[] _keys;
+        [SerializeField] [HideInInspector] private TypeDictionary[] _values;
 
         public static void Add(Type genericType, Type[] key, Type value)
         {

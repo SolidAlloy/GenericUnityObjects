@@ -15,8 +15,8 @@
     {
         protected const string AssetCreatePath = "Assets/Create/";
 
-        [SerializeField] private TypeReference _genericType; // TODO: hide in inspector
-        [SerializeField] private TypeReference[] _paramTypes;
+        [SerializeField] [HideInInspector] private TypeReference _genericType;
+        [SerializeField] [HideInInspector] private TypeReference[] _paramTypes;
 
         [DidReloadScripts]
         private static void OnScriptsReload()

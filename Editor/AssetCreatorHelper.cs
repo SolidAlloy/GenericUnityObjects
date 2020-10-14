@@ -19,6 +19,7 @@
         private readonly Type[] _paramTypes;
         private readonly string[] _paramTypeNamesWithoutAssembly;
         private readonly string _className;
+        private readonly string _defaultAssetName;
 
         public AssetCreatorHelper(Type genericType, Type[] paramTypes)
         {
@@ -28,11 +29,12 @@
             _paramTypeNamesWithoutAssembly = _paramTypes
                 .Select(type => GetTypeNameWithoutAssembly(type.FullName)).ToArray();
 
-            string genericTypeClassSafeName = GetClassSafeTypeName(_genericType.Name);
+            var genericTypeClassSafeName = GetClassSafeTypeName(_genericType.Name);
             string paramTypesClassSafeNames =
                 string.Join("_", _paramTypeNamesWithoutAssembly.Select(GetClassSafeTypeName));
 
             _className = $"{genericTypeClassSafeName}_{paramTypesClassSafeNames}";
+            _defaultAssetName = $"New {genericTypeClassSafeName}.asset";
         }
 
         public void CreateAsset()
@@ -73,7 +75,7 @@
         {
             var asset = GenericScriptableObject.CreateInstance(_genericType, _paramTypes);
             Assert.IsNotNull(asset);
-            AssetCreator.Create(asset, $"New {_className}.asset");
+            AssetCreator.Create(asset, _defaultAssetName);
         }
 
         public void CreateAssetFromExistingType()
