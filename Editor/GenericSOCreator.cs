@@ -9,13 +9,16 @@
     using UnityEngine;
     using Util;
 
+    /// <summary>
+    /// Inherit from this class and use the <see cref="CreateAsset"/> method to create an AssetCreate menu.
+    /// </summary>
     public class GenericSOCreator : SingletonScriptableObject<GenericSOCreator>
     {
         protected const string AssetCreatePath = "Assets/Create/";
 
         [SerializeField] [HideInInspector] private TypeReference _genericType;
         [SerializeField] [HideInInspector] private TypeReference[] _paramTypes;
-
+        
         public void SetAssetToCreate([CanBeNull] Type genericType, [CanBeNull] Type[] paramTypes)
         {
             _genericType = genericType;
