@@ -10,7 +10,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 
-    internal class AssetCreatorHelper // TODO: rename to a more meaningful name
+    internal class AssetCreatorHelper
     {
         private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
         private const string NamespaceName = "GenericScriptableObjectsTypes";

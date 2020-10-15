@@ -6,6 +6,9 @@
     using UnityEngine;
     using Util;
 
+    /// <summary>
+    /// A serializable dictionary of type Dictionary&lt;TypeReference[], TypeReference>.
+    /// </summary>
     [Serializable]
     internal class TypeDictionary : ISerializationCallbackReceiver
     {
@@ -62,8 +65,11 @@
             }
         }
 
+        /// <summary>
+        /// A TypeReference[] container that is used because TypeReference[][] cannot be serialized by Unity.
+        /// </summary>
         [Serializable]
-        private class TypeReferenceCollection // TODO: check if struct will give more performance
+        private class TypeReferenceCollection
         {
             [SerializeField] private TypeReference[] _array;
 
@@ -76,7 +82,8 @@
             public static implicit operator TypeReferenceCollection(Type[] typeCollection) =>
                 new TypeReferenceCollection(typeCollection);
 
-            public static implicit operator TypeReferenceCollection(TypeReference[] typeRefCollection) => new TypeReferenceCollection(typeRefCollection);
+            public static implicit operator TypeReferenceCollection(TypeReference[] typeRefCollection) =>
+                new TypeReferenceCollection(typeRefCollection);
 
             public static implicit operator TypeReference[](TypeReferenceCollection typeRefCollection) =>
                 typeRefCollection._array;

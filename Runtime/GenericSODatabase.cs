@@ -6,7 +6,21 @@
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using Util;
 
+    /// <summary>
+    /// A database of all the type parameters of generic scriptable objects and their matching concrete implementations.
+    /// When a new GenericScriptableObject asset is created through Unity context menu, a concrete implementation is
+    /// created and added to this dictionary.
+    ///
+    /// For example:
+    /// CustomGeneric&lt;T>
+    ///     bool --- CustomGeneric_1_System_Boolean
+    ///     int  --- CustomGeneric_1_System_Int32
+    /// CustomGeneric&lt;T1,T2>
+    ///     bool, int --- CustomGeneric_2_System_Boolean_System_Int32
+    ///     bool, float --- CustomGeneric_2_System_Boolean_System_Single
+    /// </summary>
     public class GenericSODatabase :
         SingletonScriptableObject<GenericSODatabase>,
         ISerializationCallbackReceiver

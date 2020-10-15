@@ -1,10 +1,10 @@
 ﻿namespace GenericScriptableObjects.Editor
 {
     using System;
-    using GenericScriptableObjects;
     using JetBrains.Annotations;
     using SolidUtilities.Helpers;
     using TypeReferences;
+    using TypeSelectionWindows;
     using UnityEditor.Callbacks;
     using UnityEngine;
     using Util;

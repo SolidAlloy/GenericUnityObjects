@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows
 {
     using System;
     using UnityEditor;
@@ -8,6 +8,7 @@
         public static void Create(int typesCount, Action<Type[]> onTypesSelected)
         {
             TypeSelectionWindow window;
+
             if (typesCount == 1)
             {
                 window = CreateInstance<OneTypeSelectionWindow>();
@@ -31,7 +32,7 @@
             AssemblyReloadEvents.beforeAssemblyReload -= Close;
         }
 
-        private static void SetupAndShow(TypeSelectionWindow window)
+        private static void SetupAndShow(EditorWindow window)
         {
             EditorApplication.projectChanged += window.Close;
             AssemblyReloadEvents.beforeAssemblyReload += window.Close;

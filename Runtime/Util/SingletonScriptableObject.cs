@@ -1,16 +1,16 @@
-﻿namespace GenericScriptableObjects
+﻿namespace GenericScriptableObjects.Util
 {
-#if UNITY_EDITOR
-    using UnityEditor;
-#endif
-    using SolidUtilities.Editor.Helpers;
     using UnityEngine;
     using UnityEngine.Assertions;
+#if UNITY_EDITOR
+    using SolidUtilities.Editor.Helpers;
+    using UnityEditor;
+#endif
 
 
     /// <summary>
     /// Abstract class for making reload-proof singletons out of ScriptableObjects
-    /// Returns the asset created on the editor, or null if there is none.
+    /// Returns the asset created in the Assets/Resources folder, or null if there is none.
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
     public abstract class SingletonScriptableObject<T> : ScriptableObject
