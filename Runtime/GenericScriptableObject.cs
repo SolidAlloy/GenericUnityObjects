@@ -70,8 +70,8 @@
                     $"generic arguments the type can take ({genericArgCount}).", nameof(genericTypeWithoutTypeParams));
             }
 
-            Type genericSOType = genericTypeWithoutTypeParams.MakeGenericType(paramTypes);
-            return (GenericScriptableObject) CreateInstance(genericSOType);
+            Type genericType = genericTypeWithoutTypeParams.MakeGenericType(paramTypes);
+            return (GenericScriptableObject) CreateInstance(genericType);
         }
     }
 }

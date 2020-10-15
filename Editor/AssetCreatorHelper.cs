@@ -55,7 +55,8 @@
                 return;
             }
 
-            GenericSOCreator.Instance.SetAssetToCreate(_genericType, _paramTypes);
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
+            GenericSOCreator.Instance.GenericTypeToCreate = genericTypeWithArgs;
 
             AssetDatabaseHelper.MakeSureFolderExists(GenericSOTypesPath);
             File.WriteAllText(fullAssetPath, scriptContent);
