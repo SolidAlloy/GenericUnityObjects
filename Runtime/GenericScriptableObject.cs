@@ -8,27 +8,30 @@
     public class GenericScriptableObject : ScriptableObject
     {
         [PublicAPI, CanBeNull]
-        public static new GenericScriptableObject CreateInstance(Type genericSOType)
+        public static new ScriptableObject CreateInstance(Type type)
         {
-            if (GenericSODatabase.TryGetValue(genericSOType, out Type concreteType))
-                return (GenericScriptableObject) ScriptableObject.CreateInstance(concreteType);
+            if ( ! type.IsGenericType)
+                return ScriptableObject.CreateInstance(type);
 
-            Debug.LogWarning($"There is no {genericSOType.GetGenericTypeDefinition()} derivative with type parameters " +
-                             $"{string.Join(", ", genericSOType.GetGenericArguments().Select(type => type.Name))}. " +
+            if (GenericSODatabase.TryGetValue(type, out Type concreteType))
+                return ScriptableObject.CreateInstance(concreteType);
+
+            Debug.LogWarning($"There is no {type.GetGenericTypeDefinition()} derivative with type parameters " +
+                             $"{string.Join(", ", type.GetGenericArguments().Select(typeParam => typeParam.Name))}. " +
                              "Please create an asset with such type parameters once to be able to create it from code.");
 
             return null;
         }
 
         [PublicAPI, CanBeNull]
-        public static new TGenericSO CreateInstance<TGenericSO>()
-            where TGenericSO : GenericScriptableObject
+        public static new T CreateInstance<T>()
+            where T : GenericScriptableObject
         {
-            return (TGenericSO) CreateInstance(typeof(TGenericSO));
+            return (T) CreateInstance(typeof(T));
         }
 
         [PublicAPI, CanBeNull]
-        public static GenericScriptableObject CreateInstance(Type genericSOTypeWithoutTypeParams, params Type[] paramTypes)
+        public static ScriptableObject CreateInstance(Type genericSOTypeWithoutTypeParams, params Type[] paramTypes)
         {
             Type genericSOType = genericSOTypeWithoutTypeParams.MakeGenericType(paramTypes);
             return CreateInstance(genericSOType);
