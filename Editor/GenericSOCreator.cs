@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableObjects.Editor
 {
     using System;
+    using System.Linq;
     using SolidUtilities.Helpers;
     using TypeReferences;
     using TypeSelectionWindows;
@@ -30,9 +31,11 @@
         protected static void CreateAsset(Type genericType)
         {
             genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
-            int typeParamCount = genericType.GetGenericArguments().Length;
+            var constraints = genericType.GetGenericArguments()
+                .Select(type => type.GetGenericParameterConstraints())
+                .ToArray();
 
-            TypeSelectionWindow.Create(typeParamCount, paramTypes =>
+            TypeSelectionWindow.Create(constraints, paramTypes =>
             {
                 var creator = new AssetCreatorHelper(genericType, paramTypes);
                 creator.CreateAsset();

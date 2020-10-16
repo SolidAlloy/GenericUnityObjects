@@ -10,6 +10,10 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 
+    /// <summary>
+    /// The class, responsible for creating a <see cref="GenericScriptableObject"/> asset when the context menu
+    /// button is pressed.
+    /// </summary>
     internal class AssetCreatorHelper
     {
         private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
@@ -37,6 +41,10 @@
             _defaultAssetName = $"New {genericTypeClassSafeName}.asset";
         }
 
+        /// <summary>
+        /// Starts the process of creating an asset. The assembly reload may be needed to finish the process if a
+        /// concrete class implementation is not created yet.
+        /// </summary>
         public void CreateAsset()
         {
             if (GenericSODatabase.ContainsKey(_genericType, _paramTypes))
@@ -63,6 +71,19 @@
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Creates a <see cref="GenericScriptableObject"/> asset, but only if its concrete class implementation
+        /// already exists.
+        /// </summary>
+        public void CreateAssetFromExistingType()
+        {
+            Assembly csharpAssembly = Assembly.Load("Assembly-CSharp");
+            Type assetType = csharpAssembly.GetType($"{NamespaceName}.{_className}");
+            Assert.IsNotNull(assetType);
+            GenericSODatabase.Add(_genericType, _paramTypes, assetType);
+            CreateAssetInteractively();
+        }
+
         private string GetScriptContent()
         {
             string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
@@ -77,15 +98,6 @@
             var asset = GenericScriptableObject.CreateInstance(_genericType, _paramTypes);
             Assert.IsNotNull(asset);
             AssetCreator.Create(asset, _defaultAssetName);
-        }
-
-        public void CreateAssetFromExistingType()
-        {
-            var csharpAssembly = Assembly.Load("Assembly-CSharp");
-            Type assetType = csharpAssembly.GetType($"{NamespaceName}.{_className}");
-            Assert.IsNotNull(assetType);
-            GenericSODatabase.Add(_genericType, _paramTypes, assetType);
-            CreateAssetInteractively();
         }
 
         private static bool FileContentMatches(string filePath, string contentToCompareTo)

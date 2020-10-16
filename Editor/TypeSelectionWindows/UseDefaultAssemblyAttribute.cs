@@ -5,6 +5,10 @@
     using System.Reflection;
     using TypeReferences;
 
+    /// <summary>
+    /// Copy of <see cref="TypeOptionsAttribute"/> that shows all the classes Assembly-CSharp has access to, even if
+    /// the declaring class is located in a separate package.
+    /// </summary>
     internal class UseDefaultAssemblyAttribute : TypeOptionsAttribute
     {
         private const string DefaultAssemblyName = "Assembly-CSharp";

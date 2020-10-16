@@ -9,6 +9,10 @@
     using UnityEngine;
     using Util;
 
+    /// <summary>
+    /// A window that has as many TypeReference fields as needed for the asset creation. The user has to choose all
+    /// the generic argument types for the asset to be created.
+    /// </summary>
     internal class MultipleTypeSelectionWindow : TypeSelectionWindow
     {
         [SerializeField, UseDefaultAssembly(ExcludeNone = true, SerializableOnly = true)]
@@ -18,8 +22,9 @@
         private SerializedObject _serializedObject;
         private ContentCache _contentCache;
 
-        protected override void OnCreate(Action<Type[]> onTypesSelected, int typesCount)
+        protected override void OnCreate(Action<Type[]> onTypesSelected, Type[][] genericParamConstraints)
         {
+            int typesCount = genericParamConstraints.Length;
             _onTypesSelected = onTypesSelected;
             _typeRefs = new TypeReference[typesCount];
             _serializedObject = new SerializedObject(this);

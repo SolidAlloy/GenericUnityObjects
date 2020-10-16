@@ -1,15 +1,23 @@
 ﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using UnityEditor;
 
+    /// <summary>
+    /// A window where you can choose the generic argument types for a <see cref="GenericScriptableObject"/> asset.
+    /// </summary>
     internal abstract class TypeSelectionWindow : EditorWindow
     {
-        public static void Create(int typesCount, Action<Type[]> onTypesSelected)
+        /// <summary>Creates and shows the <see cref="TypeSelectionWindow"/>.</summary>
+        /// <param name="typesCount">The number of types that need to be chosen.</param>
+        /// <param name="onTypesSelected">The action to do when all the types are chosen.</param>
+        public static void Create(Type[][] genericParamConstraints, Action<Type[]> onTypesSelected)
         {
             TypeSelectionWindow window;
 
-            if (typesCount == 1)
+            if (genericParamConstraints.Length == 1)
             {
                 window = CreateInstance<OneTypeSelectionWindow>();
             }
@@ -18,11 +26,11 @@
                 window = CreateInstance<MultipleTypeSelectionWindow>();
             }
 
-            window.OnCreate(onTypesSelected, typesCount);
+            window.OnCreate(onTypesSelected, genericParamConstraints);
             SetupAndShow(window);
         }
 
-        protected abstract void OnCreate(Action<Type[]> onTypesSelected, int typesCount);
+        protected abstract void OnCreate(Action<Type[]> onTypesSelected, Type[][] genericParamConstraints);
 
         protected abstract void OnGUI();
 
