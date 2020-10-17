@@ -32,7 +32,7 @@
 
         protected abstract void OnGUI();
 
-        protected void OnDestroy()
+        protected virtual void OnDestroy()
         {
             EditorApplication.projectChanged -= Close;
             EditorApplication.quitting -= Close;

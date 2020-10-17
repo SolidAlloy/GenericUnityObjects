@@ -15,6 +15,7 @@
         private Action<Type[]> _onTypeSelected;
         private bool _guiWasSetUp;
         private Type[] _genericParamConstraints;
+        private DropdownWindow _dropdownWindow;
 
         protected override void OnCreate(Action<Type[]> onTypeSelected, Type[][] genericParamConstraints)
         {
@@ -39,8 +40,20 @@
             typeOptionsAttribute.SerializableOnly = true;
 
             var dropdownDrawer = new CenteredTypeDropdownDrawer(null, typeOptionsAttribute, null);
-            DropdownWindow dropdownWindow = dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
-            dropdownWindow.OnClose += Close;
+            _dropdownWindow = dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
+
+            _dropdownWindow.OnClose += () =>
+            {
+                try { Close(); }
+                catch (NullReferenceException) { }
+            };
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _dropdownWindow.OnClose -= Close;
+
         }
     }
 }
