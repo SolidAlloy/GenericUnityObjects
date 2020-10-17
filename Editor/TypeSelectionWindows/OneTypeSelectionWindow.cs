@@ -4,7 +4,6 @@
     using SolidUtilities.Editor.Extensions;
     using TypeReferences;
     using TypeReferences.Editor.Drawers;
-    using UnityEngine;
 
     /// <summary>
     /// A window that shows the type selection dropdown immediately after the creation,
@@ -32,10 +31,14 @@
             // Vector2 windowPos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             // position = new Rect(windowPos, position.size);
 
-            var inheritsAttribute = new InheritsAttribute(_genericParamConstraints)
-                { ExcludeNone = true, SerializableOnly = true };
+            TypeOptionsAttribute typeOptionsAttribute = _genericParamConstraints.Length == 0
+                ? new TypeOptionsAttribute()
+                : new InheritsAttribute(_genericParamConstraints) { ExpandAllFolders = true };
 
-            var dropdownDrawer = new TypeDropdownDrawer(null, inheritsAttribute, null);
+            typeOptionsAttribute.ExcludeNone = true;
+            typeOptionsAttribute.SerializableOnly = true;
+
+            var dropdownDrawer = new TypeDropdownDrawer(null, typeOptionsAttribute, null);
             dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
 
             _guiWasSetUp = true;
