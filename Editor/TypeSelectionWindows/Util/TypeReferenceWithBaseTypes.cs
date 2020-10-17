@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows
+﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows.Util
 {
     using System;
     using System.Collections.Generic;

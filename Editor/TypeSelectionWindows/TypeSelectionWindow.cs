@@ -1,8 +1,6 @@
 ﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using UnityEditor;
 
     /// <summary>
@@ -11,7 +9,7 @@
     internal abstract class TypeSelectionWindow : EditorWindow
     {
         /// <summary>Creates and shows the <see cref="TypeSelectionWindow"/>.</summary>
-        /// <param name="typesCount">The number of types that need to be chosen.</param>
+        /// <param name="genericParamConstraints">Array of constraints for each generic argument.</param>
         /// <param name="onTypesSelected">The action to do when all the types are chosen.</param>
         public static void Create(Type[][] genericParamConstraints, Action<Type[]> onTypesSelected)
         {
@@ -37,12 +35,14 @@
         protected void OnDestroy()
         {
             EditorApplication.projectChanged -= Close;
+            EditorApplication.quitting -= Close;
             AssemblyReloadEvents.beforeAssemblyReload -= Close;
         }
 
         private static void SetupAndShow(EditorWindow window)
         {
             EditorApplication.projectChanged += window.Close;
+            EditorApplication.quitting += window.Close;
             AssemblyReloadEvents.beforeAssemblyReload += window.Close;
             window.Show();
         }

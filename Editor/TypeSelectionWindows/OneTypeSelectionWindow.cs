@@ -3,7 +3,8 @@
     using System;
     using SolidUtilities.Editor.Extensions;
     using TypeReferences;
-    using TypeReferences.Editor.Drawers;
+    using TypeReferences.Editor.TypeDropdown;
+    using Util;
 
     /// <summary>
     /// A window that shows the type selection dropdown immediately after the creation,
@@ -19,8 +20,8 @@
         {
             _onTypeSelected = onTypeSelected;
             _genericParamConstraints = genericParamConstraints[0];
-            this.CenterOnMainWin();
             this.Resize(1f, 1f);
+            this.MoveOutOfScreen();
         }
 
         protected override void OnGUI()
@@ -28,8 +29,7 @@
             if (_guiWasSetUp)
                 return;
 
-            // Vector2 windowPos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-            // position = new Rect(windowPos, position.size);
+            _guiWasSetUp = true;
 
             TypeOptionsAttribute typeOptionsAttribute = _genericParamConstraints.Length == 0
                 ? new TypeOptionsAttribute()
@@ -38,10 +38,9 @@
             typeOptionsAttribute.ExcludeNone = true;
             typeOptionsAttribute.SerializableOnly = true;
 
-            var dropdownDrawer = new TypeDropdownDrawer(null, typeOptionsAttribute, null);
-            dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
-
-            _guiWasSetUp = true;
+            var dropdownDrawer = new CenteredTypeDropdownDrawer(null, typeOptionsAttribute, null);
+            DropdownWindow dropdownWindow = dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
+            dropdownWindow.OnClose += Close;
         }
     }
 }
