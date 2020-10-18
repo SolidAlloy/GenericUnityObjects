@@ -18,8 +18,7 @@
     {
         private const float WindowWidth = 350f;
 
-        [SerializeField]
-        private TypeReferenceWithBaseTypes[] _typeRefs;
+        [SerializeField] private TypeReferenceWithBaseTypes[] _typeRefs;
 
         private Action<Type[]> _onTypesSelected;
         private SerializedObject _serializedObject;
