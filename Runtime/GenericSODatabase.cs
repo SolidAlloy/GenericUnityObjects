@@ -28,11 +28,15 @@
         private readonly Dictionary<TypeReference, TypeDictionary> _dict =
             new Dictionary<TypeReference, TypeDictionary>(new TypeReferenceComparer());
 
-        [SerializeField] [HideInInspector] private TypeReference[] _keys;
-        [SerializeField] [HideInInspector] private TypeDictionary[] _values;
+        // [HideInInspector]
+        [SerializeField] private TypeReference[] _keys;
+
+        // [HideInInspector]
+        [SerializeField] private TypeDictionary[] _values;
 
         public static void Add(Type genericType, Type[] key, Type value)
         {
+            Assert.IsTrue(genericType.IsGenericTypeDefinition);
             TypeDictionary assetDict = GetAssetDict(genericType);
             assetDict.Add(key, value);
             EditorUtility.SetDirty(Instance);
@@ -40,6 +44,7 @@
 
         public static bool ContainsKey(Type genericType, Type[] key)
         {
+            Assert.IsTrue(genericType.IsGenericTypeDefinition);
             TypeDictionary assetDict = GetAssetDict(genericType);
             return assetDict.ContainsKey(key);
         }

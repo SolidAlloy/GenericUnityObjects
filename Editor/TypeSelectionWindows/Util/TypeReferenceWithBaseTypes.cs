@@ -52,6 +52,7 @@
             typeOptionsAttribute.ExcludeNone = true;
             typeOptionsAttribute.SerializableOnly = true;
             typeOptionsAttribute.IncludeAdditionalAssemblies = new[] { "Assembly-CSharp" };
+            typeOptionsAttribute.ShortName = true;
 
             var serializedTypeRef = new SerializedTypeReference(property);
 
