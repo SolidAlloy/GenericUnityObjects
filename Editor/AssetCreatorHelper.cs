@@ -49,11 +49,9 @@
         {
             if (GenericSODatabase.ContainsKey(_genericType, _paramTypes))
             {
-                Debug.Log($"database contains key: {_genericType} {_paramTypes}");
                 CreateAssetInteractively();
                 return;
             }
-            Debug.Log($"database does not contain key: {_genericType} {_paramTypes}");
 
             string fullAssetPath = $"{Application.dataPath}/{GenericSOTypesPath}/{_className}.cs";
 
