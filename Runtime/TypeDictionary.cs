@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using TypeReferences;
+    using UnityEditor;
     using UnityEngine;
     using Util;
 
@@ -42,8 +44,10 @@
 
             for (int i = 0; i < keysLength; ++i)
             {
-                if (_values[i].Type != null)
-                    _dict[_keys[i]] = _values[i];
+                if (_values[i].TypeIsMissing())
+                    continue;
+
+                _dict[_keys[i]] = _values[i];
             }
 
             _keys = null;
@@ -64,29 +68,29 @@
                 ++keysIndex;
             }
         }
+    }
 
-        /// <summary>
-        /// A TypeReference[] container that is used because TypeReference[][] cannot be serialized by Unity.
-        /// </summary>
-        [Serializable]
-        private class TypeReferenceCollection
-        {
-            [SerializeField] private TypeReference[] _array;
+    /// <summary>
+    /// A TypeReference[] container that is used because TypeReference[][] cannot be serialized by Unity.
+    /// </summary>
+    [Serializable]
+    internal class TypeReferenceCollection
+    {
+        [SerializeField] private TypeReference[] _array;
 
-            public TypeReferenceCollection(TypeReference[] collection) => _array = collection;
+        public TypeReferenceCollection(TypeReference[] collection) => _array = collection;
 
-            public TypeReferenceCollection() : this((TypeReference[]) null) { }
+        public TypeReferenceCollection() : this((TypeReference[]) null) { }
 
-            public TypeReferenceCollection(Type[] collection) : this(collection.CastToTypeReference()) { }
+        public TypeReferenceCollection(Type[] collection) : this(collection.CastToTypeReference()) { }
 
-            public static implicit operator TypeReferenceCollection(Type[] typeCollection) =>
-                new TypeReferenceCollection(typeCollection);
+        public static implicit operator TypeReferenceCollection(Type[] typeCollection) =>
+            new TypeReferenceCollection(typeCollection);
 
-            public static implicit operator TypeReferenceCollection(TypeReference[] typeRefCollection) =>
-                new TypeReferenceCollection(typeRefCollection);
+        public static implicit operator TypeReferenceCollection(TypeReference[] typeRefCollection) =>
+            new TypeReferenceCollection(typeRefCollection);
 
-            public static implicit operator TypeReference[](TypeReferenceCollection typeRefCollection) =>
-                typeRefCollection._array;
-        }
+        public static implicit operator TypeReference[](TypeReferenceCollection typeRefCollection) =>
+            typeRefCollection._array;
     }
 }

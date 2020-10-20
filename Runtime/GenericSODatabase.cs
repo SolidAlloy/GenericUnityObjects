@@ -68,7 +68,14 @@
             int keysLength = _keys.Length;
 
             for (int i = 0; i < keysLength; ++i)
-                _dict[_keys[i]] = _values[i];
+            {
+                TypeReference typeRef = _keys[i];
+
+                if (typeRef.TypeIsMissing())
+                    continue;
+
+                _dict[typeRef] = _values[i];
+            }
 
             _keys = null;
             _values = null;

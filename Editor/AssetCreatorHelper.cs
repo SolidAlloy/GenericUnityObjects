@@ -84,22 +84,6 @@
             CreateAssetInteractively();
         }
 
-        private string GetScriptContent()
-        {
-            string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
-            string paramTypeNames = string.Join(", ", _paramTypeNamesWithoutAssembly);
-
-            return $"namespace {NamespaceName} {{ public class {_className} : " +
-                   $"{_genericType.Namespace}.{genericTypeNameWithoutParam}<{paramTypeNames}> {{ }} }}";
-        }
-
-        private void CreateAssetInteractively()
-        {
-            var asset = GenericScriptableObject.CreateInstance(_genericType, _paramTypes);
-            Assert.IsNotNull(asset);
-            AssetCreator.Create(asset, _defaultAssetName);
-        }
-
         private static bool FileContentMatches(string filePath, string contentToCompareTo)
         {
             if (File.Exists(filePath))
@@ -122,6 +106,22 @@
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
         {
             return fullTypeName.Split('[')[0];
+        }
+
+        private string GetScriptContent()
+        {
+            string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
+            string paramTypeNames = string.Join(", ", _paramTypeNamesWithoutAssembly);
+
+            return $"namespace {NamespaceName} {{ public class {_className} : " +
+                   $"{_genericType.Namespace}.{genericTypeNameWithoutParam}<{paramTypeNames}> {{ }} }}";
+        }
+
+        private void CreateAssetInteractively()
+        {
+            var asset = GenericScriptableObject.CreateInstance(_genericType, _paramTypes);
+            Assert.IsNotNull(asset);
+            AssetCreator.Create(asset, _defaultAssetName);
         }
     }
 }
