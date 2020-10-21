@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using JetBrains.Annotations;
+    using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using TypeReferences;
     using TypeSelectionWindows;
@@ -52,6 +53,9 @@
             string namespaceName = "GenericScriptableObjectsTypes",
             string scriptsPath = "Scripts/GenericScriptableObjectTypes")
         {
+            ValidateNamespaceName(namespaceName);
+            ValidateScriptsPath(scriptsPath);
+
             genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
             var constraints = genericType.GetGenericArguments()
                 .Select(type => type.GetGenericParameterConstraints())
@@ -83,6 +87,17 @@
                 Instance.NamespaceName = null;
                 Instance.ScriptsPath = null;
             }
+        }
+
+        private static void ValidateNamespaceName(string namespaceName)
+        {
+            if ( ! namespaceName.IsValidIdentifier())
+                throw new ArgumentException(); // TODO: set message for argument exception
+        }
+
+        private static void ValidateScriptsPath(string scriptsPath)
+        {
+
         }
     }
 }
