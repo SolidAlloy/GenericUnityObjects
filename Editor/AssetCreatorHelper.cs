@@ -4,8 +4,10 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using JetBrains.Annotations;
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Extensions;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -16,19 +18,20 @@
     /// </summary>
     internal class AssetCreatorHelper
     {
-        private const string GenericSOTypesPath = "Scripts/GenericScriptableObjectTypes";
-        private const string NamespaceName = "GenericScriptableObjectsTypes";
-
         private readonly Type _genericType;
         private readonly Type[] _paramTypes;
         private readonly string[] _paramTypeNamesWithoutAssembly;
         private readonly string _className;
         private readonly string _defaultAssetName;
+        private readonly string _scriptsPath;
+        private readonly string _namespaceName;
 
-        public AssetCreatorHelper(Type genericType, Type[] paramTypes)
+        public AssetCreatorHelper(Type genericType, Type[] paramTypes, string namespaceName, string scriptsPath)
         {
             _genericType = genericType;
             _paramTypes = paramTypes;
+            _scriptsPath = scriptsPath;
+            _namespaceName = namespaceName;
 
             _paramTypeNamesWithoutAssembly = _paramTypes
                 .Select(type => GetTypeNameWithoutAssembly(type.FullName)).ToArray();
@@ -53,22 +56,18 @@
                 return;
             }
 
-            string fullAssetPath = $"{Application.dataPath}/{GenericSOTypesPath}/{_className}.cs";
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
 
-            string scriptContent = GetScriptContent();
+            Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
 
-            if (FileContentMatches(fullAssetPath, scriptContent))
+            if (existingAssetType != null)
             {
-                CreateAssetFromExistingType();
+                CreateAssetFromExistingType(existingAssetType);
                 return;
             }
 
-            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
-            GenericSOCreator.Instance.GenericTypeToCreate = genericTypeWithArgs;
-
-            AssetDatabaseHelper.MakeSureFolderExists(GenericSOTypesPath);
-            File.WriteAllText(fullAssetPath, scriptContent);
-            AssetDatabase.Refresh();
+            GenericSOCreator.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath);
+            CreateScript();
         }
 
         /// <summary>
@@ -77,23 +76,25 @@
         /// </summary>
         public void CreateAssetFromExistingType()
         {
-            Assembly csharpAssembly = Assembly.Load("Assembly-CSharp");
-            Type assetType = csharpAssembly.GetType($"{NamespaceName}.{_className}");
-            Assert.IsNotNull(assetType);
-            GenericSODatabase.Add(_genericType, _paramTypes, assetType);
-            CreateAssetInteractively();
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
+            Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+            Assert.IsNotNull(existingAssetType);
+            CreateAssetFromExistingType(existingAssetType);
         }
 
-        private static bool FileContentMatches(string filePath, string contentToCompareTo)
+        [CanBeNull]
+        private static Type GetEmptyTypeDerivedFrom(Type parentType)
         {
-            if (File.Exists(filePath))
-            {
-                string oldFileContent = File.ReadAllText(filePath);
-                if (oldFileContent == contentToCompareTo)
-                    return true;
-            }
+            TypeCache.TypeCollection foundTypes = TypeCache.GetTypesDerivedFrom(parentType);
 
-            return false;
+            if (foundTypes.Count == 0)
+                return null;
+
+            // Why would there be another empty type derived from GenericScriptableObject?
+            Assert.IsTrue(foundTypes.Count == 1);
+
+            Type matchingType = foundTypes.FirstOrDefault(type => type.IsEmpty());
+            return matchingType;
         }
 
         private static string GetClassSafeTypeName(string rawTypeName)
@@ -104,8 +105,22 @@
         }
 
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
+            => fullTypeName.Split('[')[0];
+
+        private void CreateAssetFromExistingType(Type assetType)
         {
-            return fullTypeName.Split('[')[0];
+            GenericSODatabase.Add(_genericType, _paramTypes, assetType);
+            CreateAssetInteractively();
+        }
+
+        private void CreateScript()
+        {
+            string fullAssetPath = $"{Application.dataPath}/{_scriptsPath}/{_className}.cs";
+            string scriptContent = GetScriptContent();
+
+            AssetDatabaseHelper.MakeSureFolderExists(_scriptsPath);
+            File.WriteAllText(fullAssetPath, scriptContent);
+            AssetDatabase.Refresh();
         }
 
         private string GetScriptContent()
@@ -113,7 +128,7 @@
             string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
             string paramTypeNames = string.Join(", ", _paramTypeNamesWithoutAssembly);
 
-            return $"namespace {NamespaceName} {{ public class {_className} : " +
+            return $"namespace {_namespaceName} {{ public class {_className} : " +
                    $"{_genericType.Namespace}.{genericTypeNameWithoutParam}<{paramTypeNames}> {{ }} }}";
         }
 

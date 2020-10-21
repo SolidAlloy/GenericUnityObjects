@@ -28,10 +28,10 @@
         private readonly Dictionary<TypeReference, TypeDictionary> _dict =
             new Dictionary<TypeReference, TypeDictionary>(new TypeReferenceComparer());
 
-        // [HideInInspector]
+        [HideInInspector]
         [SerializeField] private TypeReference[] _keys;
 
-        // [HideInInspector]
+        [HideInInspector]
         [SerializeField] private TypeDictionary[] _values;
 
         public static void Add(Type genericType, Type[] key, Type value)
