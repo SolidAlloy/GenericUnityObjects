@@ -1,42 +1,55 @@
 ﻿namespace GenericScriptableObjects.Editor
 {
     using System;
+    using System.IO;
     using System.Linq;
     using JetBrains.Annotations;
+    using SolidUtilities.Editor.EditorWindows;
+    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
-    using TypeReferences;
     using TypeSelectionWindows;
+    using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
-    using Util;
+    using UnityEngine.Assertions;
 
     /// <summary>
     /// Inherit from this class and use the <see cref="CreateAsset"/> method to create an AssetCreate menu.
     /// </summary>
-    public class GenericSOCreator : SingletonScriptableObject<GenericSOCreator>
+    public class GenericSOCreator
     {
-        protected const string AssetCreatePath = "Assets/Create/";
+        public const string AssetCreatePath = "Assets/Create/";
 
-        /// <summary>
-        /// If the concrete implementation of a <see cref="GenericScriptableObject"/>-derived type was not created yet
-        /// and assemblies need to be reloaded, this field stores the type of <see cref="GenericScriptableObject"/> to
-        /// create while the assemblies are reloaded.
-        /// </summary>
-        [HideInInspector]
-        [SerializeField] private TypeReference GenericTypeToCreate;
+        private const string DefaultNamespaceName = "GenericScriptableObjectsTypes";
+        private const string DefaultScriptsPath = "Scripts/GenericScriptableObjectTypes";
 
-        [HideInInspector]
-        [SerializeField] private string NamespaceName;
+        private readonly Type _genericType;
+        private readonly Type[] _paramTypes;
+        private readonly string[] _paramTypeNamesWithoutAssembly;
+        private readonly string _className;
+        private readonly string _defaultAssetName;
+        private readonly string _scriptsPath;
+        private readonly string _namespaceName;
 
-        [HideInInspector]
-        [SerializeField] private string ScriptsPath;
+        protected GenericSOCreator() { }
 
-        internal static void SaveForAssemblyReload(Type genericTypeToCreate, string namespaceName, string scriptsPath)
+        private GenericSOCreator(Type genericType, Type[] paramTypes, string namespaceName, string scriptsPath)
         {
-            Instance.GenericTypeToCreate = genericTypeToCreate;
-            Instance.NamespaceName = namespaceName;
-            Instance.ScriptsPath = scriptsPath;
+            _genericType = genericType;
+            _paramTypes = paramTypes;
+            _scriptsPath = scriptsPath;
+            _namespaceName = namespaceName;
+
+            _paramTypeNamesWithoutAssembly = _paramTypes
+                .Select(type => GetTypeNameWithoutAssembly(type.FullName)).ToArray();
+
+            string genericTypeClassSafeName = GetClassSafeTypeName(_genericType.Name);
+            string paramTypesClassSafeNames =
+                string.Join("_", _paramTypeNamesWithoutAssembly.Select(GetClassSafeTypeName));
+
+            _className = $"{genericTypeClassSafeName}_{paramTypesClassSafeNames}";
+            _defaultAssetName = $"New {genericTypeClassSafeName}.asset";
         }
 
         /// <summary>
@@ -48,13 +61,13 @@
         /// Default is "GenericScriptableObjectsTypes".</param>
         /// <param name="scriptsPath">Custom path to a folder where auto-generated non-generic types must be kept.
         /// Default is "Scripts/GenericScriptableObjectTypes".</param>
-        protected static void CreateAsset(
+        public static void CreateAsset(
             Type genericType,
-            string namespaceName = "GenericScriptableObjectsTypes",
-            string scriptsPath = "Scripts/GenericScriptableObjectTypes")
+            string namespaceName = DefaultNamespaceName,
+            string scriptsPath = DefaultScriptsPath)
         {
-            ValidateNamespaceName(namespaceName);
-            ValidateScriptsPath(scriptsPath);
+            namespaceName = ValidateNamespaceName(namespaceName);
+            scriptsPath = ValidateScriptsPath(scriptsPath);
 
             genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
             var constraints = genericType.GetGenericArguments()
@@ -63,7 +76,7 @@
 
             TypeSelectionWindow.Create(constraints, paramTypes =>
             {
-                var creator = new AssetCreatorHelper(genericType, paramTypes, namespaceName, scriptsPath);
+                var creator = new GenericSOCreator(genericType, paramTypes, namespaceName, scriptsPath);
                 creator.CreateAsset();
             });
         }
@@ -71,33 +84,135 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if (Instance.GenericTypeToCreate.Type == null)
+            if (AssetCreatorPersistentStorage.IsEmpty)
                 return;
 
             try
             {
-                Type genericTypeWithoutArgs = Instance.GenericTypeToCreate.Type.GetGenericTypeDefinition();
-                var paramTypes = Instance.GenericTypeToCreate.Type.GenericTypeArguments;
-                var creator = new AssetCreatorHelper(genericTypeWithoutArgs, paramTypes, Instance.NamespaceName, Instance.ScriptsPath);
+                Type genericTypeWithoutArgs = AssetCreatorPersistentStorage.GenericType.Type.GetGenericTypeDefinition();
+                var paramTypes = AssetCreatorPersistentStorage.GenericType.Type.GenericTypeArguments;
+                var creator = new GenericSOCreator(genericTypeWithoutArgs, paramTypes, AssetCreatorPersistentStorage.NamespaceName, AssetCreatorPersistentStorage.ScriptsPath);
                 creator.CreateAssetFromExistingType();
             }
             finally
             {
-                Instance.GenericTypeToCreate = null;
-                Instance.NamespaceName = null;
-                Instance.ScriptsPath = null;
+                AssetCreatorPersistentStorage.Clear();
             }
         }
 
-        private static void ValidateNamespaceName(string namespaceName)
+        private static string ValidateNamespaceName(string namespaceName)
         {
-            if ( ! namespaceName.IsValidIdentifier())
-                throw new ArgumentException(); // TODO: set message for argument exception
+            if (namespaceName.IsValidIdentifier())
+                return namespaceName;
+
+            Debug.LogError($"The provided namespace name '{namespaceName}' is not a valid identifier.");
+            namespaceName = DefaultNamespaceName;
+            return namespaceName;
         }
 
-        private static void ValidateScriptsPath(string scriptsPath)
+        private static string ValidateScriptsPath(string scriptsPath)
         {
+            if (scriptsPath.IsValidPath())
+                return scriptsPath;
 
+            Debug.LogError($"The provided path '{scriptsPath}' is not a valid Unity path. Restricted characters are /?<>\\:*|\"");
+            scriptsPath = DefaultScriptsPath;
+            return scriptsPath;
+        }
+
+        [CanBeNull]
+        private static Type GetEmptyTypeDerivedFrom(Type parentType)
+        {
+            TypeCache.TypeCollection foundTypes = TypeCache.GetTypesDerivedFrom(parentType);
+
+            if (foundTypes.Count == 0)
+                return null;
+
+            // Why would there be another empty type derived from GenericScriptableObject?
+            Assert.IsTrue(foundTypes.Count == 1);
+
+            Type matchingType = foundTypes.FirstOrDefault(type => type.IsEmpty());
+            return matchingType;
+        }
+
+        private static string GetClassSafeTypeName(string rawTypeName)
+        {
+            return rawTypeName
+                .Replace('.', '_')
+                .Replace('`', '_');
+        }
+
+        private static string GetTypeNameWithoutAssembly(string fullTypeName)
+            => fullTypeName.Split('[')[0];
+
+        /// <summary>
+        /// Starts the process of creating an asset. The assembly reload may be needed to finish the process if a
+        /// concrete class implementation is not created yet.
+        /// </summary>
+        private void CreateAsset()
+        {
+            if (GenericSODatabase.ContainsKey(_genericType, _paramTypes))
+            {
+                CreateAssetInteractively();
+                return;
+            }
+
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
+
+            Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+
+            if (existingAssetType != null)
+            {
+                CreateAssetFromExistingType(existingAssetType);
+                return;
+            }
+
+            AssetCreatorPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath);
+            CreateScript();
+        }
+
+        private void CreateAssetFromExistingType(Type assetType)
+        {
+            GenericSODatabase.Add(_genericType, _paramTypes, assetType);
+            CreateAssetInteractively();
+        }
+
+        /// <summary>
+        /// Creates a <see cref="GenericScriptableObject"/> asset, but only if its concrete class implementation
+        /// already exists.
+        /// </summary>
+        private void CreateAssetFromExistingType()
+        {
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
+            Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+            Assert.IsNotNull(existingAssetType);
+            CreateAssetFromExistingType(existingAssetType);
+        }
+
+        private void CreateScript()
+        {
+            string fullAssetPath = $"{Application.dataPath}/{_scriptsPath}/{_className}.cs";
+            string scriptContent = GetScriptContent();
+
+            AssetDatabaseHelper.MakeSureFolderExists(_scriptsPath);
+            File.WriteAllText(fullAssetPath, scriptContent);
+            AssetDatabase.Refresh();
+        }
+
+        private string GetScriptContent()
+        {
+            string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
+            string paramTypeNames = string.Join(", ", _paramTypeNamesWithoutAssembly);
+
+            return $"namespace {_namespaceName} {{ public class {_className} : " +
+                   $"{_genericType.Namespace}.{genericTypeNameWithoutParam}<{paramTypeNames}> {{ }} }}";
+        }
+
+        private void CreateAssetInteractively()
+        {
+            var asset = GenericScriptableObject.CreateInstance(_genericType, _paramTypes);
+            Assert.IsNotNull(asset);
+            AssetCreator.Create(asset, _defaultAssetName);
         }
     }
 }
