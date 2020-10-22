@@ -5,6 +5,8 @@
 #if UNITY_EDITOR
     using SolidUtilities.Editor.Helpers;
     using UnityEditor;
+#else
+    using System.Linq;
 #endif
 
 
@@ -25,11 +27,14 @@
                 if (_instance != null)
                     return _instance;
 
+#if UNITY_EDITOR
                 const string assetsFolder = "Assets";
                 const string resourcesFolder = "Resources";
-
                 string assetPath = assetsFolder + '/' + resourcesFolder + '/' + typeof(T).Name + ".asset";
                 T instance = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+#else
+                T instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
+#endif
 
                 if (instance != null)
                 {

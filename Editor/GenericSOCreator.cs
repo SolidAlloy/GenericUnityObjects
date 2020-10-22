@@ -32,8 +32,6 @@
         private readonly string _scriptsPath;
         private readonly string _namespaceName;
 
-        protected GenericSOCreator() { }
-
         private GenericSOCreator(Type genericType, Type[] paramTypes, string namespaceName, string scriptsPath)
         {
             _genericType = genericType;

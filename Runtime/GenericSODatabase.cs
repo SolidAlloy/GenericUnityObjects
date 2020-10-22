@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using TypeReferences;
+#if UNITY_EDITOR
     using UnityEditor;
+#endif
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
@@ -39,7 +41,9 @@
             Assert.IsTrue(genericType.IsGenericTypeDefinition);
             TypeDictionary assetDict = GetAssetDict(genericType);
             assetDict.Add(key, value);
+#if UNITY_EDITOR
             EditorUtility.SetDirty(Instance);
+#endif
         }
 
         public static bool ContainsKey(Type genericType, Type[] key)
@@ -103,7 +107,9 @@
 
             assetDict = new TypeDictionary();
             Instance._dict.Add(genericType, assetDict);
+#if UNITY_EDITOR
             EditorUtility.SetDirty(Instance);
+#endif
             return assetDict;
         }
     }
