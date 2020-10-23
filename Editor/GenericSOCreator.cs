@@ -89,7 +89,13 @@
             {
                 Type genericTypeWithoutArgs = AssetCreatorPersistentStorage.GenericType.Type.GetGenericTypeDefinition();
                 var paramTypes = AssetCreatorPersistentStorage.GenericType.Type.GenericTypeArguments;
-                var creator = new GenericSOCreator(genericTypeWithoutArgs, paramTypes, AssetCreatorPersistentStorage.NamespaceName, AssetCreatorPersistentStorage.ScriptsPath);
+
+                var creator = new GenericSOCreator(
+                    genericTypeWithoutArgs,
+                    paramTypes,
+                    AssetCreatorPersistentStorage.NamespaceName,
+                    AssetCreatorPersistentStorage.ScriptsPath);
+
                 creator.CreateAssetFromExistingType();
             }
             finally
@@ -143,10 +149,6 @@
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
             => fullTypeName.Split('[')[0];
 
-        /// <summary>
-        /// Starts the process of creating an asset. The assembly reload may be needed to finish the process if a
-        /// concrete class implementation is not created yet.
-        /// </summary>
         private void CreateAsset()
         {
             if (GenericSODatabase.ContainsKey(_genericType, _paramTypes))
@@ -175,10 +177,6 @@
             CreateAssetInteractively();
         }
 
-        /// <summary>
-        /// Creates a <see cref="GenericScriptableObject"/> asset, but only if its concrete class implementation
-        /// already exists.
-        /// </summary>
         private void CreateAssetFromExistingType()
         {
             Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
