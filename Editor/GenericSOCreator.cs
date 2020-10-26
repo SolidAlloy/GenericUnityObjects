@@ -187,7 +187,7 @@
 
         private void CreateScript()
         {
-            string fullAssetPath = $"{Application.dataPath}/{_scriptsPath}/{_className}.cs";
+            string fullAssetPath = $@"\\?\{Application.dataPath}/{_scriptsPath}/{_className}.cs";
             string scriptContent = GetScriptContent();
 
             AssetDatabaseHelper.MakeSureFolderExists(_scriptsPath);
