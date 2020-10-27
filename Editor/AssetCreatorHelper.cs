@@ -121,7 +121,19 @@
 
         private void CreateScript(string className)
         {
-            string fullAssetPath = $@"\\?\{Application.dataPath}/{_scriptsPath}/{className}.cs";
+#if UNITY_EDITOR_WIN
+            const string longPathPrefix = @"\\?\";
+            string fullAssetPath = $"{longPathPrefix}{Application.dataPath}/{_scriptsPath}/{className}.cs";
+
+            if (fullAssetPath.Length > 260 + longPathPrefix.Length)
+            {
+                Debug.LogWarning("The generated script has a path over 260 characters. It may cause issues " +
+                                 $"on Windows (e.g. with git pull/push). Path: {fullAssetPath}");
+            }
+#else
+            string fullAssetPath = $"{Application.dataPath}/{_scriptsPath}/{className}.cs";
+#endif
+
             string scriptContent = GetScriptContent(className);
 
             AssetDatabaseHelper.MakeSureFolderExists(_scriptsPath);
