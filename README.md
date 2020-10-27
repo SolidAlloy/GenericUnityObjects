@@ -14,6 +14,8 @@ This package allows to create and use generic ScriptableObjects in Unity3D. Alth
 
 ## Usage
 
+#### Implementing a generic ScriptableObject
+
 To create a generic ScriptableObject, you need to derive the class from GenericScriptableObject:
 
 ```csharp
@@ -33,6 +35,8 @@ public class WarriorStats<TClass> : GenericScriptableObject
 Note that you can skip the Serializable attribute. You will be able to create assets without it, but if you want to reference an asset in object fields, you need to include it. Unity implicitly marks inheritors of ScriptableObject as serializable, but not if they are generic.
 
 In this example, there is only one generic argument, but you can use as many as you want.
+
+#### Context menu to create an asset
 
 Now, to be able to create assets of this ScriptableObject from context menu, you will need to implement a method with the MenuItem attribute and use GenericSOCreator.CreateAsset inside of it. The recommended way to do it is to create a separate class in the Editor folder:
 
@@ -73,5 +77,35 @@ public class WarriorStats<TClass> : GenericScriptableObject
 }
 ```
 
-Why not a single attribute like CreateAssetMenu? Unfortunately, Unity doesn't allow to inherit from CreateAssetMenu or implement your own attribute to create assets, so this is the simplest way to be able to create custom assets. Please like [this post](https://forum.unity.com/threads/ability-to-create-custom-createassetmenu-derived-attributes.985262/) so that Unity team notices this feature request and adds it sooner.
+Why not a single attribute like CreateAssetMenu? Unfortunately, Unity doesn't allow to inherit from CreateAssetMenu or implement your own attribute to create assets, so this is the simplest way to be able to create custom assets. Please like [this post](https://forum.unity.com/threads/ability-to-create-custom-createassetmenu-derived-attributes.985262/) so that Unity team notices this feature request sooner.
 
+You need to provide the [MenuItem](https://docs.unity3d.com/ScriptReference/MenuItem.html) attribute with the whole context menu path, including "Assets/Create/...". You don't have to memorize it, just use GenericSOCreator.AssetCreatePath + the path you usually write in the CreateAssetMenu attribute.
+
+Note that unlike CreateAssetMenu, MenuItem places the item to the bottom of the list by default, so if you want it on top, add `priority = 0`.
+
+Now, you can create assets:
+
+***place for gif***
+
+When you create an asset with certain generic arguments for the first time, the assemblies will reload. This is an expected behavior because the plugin must create a non-generic class that inherits generic class with the arguments you've chosen. Once the assemblies reload, the usual asset creation dialog will appear, where you will be prompted to enter the name of your new asset.
+
+By the way, the type selection pop-up is powered by ***SerializedType-for-Unity*** (insert link after updating the repo)
+
+#### Referencing a generic ScriptableObject
+
+You can create a serialized field for a generic ScriptableObject just like for the usual one:
+
+```csharp
+public class Knight : Class
+{
+    [SerializeField] private WarriorStats<Knight> _stats;
+}
+```
+
+Remember to add the Serializable attribute to your class to be able to reference it in other classes.
+
+You will get the object field in the inspector:
+
+***image of the object field***
+
+Unfortunately, Unity shows WarriorStats`1 there instead of WarriorStats\<Knight>. They are aware of [this problem](https://forum.unity.com/threads/generic-scriptable-object-fields.790763/), and hopefully it will be fixed soon.
