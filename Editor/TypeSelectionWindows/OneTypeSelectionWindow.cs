@@ -52,8 +52,11 @@
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            _dropdownWindow.OnClose -= Close;
 
+            // I caught a bug_ where _dropdownWindow was destroyed before OneTypeSelectionWindow for some reason,
+            // hence the null check.
+            if (_dropdownWindow != null)
+                _dropdownWindow.OnClose -= Close;
         }
     }
 }
