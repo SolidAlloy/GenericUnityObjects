@@ -1,0 +1,1 @@
+namespace GenericScriptableObjects.Usage_Example.ConcreteImplementations { public class WarriorsRelationship_2_Archer_Berserker : GenericScriptableObjects.Usage_Example.WarriorsRelationship<GenericScriptableObjects.Usage_Example.Classes.Archer, GenericScriptableObjects.Usage_Example.Classes.Berserker> { } }

@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1920cee0f7b4382499bd030e56a8487f, type: 3}
+  m_Script: {fileID: 11500000, guid: aebc6e3eb9f57c94488d4fd05fd1d4b4, type: 3}
   m_Name: Arnet - Geltull
   m_EditorClassIdentifier: 
   FirstWarrior: {fileID: 0}

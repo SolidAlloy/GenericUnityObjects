@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d07a81c62a11c2429d31b33c5e19ce7, type: 3}
+  m_Script: {fileID: 11500000, guid: 03ba049418105a44faa81ccf5a265f0a, type: 3}
   m_Name: Edun Stats
   m_EditorClassIdentifier: 
   Warrior: {fileID: 0}
-  Health: 65
-  Damage: 35
+  Health: 0
+  Damage: 0

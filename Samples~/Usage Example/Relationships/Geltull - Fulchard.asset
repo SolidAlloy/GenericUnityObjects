@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b9589d2c8fa75747a3ba03ef785f431, type: 3}
+  m_Script: {fileID: 11500000, guid: 18868b7425b72954cae39f3d24aac63d, type: 3}
   m_Name: Geltull - Fulchard
   m_EditorClassIdentifier: 
   FirstWarrior: {fileID: 0}
   SecondWarrior: {fileID: 0}
-  Relationship: 1
+  Relationship: 0
