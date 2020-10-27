@@ -15,8 +15,8 @@
     {
         public const string AssetCreatePath = "Assets/Create/";
 
-        private const string DefaultNamespaceName = "GenericScriptableObjectsTypes";
-        private const string DefaultScriptsPath = "Scripts/GenericScriptableObjectTypes";
+        private const string DefaultNamespaceName = "GenericSOTypes";
+        private const string DefaultScriptsPath = "Scripts/GenericSOTypes";
 
         /// <summary>
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the
