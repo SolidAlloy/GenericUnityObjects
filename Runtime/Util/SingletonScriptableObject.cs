@@ -42,7 +42,14 @@
                     return _instance;
                 }
 
+#if UNITY_2020_1_OR_NEWER
+                // FindObjectsOfType(true) returns less objects than FindObjectsOfTypeAll, thus speeding up the search
+                // of the necessary object.
                 var allInstances = FindObjectsOfType<T>(true);
+#else
+                var allInstances = Resources.FindObjectsOfTypeAll<T>();
+#endif
+
                 _instance = allInstances.Length == 0 ? CreateInstance<T>() : allInstances[0];
                 Assert.IsNotNull(_instance);
 
