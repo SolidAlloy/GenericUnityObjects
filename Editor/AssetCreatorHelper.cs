@@ -7,7 +7,6 @@
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -15,22 +14,17 @@
     internal class AssetCreatorHelper
     {
         private readonly Type _genericType;
-        private readonly Type[] _paramTypes;
-        private readonly string[] _paramTypeNamesWithoutAssembly;
+        private readonly Type[] _argumentTypes;
         private readonly string _genericTypeClassSafeName;
         private readonly string _scriptsPath;
         private readonly string _namespaceName;
 
-        public AssetCreatorHelper(Type genericType, Type[] paramTypes, string namespaceName, string scriptsPath)
+        public AssetCreatorHelper(Type genericType, Type[] argumentTypes, string namespaceName, string scriptsPath)
         {
             _genericType = genericType;
-            _paramTypes = paramTypes;
+            _argumentTypes = argumentTypes;
             _scriptsPath = scriptsPath;
             _namespaceName = namespaceName;
-
-            _paramTypeNamesWithoutAssembly = _paramTypes
-                .Select(type => GetTypeNameWithoutAssembly(type.FullName)).ToArray();
-
             _genericTypeClassSafeName = GetClassSafeTypeName(_genericType.Name);
         }
 
@@ -38,13 +32,13 @@
 
         public void CreateAsset()
         {
-            if (GenericSODatabase.ContainsKey(_genericType, _paramTypes))
+            if (GenericSODatabase.ContainsKey(_genericType, _argumentTypes))
             {
                 CreateAssetInteractively();
                 return;
             }
 
-            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_argumentTypes);
 
             Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
 
@@ -61,7 +55,7 @@
 
         public void CreateAssetFromExistingType()
         {
-            Type genericTypeWithArgs = _genericType.MakeGenericType(_paramTypes);
+            Type genericTypeWithArgs = _genericType.MakeGenericType(_argumentTypes);
             Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
             Assert.IsNotNull(existingAssetType);
             CreateAssetFromExistingType(existingAssetType);
@@ -93,32 +87,35 @@
         }
 
         /// <summary>
-        /// The method generates a SHA1 hash for the generic parameters and strips the length to 10 characters. If it
-        /// finds a collision, it increases the string length by one char and continues to do so until no collisions
-        /// are found.
+        /// The method first creates a class name that consists of the generic type name and names of the arguments.
+        /// If such a name already exists, it adds an index to the name (1, 2, and so on.)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Unique class name.</returns>
         private string GetUniqueClassName()
         {
-            string input = string.Join("_", _paramTypeNamesWithoutAssembly);
-            string hashString = Hash.SHA1(input);
+            string argumentNames = string.Join("_", _argumentTypes.Select(type => GetClassSafeTypeName(type.Name)));
 
-            int suffixLength = 10;
-            string suffix = hashString.Substring(0, suffixLength);
+            int duplicationSuffix = 0;
 
-            string GetClassName() => $"{_genericTypeClassSafeName}_{suffix}";
+            string GetClassName()
+            {
+                string className = $"{_genericTypeClassSafeName}_{argumentNames}";
+
+                if (duplicationSuffix != 0)
+                    className += $"_{duplicationSuffix}";
+
+                return className;
+            }
 
             while (AssetDatabase.FindAssets(GetClassName()).Length != 0)
-            {
-                suffix = hashString.Substring(0, ++suffixLength);
-            }
+                duplicationSuffix++;
 
             return GetClassName();
         }
 
         private void CreateAssetFromExistingType(Type assetType)
         {
-            GenericSODatabase.Add(_genericType, _paramTypes, assetType);
+            GenericSODatabase.Add(_genericType, _argumentTypes, assetType);
             CreateAssetInteractively();
         }
 
@@ -135,7 +132,8 @@
         private string GetScriptContent(string className)
         {
             string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
-            string paramTypeNames = string.Join(", ", _paramTypeNamesWithoutAssembly);
+            string paramTypeNames = string.Join(", ", _argumentTypes
+                .Select(type => GetTypeNameWithoutAssembly(type.FullName)));
 
             return $"namespace {_namespaceName} {{ public class {className} : " +
                    $"{_genericType.Namespace}.{genericTypeNameWithoutParam}<{paramTypeNames}> {{ }} }}";
@@ -143,7 +141,7 @@
 
         private void CreateAssetInteractively()
         {
-            var asset = GenericScriptableObject.CreateInstance(_genericType, _paramTypes);
+            var asset = GenericScriptableObject.CreateInstance(_genericType, _argumentTypes);
             Assert.IsNotNull(asset);
             AssetCreator.Create(asset, DefaultAssetName);
         }
