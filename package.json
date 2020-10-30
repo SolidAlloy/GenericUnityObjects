@@ -4,8 +4,8 @@
   "displayName": "Generic ScriptableObjects",
   "description": "Generic ScriptableObjects.",
   "dependencies": {
-    "com.solidalloy.util": "1.2.0",
-	"com.solidalloy.type.references": "2.2.3"
+    "com.solidalloy.util": "1.14.0",
+	"com.solidalloy.type.references": "2.5.0"
   },
   "keywords": [
     "scriptable",
