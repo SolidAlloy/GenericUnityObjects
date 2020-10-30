@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03ba049418105a44faa81ccf5a265f0a, type: 3}
-  m_Name: New WarriorStats_1
+  m_Script: {fileID: 11500000, guid: 3e36c3dcbc3241f6a10158e398512d37, type: 3}
+  m_Name: Geltull (Berserker)
   m_EditorClassIdentifier: 
-  Warrior: {fileID: 0}
-  Health: 0
-  Damage: 0
+  _hasMeleeAttack: 1
+  _hasRangedAttack: 0
+  _hasAOEAttack: 1
+  _stats: {fileID: 11400000, guid: 218abc3731531b145bfe775b6f575775, type: 2}

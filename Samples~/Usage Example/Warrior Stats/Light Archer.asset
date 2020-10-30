@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18868b7425b72954cae39f3d24aac63d, type: 3}
-  m_Name: Geltull - Fulchard
+  m_Script: {fileID: 11500000, guid: 03ba049418105a44faa81ccf5a265f0a, type: 3}
+  m_Name: Light Archer
   m_EditorClassIdentifier: 
-  FirstWarrior: {fileID: 11400000, guid: e0bb2ddddd8cc8547b6cd1f2f27ec69e, type: 2}
-  SecondWarrior: {fileID: 11400000, guid: 45a0885acaa5a3d40b8895ac944b8287, type: 2}
-  Relationship: 1
+  Health: 450
+  Damage: 85

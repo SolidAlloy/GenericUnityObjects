@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2d6fa85bd241de43b696991e7ec5a4c, type: 3}
   m_Name: Edun - Fulchard
   m_EditorClassIdentifier: 
-  FirstWarrior: {fileID: 0}
-  SecondWarrior: {fileID: 0}
+  FirstWarrior: {fileID: 11400000, guid: e7f8e501e62388e4d876c89fc20f6442, type: 2}
+  SecondWarrior: {fileID: 11400000, guid: 45a0885acaa5a3d40b8895ac944b8287, type: 2}
   Relationship: 0

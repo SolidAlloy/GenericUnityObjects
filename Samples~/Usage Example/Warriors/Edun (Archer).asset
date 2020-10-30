@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18868b7425b72954cae39f3d24aac63d, type: 3}
-  m_Name: Geltull - Fulchard
+  m_Script: {fileID: 11500000, guid: 000e287a106e415e95a3c215d416486b, type: 3}
+  m_Name: Edun (Archer)
   m_EditorClassIdentifier: 
-  FirstWarrior: {fileID: 11400000, guid: e0bb2ddddd8cc8547b6cd1f2f27ec69e, type: 2}
-  SecondWarrior: {fileID: 11400000, guid: 45a0885acaa5a3d40b8895ac944b8287, type: 2}
-  Relationship: 1
+  _hasMeleeAttack: 0
+  _hasRangedAttack: 1
+  _hasAOEAttack: 0
+  _stats: {fileID: 11400000, guid: 256faa2df31684647a9a313711568c1d, type: 2}

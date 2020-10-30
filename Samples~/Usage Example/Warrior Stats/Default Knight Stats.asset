@@ -10,8 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc6ff708b3ffa3641a1307aedc013dfa, type: 3}
-  m_Name: Fulchard Stats
+  m_Name: Default Knight Stats
   m_EditorClassIdentifier: 
-  Warrior: {fileID: 0}
-  Health: 0
-  Damage: 0
+  Health: 900
+  Damage: 100

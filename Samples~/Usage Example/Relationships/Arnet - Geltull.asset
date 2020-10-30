@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aebc6e3eb9f57c94488d4fd05fd1d4b4, type: 3}
   m_Name: Arnet - Geltull
   m_EditorClassIdentifier: 
-  FirstWarrior: {fileID: 0}
-  SecondWarrior: {fileID: 0}
-  Relationship: 0
+  FirstWarrior: {fileID: 11400000, guid: 2deee1c3d37688d458a204b3b54a88fc, type: 2}
+  SecondWarrior: {fileID: 11400000, guid: e0bb2ddddd8cc8547b6cd1f2f27ec69e, type: 2}
+  Relationship: 2

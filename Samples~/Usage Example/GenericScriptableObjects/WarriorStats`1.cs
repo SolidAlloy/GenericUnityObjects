@@ -7,9 +7,12 @@ namespace GenericScriptableObjects.Usage_Example
     public class WarriorStats<TClass> : GenericScriptableObject
         where TClass : Class
     {
-        public TClass Warrior;
-
         public int Health;
         public int Damage;
+
+        public TClass[] FindAllWarriorsWithTheseStats()
+        {
+            return FindObjectsOfType<TClass>();
+        }
     }
 }
