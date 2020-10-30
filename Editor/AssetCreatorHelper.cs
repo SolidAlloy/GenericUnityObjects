@@ -15,20 +15,18 @@
     {
         private readonly Type _genericType;
         private readonly Type[] _argumentTypes;
-        private readonly string _genericTypeClassSafeName;
         private readonly string _scriptsPath;
         private readonly string _namespaceName;
+        private readonly string _fileName;
 
-        public AssetCreatorHelper(Type genericType, Type[] argumentTypes, string namespaceName, string scriptsPath)
+        public AssetCreatorHelper(Type genericType, Type[] argumentTypes, string namespaceName, string scriptsPath, string fileName)
         {
             _genericType = genericType;
             _argumentTypes = argumentTypes;
-            _scriptsPath = scriptsPath;
             _namespaceName = namespaceName;
-            _genericTypeClassSafeName = GetClassSafeTypeName(_genericType.Name);
+            _scriptsPath = scriptsPath;
+            _fileName = fileName;
         }
-
-        private string DefaultAssetName => $"New {_genericTypeClassSafeName}.asset";
 
         public void CreateAsset()
         {
@@ -48,7 +46,7 @@
                 return;
             }
 
-            AssetCreatorPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath);
+            AssetCreatorPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath, _fileName);
             string className = GetUniqueClassName();
             CreateScript(className);
         }
@@ -61,7 +59,7 @@
             CreateAssetFromExistingType(existingAssetType);
         }
 
-        private static string GetClassSafeTypeName(string rawTypeName)
+        public static string GetClassSafeTypeName(string rawTypeName)
         {
             return rawTypeName
                 .Replace('.', '_')
@@ -96,15 +94,11 @@
             string argumentNames = string.Join("_", _argumentTypes.Select(type => GetClassSafeTypeName(type.Name)));
 
             int duplicationSuffix = 0;
+            string defaultClassName = $"{GetClassSafeTypeName(_genericType.Name)}_{argumentNames}";
 
             string GetClassName()
             {
-                string className = $"{_genericTypeClassSafeName}_{argumentNames}";
-
-                if (duplicationSuffix != 0)
-                    className += $"_{duplicationSuffix}";
-
-                return className;
+                return duplicationSuffix == 0 ? defaultClassName : $"{defaultClassName}_{duplicationSuffix}";
             }
 
             while (AssetDatabase.FindAssets(GetClassName()).Length != 0)
@@ -155,7 +149,7 @@
         {
             var asset = GenericScriptableObject.CreateInstance(_genericType, _argumentTypes);
             Assert.IsNotNull(asset);
-            AssetCreator.Create(asset, DefaultAssetName);
+            AssetCreator.Create(asset, $"New {_fileName}.asset");
         }
     }
 }

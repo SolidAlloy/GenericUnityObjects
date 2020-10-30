@@ -11,26 +11,18 @@
     /// <summary>
     /// Inherit from this class and use the <see cref="CreateAsset"/> method to create an AssetCreate menu.
     /// </summary>
-    public static class GenericSOCreator
+    public class GenericSOCreator
     {
-        public const string AssetCreatePath = "Assets/Create/";
-
-        private const string DefaultNamespaceName = "GenericSOTypes";
-        private const string DefaultScriptsPath = "Scripts/GenericSOTypes";
-
         /// <summary>
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the
         /// <see cref="UnityEditor.MenuItem"/> attribute. Use it in classes that derive from <see cref="GenericSOCreator"/>.
         /// </summary>
         /// <param name="genericType">The type of <see cref="GenericScriptableObject"/> to create.</param>
-        /// <param name="namespaceName">Custom namespace name to set for auto-generated non-generic types.
-        /// Default is "GenericScriptableObjectsTypes".</param>
-        /// <param name="scriptsPath">Custom path to a folder where auto-generated non-generic types must be kept.
-        /// Default is "Scripts/GenericScriptableObjectTypes".</param>
-        public static void CreateAsset(
-            Type genericType,
-            string namespaceName = DefaultNamespaceName,
-            string scriptsPath = DefaultScriptsPath)
+        /// <param name="namespaceName">Custom namespace name to set for auto-generated non-generic types.</param>
+        /// <param name="scriptsPath">Path to a folder where auto-generated non-generic types must be kept.</param>
+        /// <param name="fileName">Name for an asset.</param>
+        protected static void CreateAsset(
+            Type genericType, string namespaceName, string scriptsPath, string fileName)
         {
             namespaceName = ValidateNamespaceName(namespaceName);
             scriptsPath = ValidateScriptsPath(scriptsPath);
@@ -42,7 +34,7 @@
 
             TypeSelectionWindow.Create(constraints, paramTypes =>
             {
-                var creator = new AssetCreatorHelper(genericType, paramTypes, namespaceName, scriptsPath);
+                var creator = new AssetCreatorHelper(genericType, paramTypes, namespaceName, scriptsPath, fileName);
                 creator.CreateAsset();
             });
         }
@@ -62,7 +54,8 @@
                     genericTypeWithoutArgs,
                     paramTypes,
                     AssetCreatorPersistentStorage.NamespaceName,
-                    AssetCreatorPersistentStorage.ScriptsPath);
+                    AssetCreatorPersistentStorage.ScriptsPath,
+                    AssetCreatorPersistentStorage.FileName);
 
                 creator.CreateAssetFromExistingType();
             }
@@ -78,7 +71,7 @@
                 return namespaceName;
 
             Debug.LogError($"The provided namespace name '{namespaceName}' is not a valid identifier.");
-            namespaceName = DefaultNamespaceName;
+            namespaceName = CreateGenericAssetMenuAttribute.DefaultNamespaceName;
             return namespaceName;
         }
 
@@ -88,7 +81,7 @@
                 return scriptsPath;
 
             Debug.LogError($"The provided path '{scriptsPath}' is not a valid Unity path. Restricted characters are /?<>\\:*|\"");
-            scriptsPath = DefaultScriptsPath;
+            scriptsPath = CreateGenericAssetMenuAttribute.DefaultScriptsPath;
             return scriptsPath;
         }
     }
