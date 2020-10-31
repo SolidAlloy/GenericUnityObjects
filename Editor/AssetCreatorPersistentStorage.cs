@@ -19,12 +19,20 @@
         [HideInInspector]
         [SerializeField] private string _fileName;
 
+        [HideInInspector]
+        [SerializeField] private string[] _typesWithAttribute;
+
         public static bool IsEmpty => Instance._genericType.Type == null;
 
         public static TypeReference GenericType => Instance._genericType;
         public static string NamespaceName => Instance._namespaceName;
         public static string ScriptsPath => Instance._scriptsPath;
         public static string FileName => Instance._fileName;
+        public static string[] TypesWithAttribute
+        {
+            get => Instance._typesWithAttribute;
+            set => Instance._typesWithAttribute = value;
+        }
 
         public static void SaveForAssemblyReload(Type genericTypeToCreate, string namespaceName, string scriptsPath, string fileName)
         {
