@@ -19,8 +19,8 @@
         [HideInInspector]
         [SerializeField] private string _fileName;
 
-        [HideInInspector]
-        [SerializeField] private string[] _typesWithAttribute;
+        // [HideInInspector]
+        [SerializeField] private MenuItemMethod[] _menuItemMethods;
 
         public static bool IsEmpty => Instance._genericType.Type == null;
 
@@ -28,10 +28,11 @@
         public static string NamespaceName => Instance._namespaceName;
         public static string ScriptsPath => Instance._scriptsPath;
         public static string FileName => Instance._fileName;
-        public static string[] TypesWithAttribute
+
+        public static MenuItemMethod[] MenuItemMethods
         {
-            get => Instance._typesWithAttribute;
-            set => Instance._typesWithAttribute = value;
+            get => Instance._menuItemMethods;
+            set => Instance._menuItemMethods = value;
         }
 
         public static void SaveForAssemblyReload(Type genericTypeToCreate, string namespaceName, string scriptsPath, string fileName)

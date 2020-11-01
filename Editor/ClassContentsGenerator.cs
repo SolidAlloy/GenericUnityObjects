@@ -5,6 +5,7 @@
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using JetBrains.Annotations;
     using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
@@ -15,50 +16,88 @@
         private static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
         private static string _oldContent;
 
-        public static void GenerateClass(HashSet<string> newTypeSet, Dictionary<string, KeyValuePair<Type, CreateGenericAssetMenuAttribute>> typeDict)
+        private static Regex GetMethodRegex(string typeName) => new Regex($@"\[MenuItem.*?\n.*?{typeName}.*?\n");
+
+        public static void GenerateClass(MenuItemMethod[] newMethods)
         {
             string classContent = GetClassContents();
 
-            var oldTypeSet = new HashSet<string>(AssetCreatorPersistentStorage.TypesWithAttribute);
+            var oldMethodsSet = new HashSet<MenuItemMethod>(AssetCreatorPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
+            var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
 
-            if (newTypeSet.SetEquals(oldTypeSet))
+            if (oldMethodsSet.SetEquals(newMethodsSet))
                 return;
 
-            classContent = RemoveOldMethods(classContent, oldTypeSet, newTypeSet);
-            classContent = AddNewMethods(classContent, oldTypeSet, newTypeSet, typeDict);
+            classContent = RemoveOldMethods(classContent, oldMethodsSet, newMethodsSet);
+            classContent = ModifyExistingMethods(classContent, oldMethodsSet, newMethodsSet);
+            classContent = AddNewMethods(classContent, oldMethodsSet, newMethodsSet);
+
+            AssetCreatorPersistentStorage.MenuItemMethods = newMethods;
 
             SaveToFile(classContent);
         }
 
-        private static string RemoveOldMethods(string classContent, HashSet<string> oldTypeSet, HashSet<string> newTypeSet)
+        private static string ModifyExistingMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet, HashSet<MenuItemMethod> newMethodsSet)
         {
-            var typesToRemove = new HashSet<string>(oldTypeSet);
-            typesToRemove.ExceptWith(newTypeSet);
+            var oldExistingMethods = new List<MenuItemMethod>();
+            var newExistingMethods = new List<MenuItemMethod>();
 
-            foreach (string typeName in typesToRemove)
+            foreach (MenuItemMethod oldMethod in oldMethodsSet)
             {
-                var regex = new Regex($@"\[MenuItem.*?\n.*?{typeName}.*?\n");
+                if (newMethodsSet.Contains(oldMethod))
+                {
+                    oldExistingMethods.Add(oldMethod);
+                    newMethodsSet.TryGetValue(oldMethod, out MenuItemMethod newMethod);
+                    newExistingMethods.Add(newMethod);
+                }
+            }
+
+            for (int i = 0; i < oldExistingMethods.Count; ++i)
+            {
+                MenuItemMethod oldMethod = oldExistingMethods[i];
+                MenuItemMethod newMethod = newExistingMethods[i];
+
+                MenuItemMethod changedValues = new MenuItemMethod
+                {
+                    FileName =
+                };
+            }
+
+            return classContent;
+        }
+
+        private static string ChangeMethod(string classContent, string fileName = null,
+            string menuName = null, string namespaceName = null, string scriptsPath = null, int order = -1)
+        {
+
+        }
+
+        private static string RemoveOldMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet, HashSet<MenuItemMethod> newMethodsSet)
+        {
+            var methodsToRemove = oldMethodsSet.ExceptWith(newMethodsSet, MenuItemMethod.Comparer);
+
+            foreach (MenuItemMethod method in methodsToRemove)
+            {
+                var regex = GetMethodRegex(method.TypeName);
                 classContent = regex.Replace(classContent, string.Empty, 1);
             }
 
             return classContent;
         }
 
-        private static string AddNewMethods(string classContent, HashSet<string> oldTypeSet,
-            HashSet<string> newTypeSet, Dictionary<string, KeyValuePair<Type, CreateGenericAssetMenuAttribute>> typeDict)
+        private static string AddNewMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet,
+            HashSet<MenuItemMethod> newMethodsSet)
         {
-            var typesToAdd = new HashSet<string>(newTypeSet);
-            typesToAdd.ExceptWith(oldTypeSet);
+            var methodsToAdd = newMethodsSet.ExceptWith(oldMethodsSet, MenuItemMethod.Comparer);
 
-            if (typesToAdd.Count == 0)
+            if (methodsToAdd.Count == 0)
                 return classContent;
 
             string newMethods = string.Empty;
 
-            foreach (string typeName in typesToAdd)
+            foreach (MenuItemMethod method in methodsToAdd)
             {
-                var kvp = typeDict[typeName];
-                newMethods += CreateMenuItemMethod(typeName, kvp.Key, kvp.Value);
+                newMethods += CreateMenuItemMethod(method);
             }
 
             int insertPos = classContent.Length - 3;
@@ -77,14 +116,14 @@
             return _oldContent;
         }
 
-        private static string CreateMenuItemMethod(string classSafeName, Type type, CreateGenericAssetMenuAttribute attribute)
+        private static string CreateMenuItemMethod(MenuItemMethod method)
         {
-            string fileName = attribute.FileName ?? classSafeName;
-            string menuName = attribute.MenuName ?? GetGenericTypeName(type);
+            string fileName = method.FileName ?? method.TypeName;
+            string menuName = method.MenuName ?? GetGenericTypeName(method.Type);
 
-            string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {attribute.Order})]";
-            string typeName = GetGenericTypeDefinitionName(type);
-            string methodLine = $"private static void Create{classSafeName}() => CreateAsset(typeof({typeName}), \"{attribute.NamespaceName}\", \"{attribute.ScriptsPath}\", \"{fileName}\");";
+            string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
+            string typeName = GetGenericTypeDefinitionName(method.Type);
+            string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), \"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
             return $"{attributeLine}\n{methodLine}\n";
         }
 
@@ -111,6 +150,57 @@
             AssetDatabaseHelper.MakeSureFolderExists(Folders);
             File.WriteAllText(FilePath, classContent);
             AssetDatabase.Refresh();
+        }
+    }
+
+    [Serializable]
+    internal struct MenuItemMethod
+    {
+        public string TypeName;
+        public string FileName;
+        public string MenuName;
+        public string NamespaceName;
+        public string ScriptsPath;
+        public int Order;
+        public Type Type;
+
+        private static EqualityComparer _comparer;
+
+        public static EqualityComparer Comparer
+        {
+            get
+            {
+                if (_comparer == null)
+                    _comparer = new EqualityComparer();
+
+                return _comparer;
+            }
+        }
+
+        public class EqualityComparer : EqualityComparer<MenuItemMethod>
+        {
+            public override bool Equals(MenuItemMethod x, MenuItemMethod y)
+            {
+                return x.TypeName == y.TypeName;
+            }
+
+            public override int GetHashCode(MenuItemMethod obj)
+            {
+                return obj.TypeName.GetHashCode();
+            }
+        }
+    }
+
+    internal static class HashSetExtensions
+    {
+        [PublicAPI, NotNull, Pure] public static HashSet<T> ExceptWith<T>(this HashSet<T> thisSet, HashSet<T> otherSet, EqualityComparer<T> comparer = null)
+        {
+            if (comparer == null)
+                comparer = EqualityComparer<T>.Default;
+
+            var newSet = new HashSet<T>(thisSet, comparer);
+            newSet.ExceptWith(otherSet);
+            return newSet;
         }
     }
 }

@@ -7,16 +7,15 @@
     using UnityEditor;
     using UnityEngine;
 
-    internal static class MenuItemsCreator
+    public static class MenuItemsCreator
     {
         // [DidReloadScripts]
-        private static void OnScriptsReload()
+        public static void OnScriptsReload()
         {
             var types = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>().Where(type => type.IsGenericType).ToArray();
             int typesCount = types.Length;
 
-            var newTypeSet = new HashSet<string>();
-            var typeDict = new Dictionary<string, KeyValuePair<Type, CreateGenericAssetMenuAttribute>>();
+            var menuItemMethods = new List<MenuItemMethod>();
 
             for (int i = 0; i < typesCount; ++i)
             {
@@ -28,12 +27,19 @@
                 if (assetMenuAttribute == null)
                     continue;
 
-                string classSafeName = AssetCreatorHelper.GetClassSafeTypeName(type.FullName);
-                newTypeSet.Add(classSafeName);
-                typeDict[classSafeName] = new KeyValuePair<Type, CreateGenericAssetMenuAttribute>(type, assetMenuAttribute);
+                menuItemMethods.Add(new MenuItemMethod
+                {
+                    TypeName = AssetCreatorHelper.GetClassSafeTypeName(type.FullName),
+                    FileName = assetMenuAttribute.FileName,
+                    MenuName = assetMenuAttribute.MenuName,
+                    NamespaceName = assetMenuAttribute.NamespaceName,
+                    ScriptsPath = assetMenuAttribute.ScriptsPath,
+                    Order = assetMenuAttribute.Order,
+                    Type = type
+                });
             }
 
-            ClassContentsGenerator.GenerateClass(newTypeSet, typeDict);
+            ClassContentsGenerator.GenerateClass(menuItemMethods.ToArray()); // TODO: check if toarray is efficient here
         }
 
         private static void CheckInvalidName(string typeName)
