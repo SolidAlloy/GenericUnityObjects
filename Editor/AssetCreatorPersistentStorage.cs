@@ -19,8 +19,8 @@
         [HideInInspector]
         [SerializeField] private string _fileName;
 
-        // [HideInInspector]
-        [SerializeField] private MenuItemMethod[] _menuItemMethods;
+        [HideInInspector]
+        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
         public static bool IsEmpty => Instance._genericType.Type == null;
 

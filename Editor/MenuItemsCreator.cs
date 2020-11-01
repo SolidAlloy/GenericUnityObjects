@@ -5,11 +5,12 @@
     using System.Linq;
     using System.Reflection;
     using UnityEditor;
+    using UnityEditor.Callbacks;
     using UnityEngine;
 
     public static class MenuItemsCreator
     {
-        // [DidReloadScripts]
+        [DidReloadScripts]
         public static void OnScriptsReload()
         {
             var types = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>().Where(type => type.IsGenericType).ToArray();
@@ -39,7 +40,7 @@
                 });
             }
 
-            ClassContentsGenerator.GenerateClass(menuItemMethods.ToArray()); // TODO: check if toarray is efficient here
+            ClassContentsGenerator.GenerateClass(menuItemMethods.ToArray());
         }
 
         private static void CheckInvalidName(string typeName)
