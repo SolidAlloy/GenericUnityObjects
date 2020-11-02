@@ -4,6 +4,7 @@
     using JetBrains.Annotations;
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    [BaseTypeRequired(typeof(GenericScriptableObject))]
     public class CreateGenericAssetMenuAttribute : Attribute
     {
         public const string DefaultNamespaceName = "GenericSOTypes";
