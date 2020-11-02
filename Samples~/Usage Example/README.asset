@@ -34,17 +34,6 @@ MonoBehaviour:
     one generic argument, and with multiple ones, so be sure to check out both.
 
 
-    You
-    can see how GenericSOCreator.CreateAsset() method is utilized in the Editor folder.
-    It allows the context menus to create generic assets.
-
-
-    The plugin generates
-    an empty concrete class for a generic type when you create an asset. You can
-    find the generated classes in the ConcreteImplementations folder.
-
-
-    By default,
-    the namespace of all generated classes is GenericSOTypes, and they are stored
-    in the Scripts/GenericSOTypes folder. You can specify custom namespace and path
-    for the generated class. Check out how it is done in Editor/WarriorStatsCreator.cs'
+    The
+    plugin generates an empty concrete class for a generic type when you create an
+    asset. You can find the generated classes in the ConcreteImplementations folder.'
