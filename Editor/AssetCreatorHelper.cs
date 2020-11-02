@@ -149,7 +149,7 @@
         {
             var asset = GenericScriptableObject.CreateInstance(_genericType, _argumentTypes);
             Assert.IsNotNull(asset);
-            AssetCreator.Create(asset, $"New {_fileName}.asset");
+            AssetCreator.Create(asset, $"{_fileName}.asset");
         }
     }
 }
