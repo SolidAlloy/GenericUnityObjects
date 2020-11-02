@@ -3,14 +3,14 @@ This package allows to create and use generic ScriptableObjects in Unity3D. Alth
 
 **What you can do with it:**
 
-- Implement your own generic ScriptableObjects (like `Generic<T>`).
-- Create them from a context menu and choose the generic argument type in the process.
+- Implement your own generic ScriptableObjects (e.g. `Generic<T>`).
+- Create them from a context menu (similarly to the `[CreateAssetMenu]` attribute) and choose the generic argument type in the process.
 - Create object fields for the generic ScriptableObjects and drag-and-drop the created assets to those fields.
 - Instantiate generic ScriptableObjects from scripts (but see the limitations.)
 
 **What you cannot do:**
 
-- Instantiate a generic ScriptableObject from script if you haven't created a single asset of this ScriptableObject with such generic arguments (e.g. you are trying to instantiate `Generic<int>` but you haven't created a single `Generic<int>` asset yet.)
+- Instantiate a generic ScriptableObject from script if you haven't created a single asset of this scriptable object with such generic arguments (e.g. you are trying to instantiate `Generic<int>` but you haven't created a single `Generic<int>` asset yet.)
 
 ## Usage
 
@@ -39,7 +39,11 @@ Note that you can skip the `Serializable` attribute. You will be able to create 
 
 In this example, there is only one generic argument, but you can use as many as you want.
 
-#### Context menu to create an asset
+#### CreateGenericAssetMenu attribute
+
+Now, to be able to create assets from the context menu, you can add the `[CreateGenericAssetMenu]` attribute to the class. It has all the same optional properties as the [[CreateAssetMenu]](https://docs.unity3d.com/ScriptReference/CreateAssetMenuAttribute.html) attribute: FileName, MenuName, Order. But there are two additional ones: NamespaceName and ScriptsPath.
+
+
 
 Now, to be able to create assets of this ScriptableObject from the context menu, you will need to implement a method with the [MenuItem](https://docs.unity3d.com/ScriptReference/MenuItem.html) attribute and use `GenericSOCreator.CreateAsset()` inside of it. The recommended way to do it is to create a separate class in the Editor folder:
 
