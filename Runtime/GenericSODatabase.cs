@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using TypeReferences;
 #if UNITY_EDITOR
     using UnityEditor;
@@ -80,14 +81,15 @@
 
                 _dict[typeRef] = _values[i];
             }
-
-            _keys = null;
-            _values = null;
         }
 
         public void OnBeforeSerialize()
         {
             int dictLength = _dict.Count;
+
+            var prevKeys = _keys;
+            var prevValues = _values;
+
             _keys = new TypeReference[dictLength];
             _values = new TypeDictionary[dictLength];
 
@@ -97,6 +99,12 @@
                 _keys[keysIndex] = pair.Key;
                 _values[keysIndex] = pair.Value;
                 ++keysIndex;
+            }
+
+            if ( ! _keys.SequenceEqual(prevKeys) || ! _values.SequenceEqual(prevValues))
+            {
+                Debug.Log("not equal, setting dirty");
+                EditorUtility.SetDirty(this);
             }
         }
 
