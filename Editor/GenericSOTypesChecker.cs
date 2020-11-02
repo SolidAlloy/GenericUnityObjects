@@ -8,7 +8,7 @@
     using UnityEditor.Callbacks;
     using UnityEngine;
 
-    public static class MenuItemsCreator
+    public static class GenericSOTypesChecker
     {
         [DidReloadScripts]
         public static void OnScriptsReload()
@@ -40,7 +40,7 @@
                 });
             }
 
-            ClassContentsGenerator.GenerateClass(menuItemMethods.ToArray());
+            MenuItemsGenerator.GenerateClass(menuItemMethods.ToArray());
         }
 
         private static void CheckInvalidName(string typeName)

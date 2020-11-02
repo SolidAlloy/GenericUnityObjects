@@ -5,12 +5,13 @@
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using NUnit.Framework;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
     using UnityEngine;
 
-    internal static class ClassContentsGenerator
+    internal static class MenuItemsGenerator
     {
         private const string Folders = "Resources/Editor";
         private static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
@@ -37,7 +38,6 @@
         private static string RemoveOldMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet, HashSet<MenuItemMethod> newMethodsSet)
         {
             var methodsToRemove = oldMethodsSet.ExceptWith(newMethodsSet, MenuItemMethod.Comparer);
-            Debug.Log($"removed old methods: {methodsToRemove.Count}");
 
             foreach (MenuItemMethod method in methodsToRemove)
             {
@@ -52,7 +52,6 @@
             HashSet<MenuItemMethod> newMethodsSet)
         {
             var methodsToAdd = newMethodsSet.ExceptWith(oldMethodsSet, MenuItemMethod.Comparer);
-            Debug.Log($"added new methods: {methodsToAdd.Count}");
 
             if (methodsToAdd.Count == 0)
                 return classContent;
@@ -82,7 +81,7 @@
 
         private static string CreateMenuItemMethod(MenuItemMethod method)
         {
-            string fileName = method.FileName == string.Empty ? method.TypeName : method.FileName;
+            string fileName = method.FileName == string.Empty ? $"New {method.TypeName}" : method.FileName;
             string menuName = method.MenuName == string.Empty ? GetGenericTypeName(method.Type) : method.MenuName;
 
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
@@ -93,7 +92,9 @@
 
         private static string GetGenericTypeDefinitionName(Type type)
         {
-            string typeNameWithoutArguments = type.FullName.Split('`')[0];
+            string fullTypeName = type.FullName;
+            Assert.IsNotNull(fullTypeName);
+            string typeNameWithoutArguments = fullTypeName.Split('`')[0];
             int argsCount = type.GetGenericArguments().Length;
             string suffix = $"<{new string(',', argsCount-1)}>";
             return typeNameWithoutArguments + suffix;
@@ -114,55 +115,6 @@
             AssetDatabaseHelper.MakeSureFolderExists(Folders);
             File.WriteAllText(FilePath, classContent);
             AssetDatabase.Refresh();
-        }
-    }
-
-    [Serializable]
-    internal struct MenuItemMethod
-    {
-        public string TypeName;
-        public string FileName;
-        public string MenuName;
-        public string NamespaceName;
-        public string ScriptsPath;
-        public int Order;
-        public Type Type;
-
-        private static EqualityComparer _comparer;
-
-        public static EqualityComparer Comparer
-        {
-            get
-            {
-                if (_comparer == null)
-                    _comparer = new EqualityComparer();
-
-                return _comparer;
-            }
-        }
-
-        public class EqualityComparer : EqualityComparer<MenuItemMethod>
-        {
-            public override bool Equals(MenuItemMethod x, MenuItemMethod y)
-            {
-                return x.TypeName == y.TypeName && x.FileName == y.FileName && x.MenuName == y.MenuName
-                       && x.NamespaceName == y.NamespaceName && x.ScriptsPath == y.ScriptsPath && x.Order == y.Order;
-            }
-
-            public override int GetHashCode(MenuItemMethod obj)
-            {
-                unchecked
-                {
-                    int hash = 17;
-                    hash = hash * 23 + obj.TypeName.GetHashCode();
-                    hash = hash * 23 + obj.FileName.GetHashCode();
-                    hash = hash * 23 + obj.MenuName.GetHashCode();
-                    hash = hash * 23 + obj.NamespaceName.GetHashCode();
-                    hash = hash * 23 + obj.ScriptsPath.GetHashCode();
-                    hash = hash * 23 + obj.Order.GetHashCode();
-                    return hash;
-                }
-            }
         }
     }
 }
