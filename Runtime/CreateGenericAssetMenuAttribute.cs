@@ -20,14 +20,14 @@
         [PublicAPI] public int Order = 0;
 
         /// <summary>
-        /// Custom namespace name to set for auto-generated non-generic types.
-        /// Default is "GenericScriptableObjectsTypes".
+        /// Custom namespace name to set for auto-generated classes derived from this class.
+        /// Default is "GenericScriptableObjectTypes".
         /// </summary>
         [PublicAPI, NotNull] public string NamespaceName = DefaultNamespaceName;
 
         /// <summary>
-        /// Custom path to a folder where auto-generated non-generic types must be kept.
-        /// Default is "Scripts/GenericScriptableObjectTypes".
+        /// Custom path to a folder where auto-generated classes must be kept.
+        /// Default is "Scripts/GenericSOTypes".
         /// </summary>
         [PublicAPI, NotNull] public string ScriptsPath = DefaultScriptsPath;
     }

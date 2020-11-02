@@ -1,7 +1,9 @@
 ﻿namespace GenericScriptableObjects.Usage_Example
 {
+    using System;
     using Classes;
 
+    [Serializable]
     public class WarriorsRelationship<TFirst, TSecond> : GenericScriptableObject
         where TFirst : Class
         where TSecond : Class

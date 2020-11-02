@@ -12,4 +12,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3732b7fccbe84e4fa096cfbd2b945f24, type: 3}
   m_Name: README
   m_EditorClassIdentifier: 
-  description: 
+  Description: 'The example contains two classes derived from GenericScriptableObject:
+
+    -
+    WarriorStats<TClass>
+
+    - WarriorsRelationship<TFirst, TSecond>
+
+
+    You can
+    find them in the GenericScriptableObjects folder.
+
+
+    You can check the assets
+    created from those classes in the "Warrior Stats" and "Relationships" folders.
+
+
+    To
+    create a new asset, press RMB in the Project window -> Create -> Warrior Stats.
+    The asset creation looks a bit different for generic scriptable objects with
+    one generic argument, and with multiple ones, so be sure to check out both.
+
+
+    You
+    can see how GenericSOCreator.CreateAsset() method is utilized in the Editor folder.
+    It allows the context menus to create generic assets.
+
+
+    The plugin generates
+    an empty concrete class for a generic type when you create an asset. You can
+    find the generated classes in the ConcreteImplementations folder.
+
+
+    By default,
+    the namespace of all generated classes is GenericSOTypes, and they are stored
+    in the Scripts/GenericSOTypes folder. You can specify custom namespace and path
+    for the generated class. Check out how it is done in Editor/WarriorStatsCreator.cs'

@@ -3,15 +3,16 @@
     using GenericScriptableObjects.Editor;
     using UnityEditor;
 
-    public static class WarriorsRelationshipCreator
+    public class WarriorsRelationshipCreator : GenericSOCreator
     {
-        [MenuItem(GenericSOCreator.AssetCreatePath + "Warriors Relationship", priority = 0)]
+        [MenuItem("Assets/Create/Warriors Relationship", priority = 0)]
         public static void CreateAsset()
         {
-            GenericSOCreator.CreateAsset(
+            CreateAsset(
                 typeof(WarriorsRelationship<,>),
                 GenericSOSampleHelper.NamespaceName,
-                GenericSOSampleHelper.ScriptsPath);
+                GenericSOSampleHelper.ScriptsPath,
+                "Warriors Relationship");
         }
     }
 }
