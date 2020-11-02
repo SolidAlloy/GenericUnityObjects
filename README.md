@@ -1,5 +1,5 @@
 # Generic ScriptableObjects
-[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-scriptable-objects/)
+[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-scriptable-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericScriptableObjects/blob/main/LICENSE)
 
 This package allows to create and use generic ScriptableObjects in Unity3D. Although generic serializable classes are now supported by Unity 2020, generic ScriptableObject and MonoBehaviour are not yet, and this plugin allows to overcome this limitation.
 
@@ -178,6 +178,6 @@ When you create a GenericScriptableObject class, please name the file specifying
 - WarriorStats`1.cs :heavy_check_mark:
 - WarriorStats.cs :x:
 
-This way you ensure that the plugin will not lose reference to the class and there will be no issues with instantiating your class if you rename the class later.
+This way you ensure that the plugin will not lose reference to the class and there will be no issues with instantiating your class if you decide to rename it later.
 
-Also, when renaming the class, it's recommended to rename the file first, and then the class itself.
+Also, when renaming a class, it's recommended to rename the file first, and then the class itself.
