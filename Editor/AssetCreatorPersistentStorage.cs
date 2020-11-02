@@ -2,6 +2,7 @@
 {
     using System;
     using TypeReferences;
+    using UnityEditor;
     using UnityEngine;
     using Util;
 
@@ -32,7 +33,11 @@
         public static MenuItemMethod[] MenuItemMethods
         {
             get => Instance._menuItemMethods;
-            set => Instance._menuItemMethods = value;
+            set
+            {
+                Instance._menuItemMethods = value;
+                EditorUtility.SetDirty(Instance);
+            }
         }
 
         public static void SaveForAssemblyReload(Type genericTypeToCreate, string namespaceName, string scriptsPath, string fileName)
