@@ -8,12 +8,12 @@
     {
         public static TypeReference[] CastToTypeReference(this Type[] types)
         {
-            return types.Select(type => (TypeReference) type).ToArray();
+            return types.Select(type => new TypeReference(type, true)).ToArray();
         }
 
         public static Type[] CastToType(this TypeReference[] typeReferences)
         {
-            return typeReferences.Select(typeRef => (Type) typeRef).ToArray();
+            return typeReferences.Select(typeRef => typeRef.Type).ToArray();
         }
     }
 }

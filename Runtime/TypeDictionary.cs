@@ -19,7 +19,7 @@
 
         [SerializeField] private TypeReference[] _values;
 
-        public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), value);
+        public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), new TypeReference(value, true));
 
         public bool ContainsKey(Type[] key) => _dict.ContainsKey(key.CastToTypeReference());
 

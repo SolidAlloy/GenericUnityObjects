@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using TypeReferences;
 #if UNITY_EDITOR
     using UnityEditor;
@@ -24,7 +23,7 @@
     ///     bool, int --- CustomGeneric_2_System_Boolean_System_Int32
     ///     bool, float --- CustomGeneric_2_System_Boolean_System_Single
     /// </summary>
-    public class GenericSODatabase :
+    internal class GenericSODatabase :
         SingletonScriptableObject<GenericSODatabase>,
         ISerializationCallbackReceiver
     {
@@ -36,6 +35,8 @@
 
         [HideInInspector]
         [SerializeField] private TypeDictionary[] _values;
+
+        private bool _shouldSetDirty;
 
         public static void Add(Type genericType, Type[] key, Type value)
         {
@@ -66,29 +67,36 @@
 
         public void OnAfterDeserialize()
         {
-            if (_keys == null || _values == null || _keys.Length != _values.Length)
-                return;
-
-            _dict.Clear();
             int keysLength = _keys.Length;
+            int valuesLength = _values.Length;
+
+            if (keysLength != valuesLength)
+            {
+                Debug.LogError($"Something wrong happened in the database. Keys count ({keysLength}) does " +
+                               $"not equal to values count ({valuesLength}). The database will be cleaned up.");
+                _shouldSetDirty = true;
+                return;
+            }
+
+            Assert.IsTrue(_dict.Count == 0);
 
             for (int i = 0; i < keysLength; ++i)
             {
                 TypeReference typeRef = _keys[i];
 
-                if (typeRef.TypeIsMissing())
+                if (typeRef.Type == null && typeRef.GUID == string.Empty)
                     continue;
 
                 _dict[typeRef] = _values[i];
             }
+
+            if (_dict.Count != keysLength)
+                _shouldSetDirty = true;
         }
 
         public void OnBeforeSerialize()
         {
             int dictLength = _dict.Count;
-
-            var prevKeys = _keys;
-            var prevValues = _values;
 
             _keys = new TypeReference[dictLength];
             _values = new TypeDictionary[dictLength];
@@ -100,12 +108,6 @@
                 _values[keysIndex] = pair.Value;
                 ++keysIndex;
             }
-
-            if ( ! _keys.SequenceEqual(prevKeys) || ! _values.SequenceEqual(prevValues))
-            {
-                Debug.Log("not equal, setting dirty");
-                EditorUtility.SetDirty(this);
-            }
         }
 
         private static TypeDictionary GetAssetDict(Type genericType)
@@ -114,11 +116,22 @@
                 return assetDict;
 
             assetDict = new TypeDictionary();
-            Instance._dict.Add(genericType, assetDict);
+            Instance._dict.Add(new TypeReference(genericType, true), assetDict);
 #if UNITY_EDITOR
             EditorUtility.SetDirty(Instance);
 #endif
             return assetDict;
+        }
+
+        private void OnEnable()
+        {
+            if (_shouldSetDirty)
+            {
+                _shouldSetDirty = false;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
+            }
         }
     }
 }
