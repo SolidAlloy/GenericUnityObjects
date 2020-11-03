@@ -29,22 +29,21 @@ MonoBehaviour:
 
 
     To
-    create a new asset, press RMB in the Project window -> Create -> Warrior Stats.
+    create a new asset, press RMB in the Project window -> Create -> WarriorStats<TClass>.
     The asset creation looks a bit different for generic scriptable objects with
     one generic argument, and with multiple ones, so be sure to check out both.
 
 
     You
-    can see how GenericSOCreator.CreateAsset() method is utilized in the Editor folder.
-    It allows the context menus to create generic assets.
+    can see how [CreateGenericAssetMenu] makes the classes apear in the context menu.
 
 
-    The plugin generates
-    an empty concrete class for a generic type when you create an asset. You can
-    find the generated classes in the ConcreteImplementations folder.
+    The
+    plugin generates an empty concrete class for a generic type when you create an
+    asset. You can find the generated classes in the ConcreteImplementations folder.
 
 
-    By default,
-    the namespace of all generated classes is GenericSOTypes, and they are stored
-    in the Scripts/GenericSOTypes folder. You can specify custom namespace and path
-    for the generated class. Check out how it is done in Editor/WarriorStatsCreator.cs'
+    By
+    default, the namespace of all generated classes is GenericSOTypes, and they are
+    stored in the Scripts/GenericSOTypes folder. You can specify custom namespace
+    and path in the CreateGenericAssetMenu constructor.'
