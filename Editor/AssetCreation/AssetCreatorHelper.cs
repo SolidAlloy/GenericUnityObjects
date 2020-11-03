@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.AssetCreation
 {
     using System;
     using System.IO;
@@ -10,6 +10,7 @@
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using Util;
 
     internal class AssetCreatorHelper
     {
@@ -46,7 +47,7 @@
                 return;
             }
 
-            AssetCreatorPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath, _fileName);
+            GenericSOPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath, _fileName);
             string className = GetUniqueClassName();
             CreateScript(className);
         }
@@ -57,13 +58,6 @@
             Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
             Assert.IsNotNull(existingAssetType);
             CreateAssetFromExistingType(existingAssetType);
-        }
-
-        public static string GetClassSafeTypeName(string rawTypeName)
-        {
-            return rawTypeName
-                .Replace('.', '_')
-                .Replace('`', '_');
         }
 
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
@@ -91,10 +85,10 @@
         /// <returns>Unique class name.</returns>
         private string GetUniqueClassName()
         {
-            string argumentNames = string.Join("_", _argumentTypes.Select(type => GetClassSafeTypeName(type.Name)));
+            string argumentNames = string.Join("_", _argumentTypes.Select(type => GenericSOUtil.GetClassSafeTypeName(type.Name)));
 
             int duplicationSuffix = 0;
-            string defaultClassName = $"{GetClassSafeTypeName(_genericType.Name)}_{argumentNames}";
+            string defaultClassName = $"{GenericSOUtil.GetClassSafeTypeName(_genericType.Name)}_{argumentNames}";
 
             string GetClassName()
             {

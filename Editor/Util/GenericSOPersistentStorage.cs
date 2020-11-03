@@ -1,12 +1,17 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.Util
 {
     using System;
+    using GenericScriptableObjects.Util;
+    using MenuItemsGeneration;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
-    using Util;
 
-    public class AssetCreatorPersistentStorage : SingletonScriptableObject<AssetCreatorPersistentStorage>
+    /// <summary>
+    /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
+    /// creation, but also for MenuItem methods creation and Usage Example installation.
+    /// </summary>
+    public class GenericSOPersistentStorage : SingletonScriptableObject<GenericSOPersistentStorage>
     {
         [HideInInspector]
         [SerializeField] private TypeReference _genericType;

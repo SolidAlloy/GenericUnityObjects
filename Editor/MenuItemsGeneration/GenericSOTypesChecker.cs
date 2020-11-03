@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.MenuItemsGeneration
 {
     using System;
     using System.Collections.Generic;
@@ -7,8 +7,13 @@
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
+    using Util;
 
-    public static class GenericSOTypesChecker
+    /// <summary>
+    /// This class verifies that the GenericScriptableObject scripts are named appropriately and regenerates the
+    /// MenuItem methods so that assets can be created from the context menu.
+    /// </summary>
+    internal static class GenericSOTypesChecker
     {
         [DidReloadScripts]
         public static void OnScriptsReload()
@@ -30,7 +35,7 @@
 
                 menuItemMethods.Add(new MenuItemMethod
                 {
-                    TypeName = AssetCreatorHelper.GetClassSafeTypeName(type.FullName),
+                    TypeName = GenericSOUtil.GetClassSafeTypeName(type.FullName),
                     FileName = assetMenuAttribute.FileName,
                     MenuName = assetMenuAttribute.MenuName,
                     NamespaceName = assetMenuAttribute.NamespaceName,

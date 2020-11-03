@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.MenuItemsGeneration
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,12 @@
     using SolidUtilities.Extensions;
     using UnityEditor;
     using UnityEngine;
+    using Util;
 
+    /// <summary>
+    /// A class responsible for generating or updating a class that contains all the MenuItem methods needed for
+    /// the asset creation.
+    /// </summary>
     internal static class MenuItemsGenerator
     {
         private const string Folders = "Resources/Editor";
@@ -21,7 +26,7 @@
         {
             string classContent = GetClassContents();
 
-            var oldMethodsSet = new HashSet<MenuItemMethod>(AssetCreatorPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
+            var oldMethodsSet = new HashSet<MenuItemMethod>(GenericSOPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
             var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
 
             if (oldMethodsSet.SetEquals(newMethodsSet))
@@ -30,7 +35,7 @@
             classContent = RemoveOldMethods(classContent, oldMethodsSet, newMethodsSet);
             classContent = AddNewMethods(classContent, oldMethodsSet, newMethodsSet);
 
-            AssetCreatorPersistentStorage.MenuItemMethods = newMethods;
+            GenericSOPersistentStorage.MenuItemMethods = newMethods;
 
             SaveToFile(classContent);
         }

@@ -1,8 +1,11 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.MenuItemsGeneration
 {
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// A struct that holds all variables needed to create a MenuItem method.
+    /// </summary>
     [Serializable]
     public struct MenuItemMethod
     {

@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Editor
+﻿namespace GenericScriptableObjects.Editor.AssetCreation
 {
     using System;
     using System.Linq;
@@ -7,6 +7,7 @@
     using TypeSelectionWindows;
     using UnityEditor.Callbacks;
     using UnityEngine;
+    using Util;
 
     /// <summary>
     /// Inherit from this class and use the <see cref="CreateAsset"/> method to create an AssetCreate menu.
@@ -42,26 +43,26 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if (AssetCreatorPersistentStorage.IsEmpty)
+            if (GenericSOPersistentStorage.IsEmpty)
                 return;
 
             try
             {
-                Type genericTypeWithoutArgs = AssetCreatorPersistentStorage.GenericType.Type.GetGenericTypeDefinition();
-                var paramTypes = AssetCreatorPersistentStorage.GenericType.Type.GenericTypeArguments;
+                Type genericTypeWithoutArgs = GenericSOPersistentStorage.GenericType.Type.GetGenericTypeDefinition();
+                var paramTypes = GenericSOPersistentStorage.GenericType.Type.GenericTypeArguments;
 
                 var creator = new AssetCreatorHelper(
                     genericTypeWithoutArgs,
                     paramTypes,
-                    AssetCreatorPersistentStorage.NamespaceName,
-                    AssetCreatorPersistentStorage.ScriptsPath,
-                    AssetCreatorPersistentStorage.FileName);
+                    GenericSOPersistentStorage.NamespaceName,
+                    GenericSOPersistentStorage.ScriptsPath,
+                    GenericSOPersistentStorage.FileName);
 
                 creator.CreateAssetFromExistingType();
             }
             finally
             {
-                AssetCreatorPersistentStorage.Clear();
+                GenericSOPersistentStorage.Clear();
             }
         }
 
