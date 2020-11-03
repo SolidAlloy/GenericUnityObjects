@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using TypeReferences;
     using UnityEngine;
+    using UnityEngine.Assertions;
     using Util;
 
     /// <summary>
@@ -15,9 +16,9 @@
         private readonly Dictionary<TypeReference[], TypeReference> _dict =
             new Dictionary<TypeReference[], TypeReference>(new TypeReferenceArrayComparer());
 
-        [SerializeField] private TypeReferenceCollection[] _keys;
+        [SerializeField] private TypeReferenceCollection[] _keys = { };
 
-        [SerializeField] private TypeReference[] _values;
+        [SerializeField] private TypeReference[] _values = { };
 
         public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), new TypeReference(value, true));
 
@@ -34,11 +35,11 @@
 
         public void OnAfterDeserialize()
         {
-            if (_keys == null || _values == null || _keys.Length != _values.Length)
-                return;
-
-            _dict.Clear();
             int keysLength = _keys.Length;
+            int valuesLength = _values.Length;
+
+            Assert.IsTrue(keysLength == valuesLength);
+            Assert.IsTrue(_dict.Count == 0);
 
             for (int i = 0; i < keysLength; ++i)
             {
@@ -47,9 +48,6 @@
 
                 _dict[_keys[i]] = _values[i];
             }
-
-            _keys = null;
-            _values = null;
         }
 
         public void OnBeforeSerialize()

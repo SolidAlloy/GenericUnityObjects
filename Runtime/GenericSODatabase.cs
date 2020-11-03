@@ -84,7 +84,7 @@
             {
                 TypeReference typeRef = _keys[i];
 
-                if (typeRef.Type == null && typeRef.GUID == string.Empty)
+                if (typeRef.TypeIsMissing())
                     continue;
 
                 _dict[typeRef] = _values[i];
