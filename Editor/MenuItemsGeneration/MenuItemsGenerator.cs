@@ -46,7 +46,7 @@
 
             foreach (MenuItemMethod method in methodsToRemove)
             {
-                var regex = new Regex($@"\[MenuItem.*?\n.*?{method.TypeName}.*?\n");
+                var regex = new Regex($@"\[MenuItem.*?\n.*?{method.TypeName}.*?\n\n");
                 classContent = regex.Replace(classContent, string.Empty, 1);
             }
 
@@ -75,7 +75,7 @@
         private static string GetClassContents()
         {
             const string emptyClass =
-                "namespace GenericScriptableObjects.Editor\n{\nusing UnityEditor;\ninternal class MenuItems : GenericSOCreator\n{\n}\n}";
+                "namespace GenericScriptableObjects.Editor.AssetCreation\n{\nusing UnityEditor;\ninternal class MenuItems : GenericSOCreator\n{\n}\n}";
 
             if (!File.Exists(FilePath))
                 return emptyClass;
@@ -92,7 +92,7 @@
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
             string typeName = GetGenericTypeDefinitionName(method.Type);
             string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), \"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
-            return $"{attributeLine}\n{methodLine}\n";
+            return $"{attributeLine}\n{methodLine}\n\n";
         }
 
         private static string GetGenericTypeDefinitionName(Type type)
