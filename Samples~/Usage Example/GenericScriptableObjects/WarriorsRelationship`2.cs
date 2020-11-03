@@ -4,6 +4,7 @@
     using Classes;
 
     [Serializable]
+    [CreateGenericAssetMenu]
     public class WarriorsRelationship<TFirst, TSecond> : GenericScriptableObject
         where TFirst : Class
         where TSecond : Class

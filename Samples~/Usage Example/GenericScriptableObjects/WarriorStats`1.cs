@@ -4,6 +4,7 @@ namespace GenericScriptableObjects.Usage_Example
     using Classes;
 
     [Serializable]
+    [CreateGenericAssetMenu]
     public class WarriorStats<TClass> : GenericScriptableObject
         where TClass : Class
     {
