@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     [Serializable]
-    internal struct MenuItemMethod
+    public struct MenuItemMethod
     {
         public string TypeName;
         public string FileName;

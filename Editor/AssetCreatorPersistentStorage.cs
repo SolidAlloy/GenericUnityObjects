@@ -6,7 +6,7 @@
     using UnityEngine;
     using Util;
 
-    internal class AssetCreatorPersistentStorage : SingletonScriptableObject<AssetCreatorPersistentStorage>
+    public class AssetCreatorPersistentStorage : SingletonScriptableObject<AssetCreatorPersistentStorage>
     {
         [HideInInspector]
         [SerializeField] private TypeReference _genericType;
@@ -23,6 +23,9 @@
         [HideInInspector]
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
+        [HideInInspector]
+        [SerializeField] private bool _usageExampleTypesAreAdded;
+
         public static bool IsEmpty => Instance._genericType.Type == null;
 
         public static TypeReference GenericType => Instance._genericType;
@@ -36,6 +39,16 @@
             set
             {
                 Instance._menuItemMethods = value;
+                EditorUtility.SetDirty(Instance);
+            }
+        }
+
+        public static bool UsageExampleTypesAreAdded
+        {
+            get => Instance._usageExampleTypesAreAdded;
+            set
+            {
+                Instance._usageExampleTypesAreAdded = value;
                 EditorUtility.SetDirty(Instance);
             }
         }

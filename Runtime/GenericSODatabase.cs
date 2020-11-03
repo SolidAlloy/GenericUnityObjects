@@ -23,7 +23,7 @@
     ///     bool, int --- CustomGeneric_2_System_Boolean_System_Int32
     ///     bool, float --- CustomGeneric_2_System_Boolean_System_Single
     /// </summary>
-    internal class GenericSODatabase :
+    public class GenericSODatabase :
         SingletonScriptableObject<GenericSODatabase>,
         ISerializationCallbackReceiver
     {
