@@ -4,7 +4,7 @@
   "displayName": "Generic ScriptableObjects",
   "description": "A plugin that allows to implement generic scriptable objects, create assets from them, and instantiate them at runtime.",
   "dependencies": {
-    "com.solidalloy.util": "1.14.0",
+    "com.solidalloy.util": "1.15.0",
     "com.solidalloy.type.references": "2.6.0"
   },
   "keywords": [
