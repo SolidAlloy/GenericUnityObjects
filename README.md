@@ -113,7 +113,7 @@ public class WarriorStats<TClass> : GenericScriptableObject
 
 Now you can create assets:
 
-![](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/master/.asset-creation.gif)
+![](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableObjects/main/.asset-creation.gif?token=AFOZEDUUFHKZ3NXOYTFZFTS7ULXZE)
 
 When you create an asset with certain generic arguments for the first time, the assemblies will reload. This is an expected behavior because the plugin must create a non-generic class that is derived from the generic class with the arguments you've chosen. Once the assemblies reload, the usual asset creation dialog will appear, where you will be prompted to enter the name of your new asset.
 
@@ -134,7 +134,7 @@ Remember to add the Serializable attribute to your class to be able to reference
 
 You will get the object field in the inspector:
 
-![](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/master/.object-field.gif)
+![](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.object-field.png?token=AFOZEDWJGJ7L4OHVQ537XRS7ULQ4E)
 
 Unfortunately, Unity shows *WarriorStats`1* there instead of *WarriorStats\<Knight>*. They are aware of [this problem](https://forum.unity.com/threads/generic-scriptable-object-fields.790763/), and hopefully it will be fixed soon.
 
@@ -181,3 +181,7 @@ When you create a GenericScriptableObject class, please name the file specifying
 This way you ensure that the plugin will not lose reference to the class and there will be no issues with instantiating your class if you decide to rename it later.
 
 Also, when renaming a class, it's recommended to rename the file first, and then the class itself.
+
+#### What happens if I remove a class that derives from GenericScriptableObject?
+
+The plugin handles removal of the auto-generated classes. You may see an error in the console for one second, then the editor will recompile assemblies again, and all the auto-generated classes will be removed.
