@@ -26,6 +26,8 @@
 
         public bool TryGetValue(TypeReference[] key, out TypeReference value) => _dict.TryGetValue(key, out value);
 
+        public TypeReference[] Values => _values;
+
         public bool TryGetValue(Type[] key, out Type value)
         {
             bool result = TryGetValue(key.CastToTypeReference(), out TypeReference typeRef);

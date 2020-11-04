@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using TypeReferences;
 #if UNITY_EDITOR
     using UnityEditor;
@@ -37,6 +38,8 @@
         [SerializeField] private TypeDictionary[] _values;
 
         private bool _shouldSetDirty;
+
+        public static IEnumerable<TypeReference> Values => Instance._values.SelectMany(dictionary => dictionary.Values);
 
         public static void Add(Type genericType, Type[] key, Type value)
         {
