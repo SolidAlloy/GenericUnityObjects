@@ -39,8 +39,6 @@
 
         private bool _shouldSetDirty;
 
-        public static IEnumerable<TypeReference> Values => Instance._values.SelectMany(dictionary => dictionary.Values);
-
         public static void Add(Type genericType, Type[] key, Type value)
         {
             Assert.IsTrue(genericType.IsGenericTypeDefinition);

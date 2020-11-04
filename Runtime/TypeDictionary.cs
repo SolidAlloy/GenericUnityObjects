@@ -22,17 +22,24 @@
 
         public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), new TypeReference(value, true));
 
-        public bool ContainsKey(Type[] key) => _dict.ContainsKey(key.CastToTypeReference());
+        public bool ContainsKey(Type[] key)
+        {
+            var refKey = key.CastToTypeReference();
+
+            if (! _dict.ContainsKey(refKey))
+                return false;
+
+            return _dict[refKey].Type != null;
+        }
 
         public bool TryGetValue(TypeReference[] key, out TypeReference value) => _dict.TryGetValue(key, out value);
-
-        public TypeReference[] Values => _values;
 
         public bool TryGetValue(Type[] key, out Type value)
         {
             bool result = TryGetValue(key.CastToTypeReference(), out TypeReference typeRef);
             value = typeRef;
-            return result;
+
+            return result && value != null;
         }
 
         public void OnAfterDeserialize()

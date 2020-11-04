@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableObjects.Editor.Util
 {
     using System;
+    using System.Collections.Generic;
     using GenericScriptableObjects.Util;
     using MenuItemsGeneration;
     using TypeReferences;
@@ -26,7 +27,7 @@
         [SerializeField] private string _fileName;
 
         [HideInInspector]
-        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
+        [SerializeField] private List<MenuItemMethod> _menuItemMethods = new List<MenuItemMethod>();
 
         [HideInInspector]
         [SerializeField] private bool _usageExampleTypesAreAdded;
@@ -38,7 +39,7 @@
         public static string ScriptsPath => Instance._scriptsPath;
         public static string FileName => Instance._fileName;
 
-        public static MenuItemMethod[] MenuItemMethods
+        public static List<MenuItemMethod> MenuItemMethods
         {
             get => Instance._menuItemMethods;
             set

@@ -19,12 +19,12 @@
     internal static class MenuItemsGenerator
     {
         private const string Folders = "Resources/Editor";
-        private static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
+        public static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
         private static string _oldContent;
 
-        public static void GenerateClass(MenuItemMethod[] newMethods)
+        public static void GenerateClass(List<MenuItemMethod> newMethods)
         {
-            string classContent = GetClassContents();
+            string classContent = GetClassContent();
 
             var oldMethodsSet = new HashSet<MenuItemMethod>(GenericSOPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
             var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
@@ -32,7 +32,6 @@
             if (oldMethodsSet.SetEquals(newMethodsSet))
                 return;
 
-            classContent = RemoveOldMethods(classContent, oldMethodsSet, newMethodsSet);
             classContent = AddNewMethods(classContent, oldMethodsSet, newMethodsSet);
 
             GenericSOPersistentStorage.MenuItemMethods = newMethods;
@@ -40,17 +39,12 @@
             SaveToFile(classContent);
         }
 
-        private static string RemoveOldMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet, HashSet<MenuItemMethod> newMethodsSet)
+        public static void RemoveMethod(string typeName)
         {
-            var methodsToRemove = oldMethodsSet.ExceptWith(newMethodsSet, MenuItemMethod.Comparer);
-
-            foreach (MenuItemMethod method in methodsToRemove)
-            {
-                var regex = new Regex($@"\[MenuItem.*?\n.*?{method.TypeName}.*?\n\n");
-                classContent = regex.Replace(classContent, string.Empty, 1);
-            }
-
-            return classContent;
+            string classContent = GetClassContent();
+            var regex = new Regex($@"\[MenuItem.*?\n.*?{typeName}.*?\n\n");
+            classContent = regex.Replace(classContent, string.Empty, 1);
+            SaveToFile(classContent);
         }
 
         private static string AddNewMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet,
@@ -68,11 +62,11 @@
                 newMethods += CreateMenuItemMethod(method);
             }
 
-            int insertPos = classContent.Length - 3;
+            int insertPos = classContent.Length - 4;
             return classContent.Insert(insertPos, newMethods);
         }
 
-        private static string GetClassContents()
+        private static string GetClassContent()
         {
             const string emptyClass =
                 "namespace GenericScriptableObjects.Editor.AssetCreation\n{\nusing UnityEditor;\ninternal class MenuItems : GenericSOCreator\n{\n}\n}";
