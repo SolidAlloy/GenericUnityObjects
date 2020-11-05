@@ -27,7 +27,7 @@
         [SerializeField] private string _fileName;
 
         [HideInInspector]
-        [SerializeField] private List<MenuItemMethod> _menuItemMethods = new List<MenuItemMethod>();
+        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
         [HideInInspector]
         [SerializeField] private bool _usageExampleTypesAreAdded;
@@ -39,7 +39,7 @@
         public static string ScriptsPath => Instance._scriptsPath;
         public static string FileName => Instance._fileName;
 
-        public static List<MenuItemMethod> MenuItemMethods
+        public static MenuItemMethod[] MenuItemMethods
         {
             get => Instance._menuItemMethods;
             set

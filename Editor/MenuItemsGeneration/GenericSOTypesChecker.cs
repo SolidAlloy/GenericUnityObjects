@@ -45,7 +45,7 @@
                 });
             }
 
-            MenuItemsGenerator.GenerateClass(menuItemMethods);
+            MenuItemsGenerator.GenerateClass(menuItemMethods.ToArray());
         }
 
         private static void CheckInvalidName(string typeName)

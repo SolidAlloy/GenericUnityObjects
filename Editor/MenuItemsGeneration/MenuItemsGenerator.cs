@@ -18,11 +18,15 @@
     /// </summary>
     internal static class MenuItemsGenerator
     {
-        private const string Folders = "Resources/Editor";
         public static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
+
+        private const string NewLine = "\r\n";
+        private const string RawNewLine = @"\r\n";
+        private const string Folders = "Resources/Editor";
+
         private static string _oldContent;
 
-        public static void GenerateClass(List<MenuItemMethod> newMethods)
+        public static void GenerateClass(MenuItemMethod[] newMethods)
         {
             string classContent = GetClassContent();
 
@@ -32,6 +36,7 @@
             if (oldMethodsSet.SetEquals(newMethodsSet))
                 return;
 
+            classContent = RemoveOldMethods(classContent, oldMethodsSet, newMethodsSet);
             classContent = AddNewMethods(classContent, oldMethodsSet, newMethodsSet);
 
             GenericSOPersistentStorage.MenuItemMethods = newMethods;
@@ -42,8 +47,7 @@
         public static void RemoveMethod(string typeName)
         {
             string classContent = GetClassContent();
-            var regex = new Regex($@"\[MenuItem.*?\n.*?{typeName}.*?\n\n");
-            classContent = regex.Replace(classContent, string.Empty, 1);
+            classContent = RemoveMethod(classContent, typeName);
             SaveToFile(classContent);
         }
 
@@ -66,16 +70,40 @@
             return classContent.Insert(insertPos, newMethods);
         }
 
+        private static string RemoveOldMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet, HashSet<MenuItemMethod> newMethodsSet)
+        {
+            var methodsToRemove = oldMethodsSet.ExceptWith(newMethodsSet, MenuItemMethod.Comparer);
+
+            foreach (MenuItemMethod method in methodsToRemove)
+            {
+                classContent = RemoveMethod(classContent, method.TypeName);
+            }
+
+            return classContent;
+        }
+
+        private static string RemoveMethod(string classContent, string typeName)
+        {
+            var regex = new Regex($@"\[MenuItem.*?{RawNewLine}.*?{typeName}.*?{RawNewLine}{RawNewLine}");
+            classContent = regex.Replace(classContent, string.Empty, 1);
+            return classContent;
+        }
+
         private static string GetClassContent()
         {
-            const string emptyClass =
-                "namespace GenericScriptableObjects.Editor.AssetCreation\n{\nusing UnityEditor;\ninternal class MenuItems : GenericSOCreator\n{\n}\n}";
+            if (File.Exists(FilePath))
+            {
+                _oldContent = File.ReadAllText(FilePath);
+                return _oldContent;
+            }
 
-            if (!File.Exists(FilePath))
-                return emptyClass;
+            string emptyClass = $"namespace GenericScriptableObjects.Editor.AssetCreation{NewLine}{{{NewLine}" +
+                                $"using UnityEditor;{NewLine}internal class MenuItems : GenericSOCreator{NewLine}" +
+                                $"{{{NewLine}}}{NewLine}}}";
 
-            _oldContent = File.ReadAllText(FilePath);
-            return _oldContent;
+            AssetDatabaseHelper.MakeSureFolderExists(Folders);
+            File.WriteAllText(FilePath, emptyClass);
+            return emptyClass;
         }
 
         private static string CreateMenuItemMethod(MenuItemMethod method)
@@ -85,8 +113,11 @@
 
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
             string typeName = GetGenericTypeDefinitionName(method.Type);
-            string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), \"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
-            return $"{attributeLine}\n{methodLine}\n\n";
+
+            string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), " +
+                                $"\"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
+
+            return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
         }
 
         private static string GetGenericTypeDefinitionName(Type type)
@@ -111,7 +142,6 @@
             if (_oldContent != null && _oldContent == classContent)
                 return;
 
-            AssetDatabaseHelper.MakeSureFolderExists(Folders);
             File.WriteAllText(FilePath, classContent);
             AssetDatabase.Refresh();
         }
