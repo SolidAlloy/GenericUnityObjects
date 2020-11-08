@@ -27,9 +27,13 @@
 
         private static Type GetFilterType(SerializedProperty property)
         {
-            Type genericType = property.GetObjectType();
-            GenericSODatabase.TryGetValue(genericType, out Type concreteType);
-            return concreteType ?? genericType;
+            Type objectType = property.GetObjectType();
+
+            if ( ! objectType.IsGenericType)
+                return objectType;
+
+            GenericSODatabase.TryGetValue(objectType, out Type concreteType);
+            return concreteType ?? objectType;
         }
     }
 }
