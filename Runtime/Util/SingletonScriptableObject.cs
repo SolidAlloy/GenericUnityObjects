@@ -26,14 +26,25 @@
                 if (_instance != null)
                     return _instance;
 
-#if UNITY_EDITOR
+                T instance;
                 const string assetsFolder = "Assets";
                 const string resourcesFolder = "Resources";
                 string assetPath = assetsFolder + '/' + resourcesFolder + '/' + typeof(T).Name + ".asset";
-                T instance = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+
+                try
+                {
+#if UNITY_EDITOR
+                    instance = AssetDatabase.LoadAssetAtPath<T>(assetPath);
 #else
-                T instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
+                    instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
 #endif
+                }
+                catch (UnityException)
+                {
+                    Debug.LogError("GenericScriptableObject.CreateInstance() cannot be called in the field " +
+                              "initializer. Please initialize Generic ScriptableObjects in Awake or Start.");
+                    throw;
+                }
 
                 if (instance != null)
                 {
