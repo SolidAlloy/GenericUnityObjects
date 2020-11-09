@@ -15,7 +15,7 @@
         /// <summary>Creates an instance of <see cref="ScriptableObject"/>. Has support for generic scriptable objects.</summary>
         /// <param name="type">Type derived from <see cref="ScriptableObject"/>.</param>
         /// <returns>Instance of <paramref name="type"/>.</returns>
-        [PublicAPI, CanBeNull]
+        [PublicAPI, CanBeNull, Pure]
         public static new ScriptableObject CreateInstance(Type type)
         {
             if ( ! type.IsGenericType)
@@ -36,7 +36,7 @@
         /// </summary>
         /// <typeparam name="T">Type derived from ScriptableObject.</typeparam>
         /// <returns>Instance of <typeparamref name="T"/>>.</returns>
-        [PublicAPI, CanBeNull]
+        [PublicAPI, CanBeNull, Pure]
         public static new T CreateInstance<T>()
             where T : ScriptableObject
         {
@@ -58,7 +58,7 @@
         /// If the number of generic argument types passed into the method is not equal to the number of generic
         /// arguments the type can take.
         /// </exception>
-        [PublicAPI, CanBeNull]
+        [PublicAPI, CanBeNull, Pure]
         public static GenericScriptableObject CreateInstance(Type genericTypeWithoutTypeParams, params Type[] paramTypes)
         {
             int genericArgCount = genericTypeWithoutTypeParams.GetGenericArguments().Length;
