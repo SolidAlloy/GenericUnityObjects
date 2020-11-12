@@ -2,7 +2,7 @@
 {
     using System;
     using ConcreteImplementations;
-    using GenericScriptableObjects.Editor;
+    using GenericScriptableObjects.Editor.Util;
     using NUnit.Framework;
     using UnityEditor.Callbacks;
 
@@ -18,7 +18,7 @@
         [DidReloadScripts]
         public static void AddTypesToDictIfNecessary()
         {
-            if (AssetCreatorPersistentStorage.UsageExampleTypesAreAdded)
+            if (GenericSOPersistentStorage.UsageExampleTypesAreAdded)
                 return;
 
             foreach (Type type in TypesToAdd)
@@ -32,7 +32,7 @@
                     GenericSODatabase.Add(parentTypeDefinition, genericArgs, type);
             }
 
-            AssetCreatorPersistentStorage.UsageExampleTypesAreAdded = true;
+            GenericSOPersistentStorage.UsageExampleTypesAreAdded = true;
         }
     }
 }
