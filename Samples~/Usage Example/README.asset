@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3732b7fccbe84e4fa096cfbd2b945f24, type: 3}
   m_Name: README
   m_EditorClassIdentifier: 
-  Description: 'The example contains two classes derived from GenericScriptableObject:
+  _description: 'The example contains two classes derived from GenericScriptableObject:
 
     -
     WarriorStats<TClass>
