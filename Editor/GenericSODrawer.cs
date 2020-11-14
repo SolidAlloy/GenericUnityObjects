@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableObjects.Editor
 {
     using System;
+    using System.Collections.Generic;
     using SolidUtilities.Editor.Extensions;
     using SolidUtilities.Editor.Helpers;
     using UnityEditor;
@@ -32,8 +33,32 @@
             if ( ! objectType.IsGenericType)
                 return objectType;
 
-            GenericSODatabase.TryGetValue(objectType, out Type concreteType);
+            TypeCache.TryGetValue(objectType, out Type concreteType);
             return concreteType ?? objectType;
+        }
+    }
+
+    internal static class TypeCache
+    {
+        private static readonly Dictionary<Type, Type> Dict = new Dictionary<Type, Type>();
+
+        public static void TryGetValue(Type key, out Type value)
+        {
+            // GenericSODatabase is not going to get a new type at runtime, so it is wise to cache its value once.
+            // Calling GenericSODatabase.TryGetValue is apparently a tremendously heavy operation that takes 200-800 ms.
+            // That's because the TypeReference constructor takes about 80 ms to find some GUIDs in AssetDatabase.
+            // TODO: 1. Optimize the TypeReference constructor.
+            // TODO: 2. Make GenericSODrawer's private dictionaries use System.Type instead of TypeReference.
+            
+            if (Dict.ContainsKey(key))
+            {
+                value = Dict[key];
+                return;
+            }
+
+            GenericSODatabase.TryGetValue(key, out Type rawValue);
+            Dict.Add(key, rawValue);
+            value = rawValue;
         }
     }
 }
