@@ -32,7 +32,7 @@
         [HideInInspector]
         [SerializeField] private bool _usageExampleTypesAreAdded;
 
-        public static bool IsEmpty => Instance._genericType.Type == null;
+        public static bool IsEmpty => OnlyCreatedInstance == null || OnlyCreatedInstance._genericType.Type == null;
 
         public static TypeReference GenericType => Instance._genericType;
         public static string NamespaceName => Instance._namespaceName;
@@ -41,10 +41,10 @@
 
         public static MenuItemMethod[] MenuItemMethods
         {
-            get => Instance._menuItemMethods;
+            get => OnlyCreatedInstance == null ? null : OnlyCreatedInstance._menuItemMethods;
             set
             {
-                Instance._menuItemMethods = value;
+                OnlyCreatedInstance._menuItemMethods = value;
                 EditorUtility.SetDirty(Instance);
             }
         }

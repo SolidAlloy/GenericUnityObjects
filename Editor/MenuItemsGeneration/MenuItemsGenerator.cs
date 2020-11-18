@@ -30,6 +30,13 @@
         {
             string classContent = GetClassContent();
 
+            var oldMethods = GenericSOPersistentStorage.MenuItemMethods;
+
+            // Stop if the PersistentStorage asset was not found. It frequently happens on Unity Editor launch, leading
+            // to the false assumption the MenuItemMethods collection is empty.
+            if (oldMethods == null)
+                return;
+
             var oldMethodsSet = new HashSet<MenuItemMethod>(GenericSOPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
             var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
 

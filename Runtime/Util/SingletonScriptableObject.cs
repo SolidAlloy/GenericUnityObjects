@@ -1,5 +1,6 @@
 ﻿namespace GenericScriptableObjects.Util
 {
+    using JetBrains.Annotations;
     using UnityEngine;
     using UnityEngine.Assertions;
 #if UNITY_EDITOR
@@ -17,6 +18,11 @@
     public abstract class SingletonScriptableObject<T> : ScriptableObject
         where T : ScriptableObject
     {
+        private const string AssetsFolder = "Assets";
+        private const string ResourcesFolder = "Resources";
+
+        private static readonly string AssetPath = AssetsFolder + '/' + ResourcesFolder + '/' + typeof(T).Name + ".asset";
+
         private static T _instance = null;
 
         public static T Instance
@@ -26,25 +32,7 @@
                 if (_instance != null)
                     return _instance;
 
-                T instance;
-                const string assetsFolder = "Assets";
-                const string resourcesFolder = "Resources";
-                string assetPath = assetsFolder + '/' + resourcesFolder + '/' + typeof(T).Name + ".asset";
-
-                try
-                {
-#if UNITY_EDITOR
-                    instance = AssetDatabase.LoadAssetAtPath<T>(assetPath);
-#else
-                    instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
-#endif
-                }
-                catch (UnityException)
-                {
-                    Debug.LogError("GenericScriptableObject.CreateInstance() cannot be called in the field " +
-                              "initializer. Please initialize Generic ScriptableObjects in Awake or Start.");
-                    throw;
-                }
+                T instance = GetInstanceFromAsset();
 
                 if (instance != null)
                 {
@@ -64,16 +52,52 @@
                 Assert.IsNotNull(_instance);
 
 #if UNITY_EDITOR
-                AssetDatabaseHelper.MakeSureFolderExists(resourcesFolder);
+                AssetDatabaseHelper.MakeSureFolderExists(ResourcesFolder);
 
-                AssetDatabase.CreateAsset(_instance, assetPath);
+                AssetDatabase.CreateAsset(_instance, AssetPath);
                 EditorUtility.SetDirty(_instance);
 #else
                 Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
 #endif
 
+                Debug.Log("asset was created");
                 return _instance;
             }
+        }
+
+        public static T OnlyCreatedInstance
+        {
+            get
+            {
+                if (_instance != null)
+                    return _instance;
+
+                _instance = GetInstanceFromAsset();
+                return _instance;
+            }
+        }
+
+        [CanBeNull]
+        private static T GetInstanceFromAsset()
+        {
+            T instance;
+
+            try
+            {
+#if UNITY_EDITOR
+                instance = AssetDatabase.LoadAssetAtPath<T>(AssetPath);
+#else
+                instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
+#endif
+            }
+            catch (UnityException)
+            {
+                Debug.LogError("GenericScriptableObject.CreateInstance() cannot be called in the field " +
+                               "initializer. Please initialize Generic ScriptableObjects in Awake or Start.");
+                throw;
+            }
+
+            return instance;
         }
     }
 }
