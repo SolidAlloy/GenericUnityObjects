@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows.Util
 {
     using System;
+    using SolidUtilities.Extensions;
     using TypeReferences;
     using TypeReferences.Editor.Drawers;
     using TypeReferences.Editor.TypeDropdown;
@@ -30,6 +31,7 @@
 
             Vector2 dropdownPosition = EditorGUIUtility.GetMainWindowPosition().center;
             dropdownPosition.x -= DropdownWindow.CalculateOptimalWidth(selectionTree.SelectionPaths) / 2f;
+            dropdownPosition = dropdownPosition.RoundUp();
 
             return DropdownWindow.Create(selectionTree, _attribute.DropdownHeight, dropdownPosition);
         }
