@@ -1,6 +1,7 @@
 ﻿namespace GenericScriptableObjects.Editor.TypeSelectionWindows.Util
 {
     using System;
+    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using TypeReferences;
     using TypeReferences.Editor.Drawers;
@@ -29,7 +30,7 @@
             if (_attribute.ExpandAllFolders)
                 selectionTree.ExpandAllFolders();
 
-            Vector2 dropdownPosition = EditorGUIUtility.GetMainWindowPosition().center;
+            Vector2 dropdownPosition = EditorDrawHelper.GetMainWindowPosition().center;
             dropdownPosition.x -= DropdownWindow.CalculateOptimalWidth(selectionTree.SelectionPaths) / 2f;
             dropdownPosition = dropdownPosition.RoundUp();
 
