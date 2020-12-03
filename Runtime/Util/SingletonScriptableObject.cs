@@ -59,8 +59,6 @@
 #else
                 Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
 #endif
-
-                Debug.Log("asset was created");
                 return _instance;
             }
         }
