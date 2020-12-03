@@ -4,6 +4,7 @@
     using ConcreteImplementations;
     using GenericScriptableObjects.Editor.Util;
     using NUnit.Framework;
+    using UnityEditor;
     using UnityEditor.Callbacks;
 
     public static class UsageExampleInstaller
@@ -33,6 +34,9 @@
             }
 
             GenericSOPersistentStorage.UsageExampleTypesAreAdded = true;
+
+            // Reload assemblies to generate MenuItems for the newly added types.
+            AssetDatabase.Refresh();
         }
     }
 }
