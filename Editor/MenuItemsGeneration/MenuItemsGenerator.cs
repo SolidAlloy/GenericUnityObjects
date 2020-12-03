@@ -115,7 +115,7 @@
 
         private static string CreateMenuItemMethod(MenuItemMethod method)
         {
-            string fileName = method.FileName == string.Empty ? $"New {method.TypeName}" : method.FileName;
+            string fileName = method.FileName == string.Empty ? $"New {method.Type.Name}" : method.FileName;
             string menuName = method.MenuName == string.Empty ? GetGenericTypeName(method.Type) : method.MenuName;
 
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
