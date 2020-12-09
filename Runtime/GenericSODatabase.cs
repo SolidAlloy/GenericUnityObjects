@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Diagnostics;
     using TypeReferences;
 #if UNITY_EDITOR
     using UnityEditor;
@@ -10,6 +10,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
+    using Debug = UnityEngine.Debug;
 
     /// <summary>
     /// A database of all the type parameters of generic scriptable objects and their matching concrete implementations.
@@ -44,9 +45,7 @@
             Assert.IsTrue(genericType.IsGenericTypeDefinition);
             TypeDictionary assetDict = GetAssetDict(genericType);
             assetDict.Add(key, value);
-#if UNITY_EDITOR
-            EditorUtility.SetDirty(Instance);
-#endif
+            SetInstanceDirty();
         }
 
         public static bool ContainsKey(Type genericType, Type[] key)
@@ -118,9 +117,7 @@
 
             assetDict = new TypeDictionary();
             Instance._dict.Add(new TypeReference(genericType, true), assetDict);
-#if UNITY_EDITOR
-            EditorUtility.SetDirty(Instance);
-#endif
+            SetInstanceDirty();
             return assetDict;
         }
 
@@ -129,10 +126,20 @@
             if (_shouldSetDirty)
             {
                 _shouldSetDirty = false;
-#if UNITY_EDITOR
-                EditorUtility.SetDirty(this);
-#endif
+                SetDirty();
             }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private new void SetDirty()
+        {
+            EditorUtility.SetDirty(this);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private static void SetInstanceDirty()
+        {
+            EditorUtility.SetDirty(Instance);
         }
     }
 }
