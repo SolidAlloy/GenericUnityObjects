@@ -32,7 +32,7 @@
             if ( ! objectType.IsGenericType)
                 return objectType;
 
-            GenericSODatabase.TryGetValue(objectType, out Type concreteType);
+            GenericObjectDatabase.TryGetValue(objectType, out Type concreteType);
 
             return concreteType ?? objectType;
         }

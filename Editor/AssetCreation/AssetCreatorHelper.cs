@@ -7,6 +7,7 @@
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
+    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -31,7 +32,7 @@
 
         public void CreateAsset()
         {
-            if (GenericSODatabase.ContainsKey(_genericType, _argumentTypes))
+            if (GenericObjectDatabase.ContainsKey(_genericType, _argumentTypes))
             {
                 CreateAssetInteractively();
                 return;
@@ -85,10 +86,10 @@
         /// <returns>Unique class name.</returns>
         private string GetUniqueClassName()
         {
-            string argumentNames = string.Join("_", _argumentTypes.Select(type => GenericSOUtil.GetClassSafeTypeName(type.Name)));
+            string argumentNames = string.Join("_", _argumentTypes.Select(type => type.Name.MakeClassFriendly()));
 
             int duplicationSuffix = 0;
-            string defaultClassName = $"{GenericSOUtil.GetClassSafeTypeName(_genericType.Name)}_{argumentNames}";
+            string defaultClassName = $"{_genericType.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
 
             string GetClassName()
             {
@@ -103,7 +104,7 @@
 
         private void CreateAssetFromExistingType(Type assetType)
         {
-            GenericSODatabase.Add(_genericType, _argumentTypes, assetType);
+            GenericObjectDatabase.Add(_genericType, _argumentTypes, assetType);
             CreateAssetInteractively();
         }
 

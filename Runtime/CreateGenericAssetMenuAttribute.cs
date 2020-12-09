@@ -7,9 +7,6 @@
     [BaseTypeRequired(typeof(GenericScriptableObject))]
     public class CreateGenericAssetMenuAttribute : Attribute
     {
-        public const string DefaultNamespaceName = "GenericSOTypes";
-        public const string DefaultScriptsPath = "Scripts/GenericSOTypes";
-
         /// <summary>The default file name used by newly created instances of this type.</summary>
         [PublicAPI, NotNull] public string FileName = string.Empty;
 
@@ -23,12 +20,12 @@
         /// Custom namespace name to set for auto-generated classes derived from this class.
         /// Default is "GenericScriptableObjectTypes".
         /// </summary>
-        [PublicAPI, NotNull] public string NamespaceName = DefaultNamespaceName;
+        [PublicAPI, NotNull] public string NamespaceName = Config.DefaultNamespaceName;
 
         /// <summary>
         /// Custom path to a folder where auto-generated classes must be kept.
-        /// Default is "Scripts/GenericSOTypes".
+        /// Default is "GenericSOTypes".
         /// </summary>
-        [PublicAPI, NotNull] public string ScriptsPath = DefaultScriptsPath;
+        [PublicAPI, NotNull] public string ScriptsPath = Config.DefaultScriptsPath;
     }
 }

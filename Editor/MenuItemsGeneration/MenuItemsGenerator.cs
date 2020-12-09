@@ -104,9 +104,13 @@
                 return _oldContent;
             }
 
-            string emptyClass = $"namespace GenericScriptableObjects.Editor.AssetCreation{NewLine}{{{NewLine}" +
-                                $"using UnityEditor;{NewLine}internal class MenuItems : GenericSOCreator{NewLine}" +
-                                $"{{{NewLine}}}{NewLine}}}";
+            string emptyClass = $"namespace GenericScriptableObjects.Editor.AssetCreation{NewLine}" +
+                                $"{{{NewLine}" +
+                                $"using UnityEditor;{NewLine}" +
+                                $"internal class MenuItems : GenericSOCreator{NewLine}" +
+                                $"{{{NewLine}" +
+                                $"}}{NewLine}" +
+                                $"}}";
 
             AssetDatabaseHelper.MakeSureFolderExists(Folders);
             File.WriteAllText(FilePath, emptyClass);
@@ -119,22 +123,12 @@
             string menuName = method.MenuName == string.Empty ? GetGenericTypeName(method.Type) : method.MenuName;
 
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
-            string typeName = GetGenericTypeDefinitionName(method.Type);
+            string typeName = TypeChecker.GetGenericTypeDefinitionName(method.Type);
 
             string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), " +
                                 $"\"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
 
             return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
-        }
-
-        private static string GetGenericTypeDefinitionName(Type type)
-        {
-            string fullTypeName = type.FullName;
-            Assert.IsNotNull(fullTypeName);
-            string typeNameWithoutArguments = fullTypeName.Split('`')[0];
-            int argsCount = type.GetGenericArguments().Length;
-            string suffix = $"<{new string(',', argsCount-1)}>";
-            return typeNameWithoutArguments + suffix;
         }
 
         private static string GetGenericTypeName(Type type)

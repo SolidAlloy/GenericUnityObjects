@@ -16,17 +16,17 @@
     /// A database of all the type parameters of generic scriptable objects and their matching concrete implementations.
     /// When a new GenericScriptableObject asset is created through Unity context menu, a concrete implementation is
     /// created and added to this dictionary.
-    ///
-    /// For example:
+    /// <example>
     /// CustomGeneric&lt;T>
-    ///     bool --- CustomGeneric_1_System_Boolean
-    ///     int  --- CustomGeneric_1_System_Int32
+    ///     bool --- CustomGeneric_Boolean
+    ///     int  --- CustomGeneric_Int32
     /// CustomGeneric&lt;T1,T2>
-    ///     bool, int --- CustomGeneric_2_System_Boolean_System_Int32
-    ///     bool, float --- CustomGeneric_2_System_Boolean_System_Single
+    ///     bool, int --- CustomGeneric_Boolean_Int32
+    ///     bool, float --- CustomGeneric_Boolean_Single
+    /// </example>
     /// </summary>
-    public class GenericSODatabase :
-        SingletonScriptableObject<GenericSODatabase>,
+    public class GenericObjectDatabase :
+        SingletonScriptableObject<GenericObjectDatabase>,
         ISerializationCallbackReceiver
     {
         private readonly Dictionary<TypeReference, TypeDictionary> _dict =

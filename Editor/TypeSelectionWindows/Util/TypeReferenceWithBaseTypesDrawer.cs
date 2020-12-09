@@ -10,12 +10,6 @@
     using UnityEngine.Assertions;
     using TypeCache = TypeReferences.Editor.Util.TypeCache;
 
-    [Serializable]
-    internal class TypeReferenceWithBaseTypes : TypeReference
-    {
-        public string[] BaseTypeNames;
-    }
-
     [CustomPropertyDrawer(typeof(TypeReferenceWithBaseTypes))]
     internal class TypeReferenceWithBaseTypesDrawer : TypeReferencePropertyDrawer
     {

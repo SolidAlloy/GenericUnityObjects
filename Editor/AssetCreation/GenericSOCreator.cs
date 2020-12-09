@@ -72,7 +72,7 @@
                 return namespaceName;
 
             Debug.LogError($"The provided namespace name '{namespaceName}' is not a valid identifier.");
-            namespaceName = CreateGenericAssetMenuAttribute.DefaultNamespaceName;
+            namespaceName = Config.DefaultNamespaceName;
             return namespaceName;
         }
 
@@ -82,7 +82,7 @@
                 return scriptsPath;
 
             Debug.LogError($"The provided path '{scriptsPath}' is not a valid Unity path. Restricted characters are /?<>\\:*|\"");
-            scriptsPath = CreateGenericAssetMenuAttribute.DefaultScriptsPath;
+            scriptsPath = Config.DefaultScriptsPath;
             return scriptsPath;
         }
     }
