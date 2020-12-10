@@ -2,6 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using AssetCreation;
+    using GenericScriptableObjects.Util;
     using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
@@ -42,8 +44,11 @@
             }
             else
             {
-                // TODO: pass generic type and arguments to a method that will add the component.
-                Debug.Log($"Adding component of type {_targetSelector.GenericBehaviourType} with args: {string.Join(", ", (IEnumerable<TypeReferenceWithBaseTypes>) _targetSelector.TypeRefs)}");
+                GenericBehaviourCreator.AddComponent(
+                    _targetSelector.GetType(),
+                    _targetSelector.gameObject,
+                    _targetSelector.GenericBehaviourType,
+                    _targetSelector.TypeRefs.CastToType());
             }
         }
     }

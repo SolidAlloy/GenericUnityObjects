@@ -40,10 +40,18 @@
 
         private bool _shouldSetDirty;
 
-        public static void Add(Type genericType, Type[] key, Type value)
+        public static void Add(Type genericType, Type value)
         {
-            Assert.IsTrue(genericType.IsGenericTypeDefinition);
-            TypeDictionary assetDict = GetAssetDict(genericType);
+            var paramTypes = genericType.GetGenericArguments();
+            Assert.IsFalse(paramTypes.Length == 0);
+            Type genericTypeWithoutParams = genericType.GetGenericTypeDefinition();
+            Add(genericTypeWithoutParams, paramTypes, value);
+        }
+
+        public static void Add(Type genericTypeWithoutArgs, Type[] key, Type value)
+        {
+            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+            TypeDictionary assetDict = GetAssetDict(genericTypeWithoutArgs);
             assetDict.Add(key, value);
             SetInstanceDirty();
         }
@@ -60,8 +68,14 @@
             var paramTypes = genericType.GetGenericArguments();
             Assert.IsFalse(paramTypes.Length == 0);
             Type genericTypeWithoutParams = genericType.GetGenericTypeDefinition();
-            TypeDictionary assetDict = GetAssetDict(genericTypeWithoutParams);
-            bool result = assetDict.TryGetValue(paramTypes, out value);
+            return TryGetValue(genericTypeWithoutParams, paramTypes, out value);
+        }
+
+        public static bool TryGetValue(Type genericTypeWithoutArgs, Type[] genericArgs, out Type value)
+        {
+            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+            TypeDictionary assetDict = GetAssetDict(genericTypeWithoutArgs);
+            bool result = assetDict.TryGetValue(genericArgs, out value);
             return result;
         }
 

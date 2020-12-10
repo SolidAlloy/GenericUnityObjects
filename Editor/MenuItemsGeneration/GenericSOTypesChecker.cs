@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using AssetCreation;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -26,7 +27,7 @@
             {
                 Type type = types[i];
 
-                TypeChecker.CheckInvalidName(type.Name);
+                CreatorUtil.CheckInvalidName(type.Name);
 
                 var assetMenuAttribute = type.GetCustomAttribute<CreateGenericAssetMenuAttribute>();
                 if (assetMenuAttribute == null)

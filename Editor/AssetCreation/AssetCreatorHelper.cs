@@ -3,10 +3,8 @@
     using System;
     using System.IO;
     using System.Linq;
-    using JetBrains.Annotations;
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
@@ -40,7 +38,7 @@
 
             Type genericTypeWithArgs = _genericType.MakeGenericType(_argumentTypes);
 
-            Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+            Type existingAssetType = CreatorUtil.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
 
             if (existingAssetType != null)
             {
@@ -48,7 +46,7 @@
                 return;
             }
 
-            GenericSOPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath, _fileName);
+            GenericObjectsPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _namespaceName, _scriptsPath, _fileName);
             string className = GetUniqueClassName();
             CreateScript(className);
         }
@@ -56,28 +54,13 @@
         public void CreateAssetFromExistingType()
         {
             Type genericTypeWithArgs = _genericType.MakeGenericType(_argumentTypes);
-            Type existingAssetType = GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+            Type existingAssetType = CreatorUtil.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
             Assert.IsNotNull(existingAssetType);
             CreateAssetFromExistingType(existingAssetType);
         }
 
         private static string GetTypeNameWithoutAssembly(string fullTypeName)
             => fullTypeName.Split('[')[0];
-
-        [CanBeNull]
-        private static Type GetEmptyTypeDerivedFrom(Type parentType)
-        {
-            TypeCache.TypeCollection foundTypes = TypeCache.GetTypesDerivedFrom(parentType);
-
-            if (foundTypes.Count == 0)
-                return null;
-
-            // Why would there be another empty type derived from GenericScriptableObject?
-            Assert.IsTrue(foundTypes.Count == 1);
-
-            Type matchingType = foundTypes.FirstOrDefault(type => type.IsEmpty());
-            return matchingType;
-        }
 
         /// <summary>
         /// The method first creates a class name that consists of the generic type name and names of the arguments.
@@ -132,12 +115,8 @@
 
         private string GetScriptContent(string className)
         {
-            string genericTypeNameWithoutParam = _genericType.Name.Split('`')[0];
-            string paramTypeNames = string.Join(", ", _argumentTypes
-                .Select(type => GetTypeNameWithoutAssembly(type.FullName)));
-
-            return $"namespace {_namespaceName} {{ public class {className} : " +
-                   $"{_genericType.Namespace}.{genericTypeNameWithoutParam}<{paramTypeNames}> {{ }} }}";
+            string genericTypeWithBrackets = CreatorUtil.GetFullNameWithBrackets(_genericType, _argumentTypes);
+            return $"namespace {_namespaceName} {{ public class {className} : {genericTypeWithBrackets} {{ }} }}";
         }
 
         private void CreateAssetInteractively()

@@ -5,9 +5,11 @@
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using AssetCreation;
     using NUnit.Framework;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
+    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
     using Util;
@@ -20,8 +22,8 @@
     {
         public static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
 
-        private const string NewLine = "\r\n";
-        private const string RawNewLine = @"\r\n";
+        private const string NewLine = Config.NewLine;
+        private const string RawNewLine = Config.RawNewLine;
         private const string Folders = "Resources/Editor";
 
         private static string _oldContent;
@@ -30,14 +32,14 @@
         {
             string classContent = GetClassContent();
 
-            var oldMethods = GenericSOPersistentStorage.MenuItemMethods;
+            var oldMethods = GenericObjectsPersistentStorage.MenuItemMethods;
 
             // Stop if the PersistentStorage asset was not found. It frequently happens on Unity Editor launch, leading
             // to the false assumption the MenuItemMethods collection is empty.
             if (oldMethods == null)
                 return;
 
-            var oldMethodsSet = new HashSet<MenuItemMethod>(GenericSOPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
+            var oldMethodsSet = new HashSet<MenuItemMethod>(GenericObjectsPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
             var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
 
             if (oldMethodsSet.SetEquals(newMethodsSet))
@@ -46,7 +48,7 @@
             classContent = RemoveOldMethods(classContent, oldMethodsSet, newMethodsSet);
             classContent = AddNewMethods(classContent, oldMethodsSet, newMethodsSet);
 
-            GenericSOPersistentStorage.MenuItemMethods = newMethods;
+            GenericObjectsPersistentStorage.MenuItemMethods = newMethods;
 
             SaveToFile(classContent);
         }
@@ -120,22 +122,18 @@
         private static string CreateMenuItemMethod(MenuItemMethod method)
         {
             string fileName = method.FileName == string.Empty ? $"New {method.Type.Name}" : method.FileName;
-            string menuName = method.MenuName == string.Empty ? GetGenericTypeName(method.Type) : method.MenuName;
+
+            string menuName = method.MenuName == string.Empty
+                ? CreatorUtil.GetShortNameWithBrackets(method.Type, method.Type.GetGenericArguments())
+                : method.MenuName;
 
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
-            string typeName = TypeChecker.GetGenericTypeDefinitionName(method.Type);
+            string typeName = CreatorUtil.GetGenericTypeDefinitionName(method.Type);
 
             string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), " +
                                 $"\"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
 
             return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
-        }
-
-        private static string GetGenericTypeName(Type type)
-        {
-            string typeNameWithoutArguments = type.Name.Split('`')[0];
-            var argumentNames = type.GetGenericArguments().Select(argument => argument.Name);
-            return $"{typeNameWithoutArguments}<{string.Join(",", argumentNames)}>";
         }
 
         private static void SaveToFile(string classContent)

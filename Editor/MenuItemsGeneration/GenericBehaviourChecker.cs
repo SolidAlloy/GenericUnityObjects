@@ -4,13 +4,16 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using AssetCreation;
+    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
+    using UnityEngine.Assertions;
 
-    internal static class GenericMonoBehaviourChecker
+    internal static class GenericBehaviourChecker
     {
-        private const string NewLine = "\r\n";
+        private const string NewLine = Config.NewLine;
 
         private static readonly HashSet<string> ProcessedTypes = new HashSet<string>();
         private static readonly string BehaviourSelectorFullName = typeof(BehaviourSelector).FullName;
@@ -18,7 +21,10 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            var types = TypeCache.GetTypesDerivedFrom<GenericMonoBehaviour>().Where(type => type.IsGenericType);
+            var types = TypeCache
+                .GetTypesWithAttribute<GenericMonoBehaviourAttribute>()
+                .Where(type => type.IsGenericType);
+
             bool addedFiles = false;
 
             foreach (Type type in types)
@@ -28,31 +34,31 @@
                 if ( ! CheckForDuplicates(shortName))
                     continue;
 
-                TypeChecker.CheckInvalidName(shortName);
+                CreatorUtil.CheckInvalidName(shortName);
 
-                string typeNameWithoutArguments = shortName.Split('`')[0];
                 var genericArgs = type.GetGenericArguments();
-                string fileName = $"{typeNameWithoutArguments}{genericArgs.Length}";
-                string fileDir = $"Assets/{Config.DefaultScriptsPath}";
-                string filePath = $"{fileDir}/{fileName}.cs";
+                string filePath = GenericBehaviourCreator.GetPathToGeneratedFile(type, genericArgs);
 
                 if (File.Exists(filePath))
                     continue;
 
-                string componentName = GetComponentName(typeNameWithoutArguments, genericArgs);
-                string niceFullName = TypeChecker.GetGenericTypeDefinitionName(type);
+                string componentName = CreatorUtil.GetShortNameWithBrackets(type, genericArgs);
+                string className = Path.GetFileNameWithoutExtension(filePath);
+                string niceFullName = CreatorUtil.GetGenericTypeDefinitionName(type);
 
                 string fileContent =
                     $"namespace {Config.DefaultNamespaceName}{NewLine}" +
                     $"{{{NewLine}" +
-                    $"    [UnityEngine.AddComponentMenu(\"{componentName}\")]{NewLine}" +
-                    $"    internal class {fileName} : {BehaviourSelectorFullName}{NewLine}" +
+                    $"    [UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{NewLine}" +
+                    $"    internal class {className} : {BehaviourSelectorFullName}{NewLine}" +
                     $"    {{{NewLine}" +
                     $"        public override System.Type {nameof(BehaviourSelector.GenericBehaviourType)} => typeof({niceFullName});{NewLine}" +
                     $"    }}{NewLine}" +
                     $"{NewLine}" +
-                    $"}}{NewLine}";
+                    $"}}";
 
+                string fileDir = Path.GetDirectoryName(filePath);
+                Assert.IsNotNull(fileDir);
                 Directory.CreateDirectory(fileDir);
                 File.WriteAllText(filePath, fileContent);
                 addedFiles = true;
@@ -60,12 +66,6 @@
 
             if (addedFiles)
                 AssetDatabase.Refresh();
-        }
-
-        private static string GetComponentName(string typeNameWithoutArguments, Type[] genericArgs)
-        {
-            var argumentNames = genericArgs.Select(argument => argument.Name);
-            return $"{typeNameWithoutArguments}<{string.Join(",", argumentNames)}>";
         }
 
         private static bool CheckForDuplicates(string typeName)

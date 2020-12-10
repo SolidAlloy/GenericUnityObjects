@@ -4,7 +4,7 @@
     using System.Linq;
     using TypeReferences;
 
-    public static class TypeReferenceCollectionExtensions
+    internal static class TypeReferenceCollectionExtensions
     {
         public static TypeReference[] CastToTypeReference(this Type[] types)
         {
@@ -12,6 +12,11 @@
         }
 
         public static Type[] CastToType(this TypeReference[] typeReferences)
+        {
+            return typeReferences.Select(typeRef => typeRef.Type).ToArray();
+        }
+
+        public static Type[] CastToType(this TypeReferenceWithBaseTypes[] typeReferences)
         {
             return typeReferences.Select(typeRef => typeRef.Type).ToArray();
         }

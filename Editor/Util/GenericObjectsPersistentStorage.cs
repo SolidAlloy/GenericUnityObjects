@@ -1,7 +1,6 @@
 ﻿namespace GenericScriptableObjects.Editor.Util
 {
     using System;
-    using System.Collections.Generic;
     using GenericScriptableObjects.Util;
     using MenuItemsGeneration;
     using TypeReferences;
@@ -12,29 +11,24 @@
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
     /// creation, but also for MenuItem methods creation and Usage Example installation.
     /// </summary>
-    public class GenericSOPersistentStorage : SingletonScriptableObject<GenericSOPersistentStorage>
+    public class GenericObjectsPersistentStorage : SingletonScriptableObject<GenericObjectsPersistentStorage>
     {
-        [HideInInspector]
-        [SerializeField] private TypeReference _genericType;
+        [HideInInspector] [SerializeField] private TypeReference _genericSOType;
+        [HideInInspector] [SerializeField] private string _namespaceName;
+        [HideInInspector] [SerializeField] private string _scriptsPath;
+        [HideInInspector] [SerializeField] private string _fileName;
 
-        [HideInInspector]
-        [SerializeField] private string _namespaceName;
+        [HideInInspector] [SerializeField] private GameObject _gameObject;
+        [HideInInspector] [SerializeField] private TypeReference _genericBehaviourType;
 
-        [HideInInspector]
-        [SerializeField] private string _scriptsPath;
+        [HideInInspector] [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
+        [HideInInspector] [SerializeField] private bool _usageExampleTypesAreAdded;
 
-        [HideInInspector]
-        [SerializeField] private string _fileName;
+        public static bool NeedsSOCreation => OnlyCreatedInstance != null && OnlyCreatedInstance._genericSOType?.Type != null;
 
-        [HideInInspector]
-        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
+        public static bool NeedsBehaviourCreation => OnlyCreatedInstance != null && OnlyCreatedInstance._genericBehaviourType?.Type != null;
 
-        [HideInInspector]
-        [SerializeField] private bool _usageExampleTypesAreAdded;
-
-        public static bool IsEmpty => OnlyCreatedInstance == null || OnlyCreatedInstance._genericType.Type == null;
-
-        public static TypeReference GenericType => Instance._genericType;
+        public static TypeReference GenericSOType => Instance._genericSOType;
         public static string NamespaceName => Instance._namespaceName;
         public static string ScriptsPath => Instance._scriptsPath;
         public static string FileName => Instance._fileName;
@@ -61,7 +55,7 @@
 
         public static void SaveForAssemblyReload(Type genericTypeToCreate, string namespaceName, string scriptsPath, string fileName)
         {
-            Instance._genericType = genericTypeToCreate;
+            Instance._genericSOType = genericTypeToCreate;
             Instance._namespaceName = namespaceName;
             Instance._scriptsPath = scriptsPath;
             Instance._fileName = fileName;
@@ -69,10 +63,23 @@
 
         public static void Clear()
         {
-            Instance._genericType = null;
+            Instance._genericSOType = null;
             Instance._namespaceName = null;
             Instance._scriptsPath = null;
             Instance._fileName = null;
+            Instance._gameObject = null;
+            Instance._genericBehaviourType = null;
+        }
+
+        public static void SaveForAssemblyReload(GameObject gameObject, Type genericType)
+        {
+            Instance._gameObject = gameObject;
+            Instance._genericBehaviourType = genericType;
+        }
+
+        public static (GameObject, Type) GetGenericBehaviourDetails()
+        {
+            return (Instance._gameObject, Instance._genericBehaviourType);
         }
     }
 }

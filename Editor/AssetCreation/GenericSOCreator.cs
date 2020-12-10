@@ -43,26 +43,26 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if (GenericSOPersistentStorage.IsEmpty)
+            if ( ! GenericObjectsPersistentStorage.NeedsSOCreation)
                 return;
 
             try
             {
-                Type genericTypeWithoutArgs = GenericSOPersistentStorage.GenericType.Type.GetGenericTypeDefinition();
-                var paramTypes = GenericSOPersistentStorage.GenericType.Type.GenericTypeArguments;
+                Type genericTypeWithoutArgs = GenericObjectsPersistentStorage.GenericSOType.Type.GetGenericTypeDefinition();
+                var paramTypes = GenericObjectsPersistentStorage.GenericSOType.Type.GenericTypeArguments;
 
                 var creator = new AssetCreatorHelper(
                     genericTypeWithoutArgs,
                     paramTypes,
-                    GenericSOPersistentStorage.NamespaceName,
-                    GenericSOPersistentStorage.ScriptsPath,
-                    GenericSOPersistentStorage.FileName);
+                    GenericObjectsPersistentStorage.NamespaceName,
+                    GenericObjectsPersistentStorage.ScriptsPath,
+                    GenericObjectsPersistentStorage.FileName);
 
                 creator.CreateAssetFromExistingType();
             }
             finally
             {
-                GenericSOPersistentStorage.Clear();
+                GenericObjectsPersistentStorage.Clear();
             }
         }
 
