@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using NUnit.Framework;
+    using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -37,7 +38,11 @@
             string uniqueClassName = GetUniqueClassName(genericTypeWithoutArgs, genericArgs, generatedFileContent);
 
             string typeWithBrackets = CreatorUtil.GetFullNameWithBrackets(genericTypeWithoutArgs, genericArgs);
-            string lineToAdd = $"    internal class {uniqueClassName} : {typeWithBrackets} {{ }}{Config.NewLine}{Config.NewLine}";
+
+            string componentName = GetComponentName(genericTypeWithoutArgs, genericArgs);
+
+            string lineToAdd = $"    [UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{Config.NewLine}" +
+                               $"    internal class {uniqueClassName} : {typeWithBrackets} {{ }}{Config.NewLine}{Config.NewLine}";
 
             int insertPos = generatedFileContent.Length - 1;
             generatedFileContent = generatedFileContent.Insert(insertPos, lineToAdd);
@@ -71,6 +76,21 @@
             {
                 GenericObjectsPersistentStorage.Clear();
             }
+        }
+
+        private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)
+        {
+            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+
+            string shortName = genericTypeWithoutArgs.Name;
+            string typeNameWithoutSuffix = shortName.StripGenericSuffix();
+
+            var argumentNames = genericArgs
+                .Select(argument => argument.FullName)
+                .Select(fullName => fullName.ReplaceWithBuiltInName())
+                .Select(fullName => fullName.GetSubstringAfterLast('.'));
+
+            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
 
         private static string GetUniqueClassName(Type genericTypeWithoutArgs, Type[] genericArgs, string generatedFileContent)

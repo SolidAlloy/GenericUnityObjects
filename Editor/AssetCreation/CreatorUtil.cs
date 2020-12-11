@@ -5,9 +5,11 @@
     using JetBrains.Annotations;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
+    using TypeReferences.Editor.Util;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using TypeCache = UnityEditor.TypeCache;
 
     public static class CreatorUtil
     {
@@ -38,7 +40,11 @@
             Assert.IsNotNull(typeFullName);
 
             string genericTypeNameWithoutParam = typeFullName.StripGenericSuffix();
-            var argumentNames = genericArgs.Select(argument => argument.FullName);
+
+            var argumentNames = genericArgs
+                .Select(argument => argument.FullName)
+                .Select(fullName => fullName.ReplaceWithBuiltInName());
+
             return $"{genericTypeNameWithoutParam}<{string.Join(",", argumentNames)}>";
         }
 

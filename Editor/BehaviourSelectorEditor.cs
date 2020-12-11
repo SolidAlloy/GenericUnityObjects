@@ -5,6 +5,9 @@
     using AssetCreation;
     using GenericScriptableObjects.Util;
     using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Extensions;
+    using SolidUtilities.Helpers;
+    using TypeReferences.Editor.Util;
     using UnityEditor;
     using UnityEngine;
 
@@ -14,6 +17,7 @@
         private SerializedProperty _typesArray;
         private ContentCache _contentCache;
         private BehaviourSelector _targetSelector;
+        private string _genericTypeNameWithoutSuffix;
 
         private void OnEnable()
         {
@@ -24,6 +28,7 @@
             _targetSelector = targetSelector;
             _typesArray = serializedObject.FindProperty(nameof(BehaviourSelector.TypeRefs));
             _contentCache = new ContentCache();
+            _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
         }
 
         public override void OnInspectorGUI()
@@ -35,7 +40,7 @@
                     _contentCache.GetItem($"Type Parameter #{i+1}"));
             }
 
-            if ( ! GUILayout.Button("Add Component"))
+            if ( ! GUILayout.Button($"Add {GetComponentName()}"))
                 return;
 
             if (_targetSelector.TypeRefs.Any(typeRef => typeRef.Type == null))
@@ -50,6 +55,16 @@
                     _targetSelector.GenericBehaviourType,
                     _targetSelector.TypeRefs.CastToType());
             }
+        }
+
+        private string GetComponentName()
+        {
+            var argumentNames = _targetSelector.TypeRefs
+                .Select(typeRef => typeRef.Type == null ? string.Empty : typeRef.Type.FullName)
+                .Select(fullName => fullName.ReplaceWithBuiltInName())
+                .Select(fullName => fullName.GetSubstringAfterLast('.'));
+
+            return $"{_genericTypeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
     }
 }
