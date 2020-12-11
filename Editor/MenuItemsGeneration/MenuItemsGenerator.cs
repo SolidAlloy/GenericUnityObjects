@@ -1,17 +1,12 @@
 ﻿namespace GenericScriptableObjects.Editor.MenuItemsGeneration
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Text.RegularExpressions;
     using AssetCreation;
-    using NUnit.Framework;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
     using UnityEditor;
-    using UnityEngine;
     using Util;
 
     /// <summary>
@@ -20,7 +15,7 @@
     /// </summary>
     internal static class MenuItemsGenerator
     {
-        public static readonly string FilePath = $"{Application.dataPath}/{Folders}/MenuItems.cs";
+        public static readonly string FilePath = $"Assets/{Folders}/MenuItems.cs";
 
         private const string NewLine = Config.NewLine;
         private const string RawNewLine = Config.RawNewLine;
