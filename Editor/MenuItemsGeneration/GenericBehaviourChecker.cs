@@ -5,7 +5,6 @@
     using System.IO;
     using System.Linq;
     using AssetCreation;
-    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
@@ -15,7 +14,6 @@
     {
         private const string NewLine = Config.NewLine;
 
-        private static readonly HashSet<string> ProcessedTypes = new HashSet<string>();
         private static readonly string BehaviourSelectorFullName = typeof(BehaviourSelector).FullName;
 
         [DidReloadScripts]
@@ -30,9 +28,6 @@
             foreach (Type type in types)
             {
                 string shortName = type.Name;
-
-                if ( ! CheckForDuplicates(shortName))
-                    continue;
 
                 CreatorUtil.CheckInvalidName(shortName);
 
@@ -66,18 +61,6 @@
 
             if (addedFiles)
                 AssetDatabase.Refresh();
-        }
-
-        private static bool CheckForDuplicates(string typeName)
-        {
-            if (ProcessedTypes.Contains(typeName))
-            {
-                Debug.LogError($"Generic MonoBehaviour called {typeName} exists in multiple namespaces. The plugin does not support this. Please rename one of the types");
-                return false;
-            }
-
-            ProcessedTypes.Add(typeName);
-            return true;
         }
     }
 }
