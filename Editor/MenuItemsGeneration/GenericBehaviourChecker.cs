@@ -42,7 +42,7 @@
                 string niceFullName = CreatorUtil.GetGenericTypeDefinitionName(type);
 
                 string fileContent =
-                    $"namespace {Config.DefaultNamespaceName}{NewLine}" +
+                    $"namespace {Config.NamespaceName}{NewLine}" +
                     $"{{{NewLine}" +
                     $"    [UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{NewLine}" +
                     $"    internal class {className} : {BehaviourSelectorFullName}{NewLine}" +

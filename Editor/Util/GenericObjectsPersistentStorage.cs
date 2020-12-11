@@ -14,8 +14,6 @@
     public class GenericObjectsPersistentStorage : SingletonScriptableObject<GenericObjectsPersistentStorage>
     {
         [HideInInspector] [SerializeField] private TypeReference _genericSOType;
-        [HideInInspector] [SerializeField] private string _namespaceName;
-        [HideInInspector] [SerializeField] private string _scriptsPath;
         [HideInInspector] [SerializeField] private string _fileName;
 
         [HideInInspector] [SerializeField] private GameObject _gameObject;
@@ -29,8 +27,6 @@
         public static bool NeedsBehaviourCreation => OnlyCreatedInstance != null && OnlyCreatedInstance._genericBehaviourType?.Type != null;
 
         public static TypeReference GenericSOType => Instance._genericSOType;
-        public static string NamespaceName => Instance._namespaceName;
-        public static string ScriptsPath => Instance._scriptsPath;
         public static string FileName => Instance._fileName;
 
         public static MenuItemMethod[] MenuItemMethods
@@ -53,19 +49,15 @@
             }
         }
 
-        public static void SaveForAssemblyReload(Type genericTypeToCreate, string namespaceName, string scriptsPath, string fileName)
+        public static void SaveForAssemblyReload(Type genericTypeToCreate, string fileName)
         {
             Instance._genericSOType = genericTypeToCreate;
-            Instance._namespaceName = namespaceName;
-            Instance._scriptsPath = scriptsPath;
             Instance._fileName = fileName;
         }
 
         public static void Clear()
         {
             Instance._genericSOType = null;
-            Instance._namespaceName = null;
-            Instance._scriptsPath = null;
             Instance._fileName = null;
             Instance._gameObject = null;
             Instance._genericBehaviourType = null;

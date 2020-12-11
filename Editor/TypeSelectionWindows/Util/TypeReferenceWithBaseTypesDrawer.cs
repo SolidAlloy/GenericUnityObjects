@@ -44,7 +44,6 @@
         {
             TypeOptionsAttribute typeOptionsAttribute = GetAttribute(property);
             typeOptionsAttribute.ExcludeNone = true;
-            typeOptionsAttribute.SerializableOnly = true;
             typeOptionsAttribute.IncludeAdditionalAssemblies = new[] { "Assembly-CSharp" };
             typeOptionsAttribute.ShortName = true;
 

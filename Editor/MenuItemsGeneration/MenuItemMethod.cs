@@ -12,8 +12,6 @@
         public string TypeName;
         public string FileName;
         public string MenuName;
-        public string NamespaceName;
-        public string ScriptsPath;
         public int Order;
         public Type Type;
 
@@ -34,8 +32,7 @@
         {
             public override bool Equals(MenuItemMethod x, MenuItemMethod y)
             {
-                return x.TypeName == y.TypeName && x.FileName == y.FileName && x.MenuName == y.MenuName
-                       && x.NamespaceName == y.NamespaceName && x.ScriptsPath == y.ScriptsPath && x.Order == y.Order;
+                return x.TypeName == y.TypeName && x.FileName == y.FileName && x.MenuName == y.MenuName && x.Order == y.Order;
             }
 
             public override int GetHashCode(MenuItemMethod obj)
@@ -46,8 +43,6 @@
                     hash = hash * 23 + obj.TypeName.GetHashCode();
                     hash = hash * 23 + obj.FileName.GetHashCode();
                     hash = hash * 23 + obj.MenuName.GetHashCode();
-                    hash = hash * 23 + obj.NamespaceName.GetHashCode();
-                    hash = hash * 23 + obj.ScriptsPath.GetHashCode();
                     hash = hash * 23 + obj.Order.GetHashCode();
                     return hash;
                 }

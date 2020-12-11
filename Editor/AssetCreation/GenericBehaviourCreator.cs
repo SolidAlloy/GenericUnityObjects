@@ -105,7 +105,7 @@
         public static string GetPathToGeneratedFile(Type genericTypeWithoutArgs, Type[] genericArgs)
         {
             string fileName = genericTypeWithoutArgs.FullName.MakeClassFriendly();
-            string fileDir = $"Assets/{Config.DefaultScriptsPath}";
+            string fileDir = $"Assets/{Config.ScriptsPath}";
             return $"{fileDir}/{fileName}.cs";
         }
 

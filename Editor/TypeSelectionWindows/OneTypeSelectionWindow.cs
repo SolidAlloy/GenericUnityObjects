@@ -37,7 +37,6 @@
                 : new InheritsAttribute(_genericParamConstraints) { ExpandAllFolders = true };
 
             typeOptionsAttribute.ExcludeNone = true;
-            typeOptionsAttribute.SerializableOnly = true;
 
             var dropdownDrawer = new CenteredTypeDropdownDrawer(null, typeOptionsAttribute, null);
             _dropdownWindow = dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));

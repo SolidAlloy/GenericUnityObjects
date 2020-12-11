@@ -38,8 +38,6 @@
                     TypeName = type.FullName.MakeClassFriendly(),
                     FileName = assetMenuAttribute.FileName,
                     MenuName = assetMenuAttribute.MenuName,
-                    NamespaceName = assetMenuAttribute.NamespaceName,
-                    ScriptsPath = assetMenuAttribute.ScriptsPath,
                     Order = assetMenuAttribute.Order,
                     Type = type
                 });

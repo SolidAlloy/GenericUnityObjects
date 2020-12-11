@@ -1,13 +1,11 @@
 ﻿namespace GenericScriptableObjects.Editor
 {
-    using System.Collections.Generic;
     using System.Linq;
     using AssetCreation;
     using GenericScriptableObjects.Util;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
-    using TypeReferences.Editor.Util;
     using UnityEditor;
     using UnityEngine;
 

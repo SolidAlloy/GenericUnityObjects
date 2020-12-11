@@ -126,7 +126,7 @@
             string typeName = CreatorUtil.GetGenericTypeDefinitionName(method.Type);
 
             string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), " +
-                                $"\"{method.NamespaceName}\", \"{method.ScriptsPath}\", \"{fileName}\");";
+                                $"\"{Config.NamespaceName}\", \"{Config.ScriptsPath}\", \"{fileName}\");";
 
             return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
         }

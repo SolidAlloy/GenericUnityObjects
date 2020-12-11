@@ -8,7 +8,6 @@
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
-    using Util;
 
     /// <summary>
     /// A window that has as many TypeReference fields as needed for the asset creation. The user has to choose all

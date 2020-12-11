@@ -23,11 +23,8 @@
         /// <param name="scriptsPath">Path to a folder where auto-generated non-generic types must be kept.</param>
         /// <param name="fileName">Name for an asset.</param>
         protected static void CreateAsset(
-            Type genericType, string namespaceName, string scriptsPath, string fileName)
+            Type genericType, string fileName)
         {
-            namespaceName = ValidateNamespaceName(namespaceName);
-            scriptsPath = ValidateScriptsPath(scriptsPath);
-
             genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
             var constraints = genericType.GetGenericArguments()
                 .Select(type => type.GetGenericParameterConstraints())
@@ -35,7 +32,7 @@
 
             TypeSelectionWindow.Create(constraints, paramTypes =>
             {
-                var creator = new AssetCreatorHelper(genericType, paramTypes, namespaceName, scriptsPath, fileName);
+                var creator = new AssetCreatorHelper(genericType, paramTypes, fileName);
                 creator.CreateAsset();
             });
         }
@@ -54,8 +51,6 @@
                 var creator = new AssetCreatorHelper(
                     genericTypeWithoutArgs,
                     paramTypes,
-                    GenericObjectsPersistentStorage.NamespaceName,
-                    GenericObjectsPersistentStorage.ScriptsPath,
                     GenericObjectsPersistentStorage.FileName);
 
                 creator.CreateAssetFromExistingType();
@@ -64,26 +59,6 @@
             {
                 GenericObjectsPersistentStorage.Clear();
             }
-        }
-
-        private static string ValidateNamespaceName(string namespaceName)
-        {
-            if (namespaceName.IsValidIdentifier())
-                return namespaceName;
-
-            Debug.LogError($"The provided namespace name '{namespaceName}' is not a valid identifier.");
-            namespaceName = Config.DefaultNamespaceName;
-            return namespaceName;
-        }
-
-        private static string ValidateScriptsPath(string scriptsPath)
-        {
-            if (scriptsPath.IsValidPath())
-                return scriptsPath;
-
-            Debug.LogError($"The provided path '{scriptsPath}' is not a valid Unity path. Restricted characters are /?<>\\:*|\"");
-            scriptsPath = Config.DefaultScriptsPath;
-            return scriptsPath;
         }
     }
 }

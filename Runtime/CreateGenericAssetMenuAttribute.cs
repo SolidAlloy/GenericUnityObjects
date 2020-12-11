@@ -15,17 +15,5 @@
 
         /// <summary>The position of the menu item within the Assets/Create menu.</summary>
         [PublicAPI] public int Order = 0;
-
-        /// <summary>
-        /// Custom namespace name to set for auto-generated classes derived from this class.
-        /// Default is "GenericScriptableObjectTypes".
-        /// </summary>
-        [PublicAPI, NotNull] public string NamespaceName = Config.DefaultNamespaceName;
-
-        /// <summary>
-        /// Custom path to a folder where auto-generated classes must be kept.
-        /// Default is "GenericSOTypes".
-        /// </summary>
-        [PublicAPI, NotNull] public string ScriptsPath = Config.DefaultScriptsPath;
     }
 }
