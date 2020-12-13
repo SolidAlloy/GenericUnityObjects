@@ -25,7 +25,7 @@
     ///     bool, float --- CustomGeneric_Boolean_Single
     /// </example>
     /// </summary>
-    public class GenericObjectDatabase :
+    internal class GenericObjectDatabase :
         SingletonScriptableObject<GenericObjectDatabase>,
         ISerializationCallbackReceiver
     {

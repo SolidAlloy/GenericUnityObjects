@@ -2,7 +2,7 @@
 {
     using System;
     using ConcreteImplementations;
-    using GenericScriptableObjects.Editor.Util;
+    using GenericScriptableObjects.Editor;
     using NUnit.Framework;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -19,7 +19,7 @@
         [DidReloadScripts]
         public static void AddTypesToDictIfNecessary()
         {
-            if (GenericSOPersistentStorage.UsageExampleTypesAreAdded)
+            if (SampleLayer.PersistentStorage.UsageExampleTypesAreAdded)
                 return;
 
             foreach (Type type in TypesToAdd)
@@ -29,11 +29,11 @@
                 Type parentTypeDefinition = parentType.GetGenericTypeDefinition();
                 var genericArgs = parentType.GetGenericArguments();
 
-                if (! GenericSODatabase.ContainsKey(parentTypeDefinition, genericArgs))
-                    GenericSODatabase.Add(parentTypeDefinition, genericArgs, type);
+                if (! SampleLayer.GenericObjectDatabase.ContainsKey(parentTypeDefinition, genericArgs))
+                    SampleLayer.GenericObjectDatabase.Add(parentTypeDefinition, genericArgs, type);
             }
 
-            GenericSOPersistentStorage.UsageExampleTypesAreAdded = true;
+            SampleLayer.PersistentStorage.UsageExampleTypesAreAdded = true;
 
             // Reload assemblies to generate MenuItems for the newly added types.
             AssetDatabase.Refresh();

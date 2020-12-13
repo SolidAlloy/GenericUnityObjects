@@ -11,7 +11,7 @@
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
     /// creation, but also for MenuItem methods creation and Usage Example installation.
     /// </summary>
-    public class PersistentStorage : SingletonScriptableObject<PersistentStorage>
+    internal class PersistentStorage : SingletonScriptableObject<PersistentStorage>
     {
         [HideInInspector] [SerializeField] private TypeReference _genericSOType;
         [HideInInspector] [SerializeField] private string _fileName;
@@ -22,19 +22,19 @@
         [HideInInspector] [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
         [HideInInspector] [SerializeField] private bool _usageExampleTypesAreAdded;
 
-        public static bool NeedsSOCreation => OnlyCreatedInstance != null && OnlyCreatedInstance._genericSOType?.Type != null;
+        public static bool NeedsSOCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericSOType?.Type != null;
 
-        public static bool NeedsBehaviourCreation => OnlyCreatedInstance != null && OnlyCreatedInstance._genericBehaviourType?.Type != null;
+        public static bool NeedsBehaviourCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericBehaviourType?.Type != null;
 
         public static TypeReference GenericSOType => Instance._genericSOType;
         public static string FileName => Instance._fileName;
 
         public static MenuItemMethod[] MenuItemMethods
         {
-            get => OnlyCreatedInstance == null ? null : OnlyCreatedInstance._menuItemMethods;
+            get => CreatedOnlyInstance == null ? null : CreatedOnlyInstance._menuItemMethods;
             set
             {
-                OnlyCreatedInstance._menuItemMethods = value;
+                CreatedOnlyInstance._menuItemMethods = value;
                 EditorUtility.SetDirty(Instance);
             }
         }
