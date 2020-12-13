@@ -18,10 +18,14 @@
     public abstract class SingletonScriptableObject<T> : ScriptableObject
         where T : ScriptableObject
     {
-        private static readonly string AssetPath = Config.SettingsPath + '/' + typeof(T).Name + ".asset";
+        private static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
 
         private static T _instance = null;
 
+        /// <summary>
+        /// Retrieves an instance to the asset. DON'T call in DidReloadScripts and InitializeOnLoad!
+        /// Use <see cref="CreatedOnlyInstance"/> instead.
+        /// </summary>
         protected static T Instance
         {
             get
@@ -49,7 +53,7 @@
                 Assert.IsNotNull(_instance);
 
 #if UNITY_EDITOR
-                Directory.CreateDirectory(Config.SettingsPath);
+                Directory.CreateDirectory(Config.ResourcesPath);
                 AssetDatabase.CreateAsset(_instance, AssetPath);
                 EditorUtility.SetDirty(_instance);
 #else
@@ -60,9 +64,10 @@
         }
 
         /// <summary>
-        /// Sometimes, <see cref="AssetDatabase.CreateAsset"/> is not available (e.g. when SingletonScriptableObject
-        /// is called in a [DidScriptsReload] method). So, there is no need to try creating an asset as it will output
-        /// an error.
+        /// Sometimes, FindObjectsOfType and FindObjectsOfTypeAll return null even though the asset exists (this
+        /// happens in a DidReloadScripts method on editor launch, for example). In such a case, if
+        /// <see cref="Instance"/> is called, a new asset is created and replaces the old one which is harmful.
+        /// So, only <see cref="CreatedOnlyInstance"/> must be used in DidReloadScripts, InitializeOnLoad and similar methods.
         /// </summary>
         protected static T CreatedOnlyInstance
         {
