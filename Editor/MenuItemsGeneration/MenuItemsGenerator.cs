@@ -122,8 +122,7 @@
             string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
             string typeName = CreatorUtil.GetGenericTypeDefinitionName(method.Type);
 
-            string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), " +
-                                $"\"{Config.GeneratedTypesNamespace}\", \"{Config.MainFolderPath}\", \"{fileName}\");";
+            string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), \"{fileName}\");";
 
             return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
         }
