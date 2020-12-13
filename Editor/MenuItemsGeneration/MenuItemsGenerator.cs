@@ -4,6 +4,7 @@
     using System.IO;
     using System.Text.RegularExpressions;
     using AssetCreation;
+    using NUnit.Framework;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
@@ -15,11 +16,8 @@
     /// </summary>
     internal static class MenuItemsGenerator
     {
-        public static readonly string FilePath = $"Assets/{Folders}/MenuItems.cs";
-
         private const string NewLine = Config.NewLine;
         private const string RawNewLine = Config.RawNewLine;
-        private const string Folders = "Resources/Editor";
 
         private static string _oldContent;
 
@@ -27,14 +25,14 @@
         {
             string classContent = GetClassContent();
 
-            var oldMethods = GenericObjectsPersistentStorage.MenuItemMethods;
+            var oldMethods = PersistentStorage.MenuItemMethods;
 
             // Stop if the PersistentStorage asset was not found. It frequently happens on Unity Editor launch, leading
             // to the false assumption the MenuItemMethods collection is empty.
             if (oldMethods == null)
                 return;
 
-            var oldMethodsSet = new HashSet<MenuItemMethod>(GenericObjectsPersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
+            var oldMethodsSet = new HashSet<MenuItemMethod>(PersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
             var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
 
             if (oldMethodsSet.SetEquals(newMethodsSet))
@@ -43,7 +41,7 @@
             classContent = RemoveOldMethods(classContent, oldMethodsSet, newMethodsSet);
             classContent = AddNewMethods(classContent, oldMethodsSet, newMethodsSet);
 
-            GenericObjectsPersistentStorage.MenuItemMethods = newMethods;
+            PersistentStorage.MenuItemMethods = newMethods;
 
             SaveToFile(classContent);
         }
@@ -95,9 +93,9 @@
 
         private static string GetClassContent()
         {
-            if (File.Exists(FilePath))
+            if (File.Exists(Config.MenuItemsPath))
             {
-                _oldContent = File.ReadAllText(FilePath);
+                _oldContent = File.ReadAllText(Config.MenuItemsPath);
                 return _oldContent;
             }
 
@@ -109,8 +107,7 @@
                                 $"}}{NewLine}" +
                                 $"}}";
 
-            AssetDatabaseHelper.MakeSureFolderExists(Folders);
-            File.WriteAllText(FilePath, emptyClass);
+            CreatorUtil.WriteAllText(Config.MenuItemsPath, emptyClass);
             return emptyClass;
         }
 
@@ -126,7 +123,7 @@
             string typeName = CreatorUtil.GetGenericTypeDefinitionName(method.Type);
 
             string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), " +
-                                $"\"{Config.NamespaceName}\", \"{Config.ScriptsPath}\", \"{fileName}\");";
+                                $"\"{Config.GeneratedTypesNamespace}\", \"{Config.MainFolderPath}\", \"{fileName}\");";
 
             return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
         }
@@ -136,7 +133,7 @@
             if (_oldContent != null && _oldContent == classContent)
                 return;
 
-            File.WriteAllText(FilePath, classContent);
+            File.WriteAllText(Config.MenuItemsPath, classContent);
             AssetDatabase.Refresh();
         }
     }

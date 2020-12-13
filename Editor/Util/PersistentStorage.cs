@@ -11,7 +11,7 @@
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
     /// creation, but also for MenuItem methods creation and Usage Example installation.
     /// </summary>
-    public class GenericObjectsPersistentStorage : SingletonScriptableObject<GenericObjectsPersistentStorage>
+    public class PersistentStorage : SingletonScriptableObject<PersistentStorage>
     {
         [HideInInspector] [SerializeField] private TypeReference _genericSOType;
         [HideInInspector] [SerializeField] private string _fileName;

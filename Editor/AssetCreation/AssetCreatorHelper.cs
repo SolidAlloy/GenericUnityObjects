@@ -42,7 +42,7 @@
                 return;
             }
 
-            GenericObjectsPersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _fileName);
+            PersistentStorage.SaveForAssemblyReload(genericTypeWithArgs, _fileName);
             string className = GetUniqueClassName();
             CreateScript(className);
         }
@@ -75,7 +75,7 @@
                 return duplicationSuffix == 0 ? defaultClassName : $"{defaultClassName}_{duplicationSuffix}";
             }
 
-            while (AssetDatabase.FindAssets(GetClassName()).Length != 0)
+            while (AssetDatabase.FindAssets(GetClassName(), new[] { Config.GeneratedTypesPath }).Length != 0)
                 duplicationSuffix++;
 
             return GetClassName();
@@ -91,7 +91,7 @@
         {
 #if UNITY_EDITOR_WIN
             const string longPathPrefix = @"\\?\";
-            string fullAssetPath = $"{longPathPrefix}{Application.dataPath}/{Config.ScriptsPath}/{className}.cs";
+            string fullAssetPath = $"{longPathPrefix}{Directory.GetCurrentDirectory()}/{Config.GeneratedTypesPath}/{className}.cs";
 
             if (fullAssetPath.Length > 260 + longPathPrefix.Length)
             {
@@ -99,20 +99,19 @@
                                  $"on Windows (e.g. with git pull/push). Path: {fullAssetPath}");
             }
 #else
-            string fullAssetPath = $"{Application.dataPath}/{_scriptsPath}/{className}.cs";
+            string fullAssetPath = $"{Config.GeneratedTypesPath}/{className}.cs";
 #endif
 
             string scriptContent = GetScriptContent(className);
 
-            AssetDatabaseHelper.MakeSureFolderExists(Config.ScriptsPath);
-            File.WriteAllText(fullAssetPath, scriptContent);
+            CreatorUtil.WriteAllText(fullAssetPath, scriptContent, Config.GeneratedTypesPath);
             AssetDatabase.Refresh();
         }
 
         private string GetScriptContent(string className)
         {
             string genericTypeWithBrackets = CreatorUtil.GetFullNameWithBrackets(_genericType, _argumentTypes);
-            return $"namespace {Config.NamespaceName} {{ public class {className} : {genericTypeWithBrackets} {{ }} }}";
+            return $"namespace {Config.GeneratedTypesNamespace} {{ public class {className} : {genericTypeWithBrackets} {{ }} }}";
         }
 
         private void CreateAssetInteractively()

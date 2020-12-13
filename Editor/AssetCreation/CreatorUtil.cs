@@ -1,11 +1,11 @@
 ﻿namespace GenericScriptableObjects.Editor.AssetCreation
 {
     using System;
+    using System.IO;
     using System.Linq;
     using JetBrains.Annotations;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
-    using TypeReferences.Editor.Util;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -16,7 +16,7 @@
         [CanBeNull]
         public static Type GetEmptyTypeDerivedFrom(Type parentType)
         {
-            TypeCache.TypeCollection foundTypes = TypeCache.GetTypesDerivedFrom(parentType);
+            var foundTypes = TypeCache.GetTypesDerivedFrom(parentType);
 
             if (foundTypes.Count == 0)
                 return null;
@@ -67,6 +67,10 @@
                              "It will help the plugin not lose a reference to the type should you rename it later.");
         }
 
+        /// <summary>
+        /// Gets the full type name with brackets but without generic arguments names.
+        /// It looks like this: Namespace.ClassName&lt;,>
+        /// </summary>
         public static string GetGenericTypeDefinitionName(Type type)
         {
             string fullTypeName = type.FullName;
@@ -75,6 +79,18 @@
             int argsCount = type.GetGenericArguments().Length;
             string suffix = $"<{new string(',', argsCount-1)}>";
             return typeNameWithoutArguments + suffix;
+        }
+
+        public static void WriteAllText(string filePath, string text, string directoryPath = null)
+        {
+            if (directoryPath == null)
+            {
+                directoryPath = Path.GetDirectoryName(filePath);
+                Assert.IsNotNull(directoryPath);
+            }
+
+            Directory.CreateDirectory(directoryPath);
+            File.WriteAllText(filePath, text);
         }
     }
 }

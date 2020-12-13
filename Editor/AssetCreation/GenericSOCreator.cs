@@ -2,11 +2,9 @@
 {
     using System;
     using System.Linq;
-    using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using TypeSelectionWindows;
     using UnityEditor.Callbacks;
-    using UnityEngine;
     using Util;
 
     /// <summary>
@@ -19,11 +17,8 @@
         /// <see cref="UnityEditor.MenuItem"/> attribute. Use it in classes that derive from <see cref="GenericSOCreator"/>.
         /// </summary>
         /// <param name="genericType">The type of <see cref="GenericScriptableObject"/> to create.</param>
-        /// <param name="namespaceName">Custom namespace name to set for auto-generated non-generic types.</param>
-        /// <param name="scriptsPath">Path to a folder where auto-generated non-generic types must be kept.</param>
         /// <param name="fileName">Name for an asset.</param>
-        protected static void CreateAsset(
-            Type genericType, string fileName)
+        protected static void CreateAsset(Type genericType, string fileName)
         {
             genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
             var constraints = genericType.GetGenericArguments()
@@ -40,24 +35,24 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if ( ! GenericObjectsPersistentStorage.NeedsSOCreation)
+            if ( ! PersistentStorage.NeedsSOCreation)
                 return;
 
             try
             {
-                Type genericTypeWithoutArgs = GenericObjectsPersistentStorage.GenericSOType.Type.GetGenericTypeDefinition();
-                var paramTypes = GenericObjectsPersistentStorage.GenericSOType.Type.GenericTypeArguments;
+                Type genericTypeWithoutArgs = PersistentStorage.GenericSOType.Type.GetGenericTypeDefinition();
+                var paramTypes = PersistentStorage.GenericSOType.Type.GenericTypeArguments;
 
                 var creator = new AssetCreatorHelper(
                     genericTypeWithoutArgs,
                     paramTypes,
-                    GenericObjectsPersistentStorage.FileName);
+                    PersistentStorage.FileName);
 
                 creator.CreateAssetFromExistingType();
             }
             finally
             {
-                GenericObjectsPersistentStorage.Clear();
+                PersistentStorage.Clear();
             }
         }
     }

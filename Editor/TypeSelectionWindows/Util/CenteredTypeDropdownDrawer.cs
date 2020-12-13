@@ -6,7 +6,6 @@
     using TypeReferences;
     using TypeReferences.Editor.Drawers;
     using TypeReferences.Editor.TypeDropdown;
-    using UnityEditor;
     using UnityEngine;
 
     internal class CenteredTypeDropdownDrawer : TypeDropdownDrawer

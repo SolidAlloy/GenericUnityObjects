@@ -1,14 +1,11 @@
 ﻿namespace GenericScriptableObjects.Editor.MenuItemsGeneration
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using AssetCreation;
     using UnityEditor;
     using UnityEditor.Callbacks;
-    using UnityEngine;
-    using UnityEngine.Assertions;
 
     internal static class GenericBehaviourChecker
     {
@@ -32,17 +29,18 @@
                 CreatorUtil.CheckInvalidName(shortName);
 
                 var genericArgs = type.GetGenericArguments();
-                string filePath = GenericBehaviourCreator.GetPathToGeneratedFile(type, genericArgs);
+                string fileName = GenericBehaviourCreator.GetGeneratedFileName(type);
+                string filePath = $"{Config.GeneratedTypesPath}/{fileName}";
 
                 if (File.Exists(filePath))
                     continue;
 
                 string componentName = CreatorUtil.GetShortNameWithBrackets(type, genericArgs);
-                string className = Path.GetFileNameWithoutExtension(filePath);
+                string className = Path.GetFileNameWithoutExtension(fileName);
                 string niceFullName = CreatorUtil.GetGenericTypeDefinitionName(type);
 
                 string fileContent =
-                    $"namespace {Config.NamespaceName}{NewLine}" +
+                    $"namespace {Config.GeneratedTypesNamespace}{NewLine}" +
                     $"{{{NewLine}" +
                     $"    [UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{NewLine}" +
                     $"    internal class {className} : {BehaviourSelectorFullName}{NewLine}" +
@@ -52,10 +50,7 @@
                     $"{NewLine}" +
                     $"}}";
 
-                string fileDir = Path.GetDirectoryName(filePath);
-                Assert.IsNotNull(fileDir);
-                Directory.CreateDirectory(fileDir);
-                File.WriteAllText(filePath, fileContent);
+                CreatorUtil.WriteAllText(filePath, fileContent, Config.GeneratedTypesPath);
                 addedFiles = true;
             }
 

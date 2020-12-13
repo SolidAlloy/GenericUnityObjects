@@ -4,7 +4,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 #if UNITY_EDITOR
-    using SolidUtilities.Editor.Helpers;
+    using System.IO;
     using UnityEditor;
 #else
     using System.Linq;
@@ -18,10 +18,7 @@
     public abstract class SingletonScriptableObject<T> : ScriptableObject
         where T : ScriptableObject
     {
-        private const string AssetsFolder = "Assets";
-        private const string ResourcesFolder = "Resources";
-
-        private static readonly string AssetPath = AssetsFolder + '/' + ResourcesFolder + '/' + typeof(T).Name + ".asset";
+        private static readonly string AssetPath = Config.SettingsPath + '/' + typeof(T).Name + ".asset";
 
         private static T _instance = null;
 
@@ -52,7 +49,7 @@
                 Assert.IsNotNull(_instance);
 
 #if UNITY_EDITOR
-                AssetDatabaseHelper.MakeSureFolderExists(ResourcesFolder);
+                Directory.CreateDirectory(Config.SettingsPath);
 
                 AssetDatabase.CreateAsset(_instance, AssetPath);
                 EditorUtility.SetDirty(_instance);

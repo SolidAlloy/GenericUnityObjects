@@ -7,7 +7,7 @@
 
     /// <summary>
     /// Inherit from this class to create a generic ScriptableObject.
-    /// Add an AssetCreate menu using <see cref="GenericSOCreator"/>.
+    /// Add a menu to create assets using <see cref="CreateGenericAssetMenuAttribute"/>.
     /// </summary>
     [Serializable]
     public class GenericScriptableObject : ScriptableObject

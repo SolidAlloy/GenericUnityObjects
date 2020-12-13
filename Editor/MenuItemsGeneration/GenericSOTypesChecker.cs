@@ -18,7 +18,10 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            var types = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>().Where(type => type.IsGenericType).ToArray();
+            var types = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>()
+                .Where(type => type.IsGenericType)
+                .ToArray();
+
             int typesCount = types.Length;
 
             var menuItemMethods = new List<MenuItemMethod>();

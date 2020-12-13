@@ -11,11 +11,6 @@
             return types.Select(type => new TypeReference(type, true)).ToArray();
         }
 
-        public static Type[] CastToType(this TypeReference[] typeReferences)
-        {
-            return typeReferences.Select(typeRef => typeRef.Type).ToArray();
-        }
-
         public static Type[] CastToType(this TypeReferenceWithBaseTypes[] typeReferences)
         {
             return typeReferences.Select(typeRef => typeRef.Type).ToArray();

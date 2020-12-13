@@ -14,12 +14,13 @@
 
     internal static class GenericBehaviourCreator
     {
-        public static Component AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
+        public static void AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
         {
             if (GenericObjectDatabase.TryGetValue(genericTypeWithoutArgs, genericArgs, out Type concreteComponent))
             {
                 DestroySelectorComponent(gameObject, selectorComponentType);
-                return gameObject.AddComponent(concreteComponent);
+                gameObject.AddComponent(concreteComponent);
+                return;
             }
 
             Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
@@ -29,10 +30,12 @@
             {
                 DestroySelectorComponent(gameObject, selectorComponentType);
                 GenericObjectDatabase.Add(genericTypeWithoutArgs, genericArgs, existingType);
-                return gameObject.AddComponent(existingType);
+                gameObject.AddComponent(existingType);
+                return;
             }
 
-            string generatedFilePath = GetPathToGeneratedFile(genericTypeWithoutArgs, genericArgs);
+            string generatedFileName = GetGeneratedFileName(genericTypeWithoutArgs);
+            string generatedFilePath = $"{Config.GeneratedTypesPath}/{generatedFileName}";
             string generatedFileContent = File.ReadAllText(generatedFilePath);
 
             string uniqueClassName = GetUniqueClassName(genericTypeWithoutArgs, genericArgs, generatedFileContent);
@@ -48,23 +51,22 @@
             generatedFileContent = generatedFileContent.Insert(insertPos, lineToAdd);
             File.WriteAllText(generatedFilePath, generatedFileContent);
 
-            GenericObjectsPersistentStorage.SaveForAssemblyReload(gameObject, genericType);
+            PersistentStorage.SaveForAssemblyReload(gameObject, genericType);
 
             DestroySelectorComponent(gameObject, selectorComponentType);
             AssetDatabase.Refresh();
-            return null;
         }
 
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            if ( ! GenericObjectsPersistentStorage.NeedsBehaviourCreation)
+            if ( ! PersistentStorage.NeedsBehaviourCreation)
                 return;
 
             try
             {
                 (GameObject gameObject, Type genericType) =
-                    GenericObjectsPersistentStorage.GetGenericBehaviourDetails();
+                    PersistentStorage.GetGenericBehaviourDetails();
 
                 Type existingType = CreatorUtil.GetEmptyTypeDerivedFrom(genericType);
                 Assert.IsNotNull(existingType);
@@ -74,7 +76,7 @@
             }
             finally
             {
-                GenericObjectsPersistentStorage.Clear();
+                PersistentStorage.Clear();
             }
         }
 
@@ -102,11 +104,10 @@
             return sameClassNamesCount == 0 ? defaultClassName : $"{defaultClassName}_{sameClassNamesCount}";
         }
 
-        public static string GetPathToGeneratedFile(Type genericTypeWithoutArgs, Type[] genericArgs)
+        public static string GetGeneratedFileName(Type genericTypeWithoutArgs)
         {
             string fileName = genericTypeWithoutArgs.FullName.MakeClassFriendly();
-            string fileDir = $"Assets/{Config.ScriptsPath}";
-            return $"{fileDir}/{fileName}.cs";
+            return $"{fileName}.cs";
         }
 
         private static int CountMatches(this string text, string match)
