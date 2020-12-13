@@ -22,7 +22,7 @@
 
         private static T _instance = null;
 
-        public static T Instance
+        protected static T Instance
         {
             get
             {
@@ -50,7 +50,6 @@
 
 #if UNITY_EDITOR
                 Directory.CreateDirectory(Config.SettingsPath);
-
                 AssetDatabase.CreateAsset(_instance, AssetPath);
                 EditorUtility.SetDirty(_instance);
 #else
@@ -60,7 +59,12 @@
             }
         }
 
-        public static T OnlyCreatedInstance
+        /// <summary>
+        /// Sometimes, <see cref="AssetDatabase.CreateAsset"/> is not available (e.g. when SingletonScriptableObject
+        /// is called in a [DidScriptsReload] method). So, there is no need to try creating an asset as it will output
+        /// an error.
+        /// </summary>
+        protected static T CreatedOnlyInstance
         {
             get
             {
@@ -88,7 +92,7 @@
             catch (UnityException)
             {
                 Debug.LogError("GenericScriptableObject.CreateInstance() cannot be called in the field " +
-                               "initializer. Please initialize Generic ScriptableObjects in Awake or Start.");
+                               "initializer. Please initialize GenericScriptableObjects in Awake or Start.");
                 throw;
             }
 
