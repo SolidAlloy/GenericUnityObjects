@@ -55,9 +55,6 @@
             CreateAssetFromExistingType(existingAssetType);
         }
 
-        private static string GetTypeNameWithoutAssembly(string fullTypeName)
-            => fullTypeName.Split('[')[0];
-
         /// <summary>
         /// The method first creates a class name that consists of the generic type name and names of the arguments.
         /// If such a name already exists, it adds an index to the name (1, 2, and so on.)
@@ -66,19 +63,9 @@
         private string GetUniqueClassName()
         {
             string argumentNames = string.Join("_", _argumentTypes.Select(type => type.Name.MakeClassFriendly()));
-
-            int duplicationSuffix = 0;
-            string defaultClassName = $"{_genericType.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
-
-            string GetClassName()
-            {
-                return duplicationSuffix == 0 ? defaultClassName : $"{defaultClassName}_{duplicationSuffix}";
-            }
-
-            while (AssetDatabase.FindAssets(GetClassName(), new[] { Config.GeneratedTypesPath }).Length != 0)
-                duplicationSuffix++;
-
-            return GetClassName();
+            string className = $"{_genericType.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
+            int identicalNamesNum = AssetDatabase.FindAssets(className, new[] { Config.GeneratedTypesPath }).Length;
+            return identicalNamesNum == 0 ? className : $"{className}_{identicalNamesNum}";
         }
 
         private void CreateAssetFromExistingType(Type assetType)
@@ -116,7 +103,8 @@
 
         private void CreateAssetInteractively()
         {
-            var asset = GenericScriptableObject.CreateInstance(_genericType, _argumentTypes);
+            Type typeToCreate = _genericType.MakeGenericType(_argumentTypes);
+            var asset = GenericScriptableObject.CreateInstance(typeToCreate);
             Assert.IsNotNull(asset);
             AssetCreator.Create(asset, $"{_fileName}.asset");
         }
