@@ -21,7 +21,7 @@
             if (foundTypes.Count == 0)
                 return null;
 
-            // Why would there be another empty type derived from GenericScriptableObject?
+            // Why would there be another empty type derived from the GenericScriptableObject other than the auto-generated one?
             Assert.IsTrue(foundTypes.Count == 1);
 
             Type matchingType = foundTypes.FirstOrDefault(type => type.IsEmpty());

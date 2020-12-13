@@ -3,6 +3,10 @@
     using System;
     using JetBrains.Annotations;
 
+    /// <summary>
+    /// Marks a GenericScriptableObject-derived type to be automatically listed in the Assets/Create submenu, so that
+    /// instances of the type can be easily created and stored in the project as ".asset" files.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     [BaseTypeRequired(typeof(GenericScriptableObject))]
     public class CreateGenericAssetMenuAttribute : Attribute
