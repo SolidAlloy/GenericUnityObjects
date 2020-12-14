@@ -4,8 +4,6 @@
     using System.IO;
     using System.Text.RegularExpressions;
     using AssetCreation;
-    using NUnit.Framework;
-    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
     using Util;
@@ -18,6 +16,7 @@
     {
         private const string NewLine = Config.NewLine;
         private const string RawNewLine = Config.RawNewLine;
+        private const string Tab = Config.Tab;
 
         private static string _oldContent;
 
@@ -101,10 +100,10 @@
 
             string emptyClass = $"namespace GenericScriptableObjects.Editor.AssetCreation{NewLine}" +
                                 $"{{{NewLine}" +
-                                $"using UnityEditor;{NewLine}" +
-                                $"internal class MenuItems : GenericSOCreator{NewLine}" +
-                                $"{{{NewLine}" +
-                                $"}}{NewLine}" +
+                                $"{Tab}using UnityEditor;{NewLine}{NewLine}" +
+                                $"{Tab}internal class MenuItems : GenericSOCreator{NewLine}" +
+                                $"{Tab}{{{NewLine}" +
+                                $"{Tab}}}{NewLine}" +
                                 $"}}";
 
             CreatorUtil.WriteAllText(Config.MenuItemsPath, emptyClass);
@@ -119,10 +118,10 @@
                 ? CreatorUtil.GetShortNameWithBrackets(method.Type, method.Type.GetGenericArguments())
                 : method.MenuName;
 
-            string attributeLine = $"[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
+            string attributeLine = $"{Tab}{Tab}[MenuItem(\"Assets/Create/{menuName}\", priority = {method.Order})]";
             string typeName = CreatorUtil.GetGenericTypeDefinitionName(method.Type);
 
-            string methodLine = $"private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), \"{fileName}\");";
+            string methodLine = $"{Tab}{Tab}private static void Create{method.TypeName}() => CreateAsset(typeof({typeName}), \"{fileName}\");";
 
             return $"{attributeLine}{NewLine}{methodLine}{NewLine}{NewLine}";
         }

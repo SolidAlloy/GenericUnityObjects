@@ -44,8 +44,8 @@
 
             string componentName = GetComponentName(genericTypeWithoutArgs, genericArgs);
 
-            string lineToAdd = $"    [UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{Config.NewLine}" +
-                               $"    internal class {uniqueClassName} : {typeWithBrackets} {{ }}{Config.NewLine}{Config.NewLine}";
+            string lineToAdd = $"{Config.Tab}[UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{Config.NewLine}" +
+                               $"{Config.Tab}internal class {uniqueClassName} : {typeWithBrackets} {{ }}{Config.NewLine}{Config.NewLine}";
 
             int insertPos = generatedFileContent.Length - 1;
             generatedFileContent = generatedFileContent.Insert(insertPos, lineToAdd);

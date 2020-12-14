@@ -10,6 +10,7 @@
     internal static class GenericBehaviourChecker
     {
         private const string NewLine = Config.NewLine;
+        private const string Tab = Config.Tab;
 
         private static readonly string BehaviourSelectorFullName = typeof(BehaviourSelector).FullName;
 
@@ -42,11 +43,11 @@
                 string fileContent =
                     $"namespace {Config.GeneratedTypesNamespace}{NewLine}" +
                     $"{{{NewLine}" +
-                    $"    [UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{NewLine}" +
-                    $"    internal class {className} : {BehaviourSelectorFullName}{NewLine}" +
-                    $"    {{{NewLine}" +
-                    $"        public override System.Type {nameof(BehaviourSelector.GenericBehaviourType)} => typeof({niceFullName});{NewLine}" +
-                    $"    }}{NewLine}" +
+                    $"{Tab}[UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{NewLine}" +
+                    $"{Tab}internal class {className} : {BehaviourSelectorFullName}{NewLine}" +
+                    $"{Tab}{{{NewLine}" +
+                    $"{Tab}{Tab}public override System.Type {nameof(BehaviourSelector.GenericBehaviourType)} => typeof({niceFullName});{NewLine}" +
+                    $"{Tab}}}{NewLine}" +
                     $"{NewLine}" +
                     $"}}";
 

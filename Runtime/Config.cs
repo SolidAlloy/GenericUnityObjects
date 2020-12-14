@@ -10,5 +10,6 @@
 
         public const string NewLine = "\r\n";
         public const string RawNewLine = @"\r\n";
+        public const string Tab = "    ";
     }
 }
