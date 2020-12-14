@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects
+﻿namespace GenericUnityObjects
 {
     using System;
 

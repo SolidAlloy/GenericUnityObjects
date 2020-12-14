@@ -1,11 +1,11 @@
-﻿namespace GenericScriptableObjects.Editor.Util
+﻿namespace GenericUnityObjects.Editor
 {
     using System;
-    using GenericScriptableObjects.Util;
-    using MenuItemsGeneration;
+    using ScriptableObject;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
+    using Util;
 
     /// <summary>
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset

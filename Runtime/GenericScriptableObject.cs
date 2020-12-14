@@ -1,9 +1,10 @@
-﻿namespace GenericScriptableObjects
+﻿namespace GenericUnityObjects
 {
     using System;
     using System.Linq;
     using JetBrains.Annotations;
     using UnityEngine;
+    using Util;
 
     /// <summary>
     /// Inherit from this class to create a generic ScriptableObject.

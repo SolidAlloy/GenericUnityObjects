@@ -1,0 +1,22 @@
+{
+    "name": "GenericUnityObjects.Editor",
+    "rootNamespace": "GenericUnityObjects.Editor",
+    "references": [
+        "GUID:48d58eaab94e1de429344393b7653b1f",
+        "GUID:7fadca414dede194f95d4f8d2a1e32dc",
+        "GUID:9168b41b563c2d84b94cfe84212541a9",
+        "GUID:ea6a6314f279f814facc8c48a7d3c9f1",
+        "GUID:b73ef07971851e14fa74ae50b76f8225"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

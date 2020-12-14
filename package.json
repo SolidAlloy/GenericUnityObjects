@@ -1,5 +1,5 @@
 {
-  "name": "com.solidalloy.generic-scriptable-objects",
+  "name": "com.solidalloy.generic-unity-objects",
   "version": "1.1.5",
   "displayName": "Generic ScriptableObjects",
   "description": "A plugin that allows to implement generic scriptable objects, create assets from them, and instantiate them at runtime.",
@@ -23,5 +23,6 @@
       "description": "A scene that shows how generic scriptable objects can be implemented and used",
       "path": "Samples~/Usage Example"
     }
-  ]
+  ],
+  "type": "tool"
 }

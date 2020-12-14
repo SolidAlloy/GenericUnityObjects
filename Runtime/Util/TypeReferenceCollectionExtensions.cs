@@ -1,4 +1,4 @@
-﻿namespace GenericScriptableObjects.Util
+﻿namespace GenericUnityObjects.Util
 {
     using System;
     using System.Linq;

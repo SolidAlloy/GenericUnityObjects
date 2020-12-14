@@ -1,11 +1,13 @@
-﻿namespace GenericScriptableObjects.Util
+﻿namespace GenericUnityObjects.Util
 {
+    using System.IO;
     using JetBrains.Annotations;
+    using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+
 #if UNITY_EDITOR
-    using System.IO;
-    using UnityEditor;
+
 #else
     using System.Linq;
 #endif
