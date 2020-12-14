@@ -13,7 +13,7 @@
     /// This class verifies that the GenericScriptableObject scripts are named appropriately and regenerates the
     /// MenuItem methods so that assets can be created from the context menu.
     /// </summary>
-    internal static class GenericSOTypesChecker
+    internal static class GenericSOChecker
     {
         [DidReloadScripts]
         private static void OnScriptsReload()

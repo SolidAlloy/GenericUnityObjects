@@ -9,9 +9,6 @@
 
     internal static class GenericBehaviourChecker
     {
-        private const string NewLine = Config.NewLine;
-        private const string Tab = Config.Tab;
-
         private static readonly string BehaviourSelectorFullName = typeof(BehaviourSelector).FullName;
 
         [DidReloadScripts]
@@ -29,34 +26,40 @@
 
                 CreatorUtil.CheckInvalidName(shortName);
 
-                var genericArgs = type.GetGenericArguments();
-                string fileName = GenericBehaviourCreator.GetGeneratedFileName(type);
+                string fileName = GenericBehaviourUtil.GetGeneratedFileName(type);
                 string filePath = $"{Config.GeneratedTypesPath}/{fileName}";
 
                 if (File.Exists(filePath))
                     continue;
 
-                string componentName = CreatorUtil.GetShortNameWithBrackets(type, genericArgs);
-                string className = Path.GetFileNameWithoutExtension(fileName);
-                string niceFullName = CreatorUtil.GetGenericTypeDefinitionName(type);
-
-                string fileContent =
-                    $"namespace {Config.GeneratedTypesNamespace}{NewLine}" +
-                    $"{{{NewLine}" +
-                    $"{Tab}[UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{NewLine}" +
-                    $"{Tab}internal class {className} : {BehaviourSelectorFullName}{NewLine}" +
-                    $"{Tab}{{{NewLine}" +
-                    $"{Tab}{Tab}public override System.Type {nameof(BehaviourSelector.GenericBehaviourType)} => typeof({niceFullName});{NewLine}" +
-                    $"{Tab}}}{NewLine}" +
-                    $"{NewLine}" +
-                    $"}}";
-
+                string fileContent = GenerateSelectorScript(type, fileName);
                 CreatorUtil.WriteAllText(filePath, fileContent, Config.GeneratedTypesPath);
                 addedFiles = true;
             }
 
             if (addedFiles)
                 AssetDatabase.Refresh();
+        }
+
+        private static string GenerateSelectorScript(Type genericType, string fileName)
+        {
+            var genericArgs = genericType.GetGenericArguments();
+            string componentName = CreatorUtil.GetShortNameWithBrackets(genericType, genericArgs);
+            string className = Path.GetFileNameWithoutExtension(fileName);
+            string niceFullName = CreatorUtil.GetGenericTypeDefinitionName(genericType);
+
+            const string tab = Config.Tab;
+            const string nl = Config.NewLine;
+
+            return $"namespace {Config.GeneratedTypesNamespace}{nl}" +
+                   $"{{{nl}" +
+                   $"{tab}[UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{nl}" +
+                   $"{tab}internal class {className} : {BehaviourSelectorFullName}{nl}" +
+                   $"{tab}{{{nl}" +
+                   $"{tab}{tab}public override System.Type {nameof(BehaviourSelector.GenericBehaviourType)} => typeof({niceFullName});{nl}" +
+                   $"{tab}}}{nl}" +
+                   $"{nl}" +
+                   $"}}";
         }
     }
 }

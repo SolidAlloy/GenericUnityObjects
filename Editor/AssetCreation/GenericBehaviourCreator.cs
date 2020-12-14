@@ -12,49 +12,12 @@
     using Util;
     using Object = UnityEngine.Object;
 
-    internal static class GenericBehaviourCreator
+    internal class GenericBehaviourCreator
     {
         public static void AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
         {
-            if (GenericObjectDatabase.TryGetValue(genericTypeWithoutArgs, genericArgs, out Type concreteComponent))
-            {
-                DestroySelectorComponent(gameObject, selectorComponentType);
-                gameObject.AddComponent(concreteComponent);
-                return;
-            }
-
-            Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
-
-            Type existingType = CreatorUtil.GetEmptyTypeDerivedFrom(genericType);
-            if (existingType != null)
-            {
-                DestroySelectorComponent(gameObject, selectorComponentType);
-                GenericObjectDatabase.Add(genericTypeWithoutArgs, genericArgs, existingType);
-                gameObject.AddComponent(existingType);
-                return;
-            }
-
-            string generatedFileName = GetGeneratedFileName(genericTypeWithoutArgs);
-            string generatedFilePath = $"{Config.GeneratedTypesPath}/{generatedFileName}";
-            string generatedFileContent = File.ReadAllText(generatedFilePath);
-
-            string uniqueClassName = GetUniqueClassName(genericTypeWithoutArgs, genericArgs, generatedFileContent);
-
-            string typeWithBrackets = CreatorUtil.GetFullNameWithBrackets(genericTypeWithoutArgs, genericArgs);
-
-            string componentName = GetComponentName(genericTypeWithoutArgs, genericArgs);
-
-            string lineToAdd = $"{Config.Tab}[UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{Config.NewLine}" +
-                               $"{Config.Tab}internal class {uniqueClassName} : {typeWithBrackets} {{ }}{Config.NewLine}{Config.NewLine}";
-
-            int insertPos = generatedFileContent.Length - 1;
-            generatedFileContent = generatedFileContent.Insert(insertPos, lineToAdd);
-            File.WriteAllText(generatedFilePath, generatedFileContent);
-
-            PersistentStorage.SaveForAssemblyReload(gameObject, genericType);
-
-            DestroySelectorComponent(gameObject, selectorComponentType);
-            AssetDatabase.Refresh();
+            var creator = new GenericBehaviourCreator(selectorComponentType, gameObject, genericTypeWithoutArgs, genericArgs);
+            creator.AddComponent();
         }
 
         [DidReloadScripts]
@@ -68,11 +31,11 @@
                 (GameObject gameObject, Type genericType) =
                     PersistentStorage.GetGenericBehaviourDetails();
 
-                Type existingType = CreatorUtil.GetEmptyTypeDerivedFrom(genericType);
-                Assert.IsNotNull(existingType);
+                Type concreteType = CreatorUtil.GetEmptyTypeDerivedFrom(genericType);
+                Assert.IsNotNull(concreteType);
 
-                GenericObjectDatabase.Add(genericType, existingType);
-                gameObject.AddComponent(existingType);
+                GenericObjectDatabase.Add(genericType, concreteType);
+                gameObject.AddComponent(concreteType);
             }
             finally
             {
@@ -80,14 +43,98 @@
             }
         }
 
-        private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)
-        {
-            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+        private readonly Type _selectorComponentType;
+        private readonly Type _genericTypeWithoutArgs;
+        private readonly Type[] _genericArgs;
+        private readonly GameObject _gameObject;
 
-            string shortName = genericTypeWithoutArgs.Name;
+        private GenericBehaviourCreator(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
+        {
+            _selectorComponentType = selectorComponentType;
+            _gameObject = gameObject;
+            _genericTypeWithoutArgs = genericTypeWithoutArgs;
+            _genericArgs = genericArgs;
+        }
+
+        private void AddComponent()
+        {
+            if (GenericObjectDatabase.TryGetValue(_genericTypeWithoutArgs, _genericArgs, out Type concreteComponent))
+            {
+                AddConcreteComponent(concreteComponent);
+                return;
+            }
+
+            if (TryFindExistingType(out Type genericType))
+                return;
+
+            AddConcreteClassToFile();
+            PersistentStorage.SaveForAssemblyReload(_gameObject, genericType);
+            DestroySelectorComponent();
+            AssetDatabase.Refresh();
+        }
+
+        private bool TryFindExistingType(out Type genericType)
+        {
+            genericType = _genericTypeWithoutArgs.MakeGenericType(_genericArgs);
+
+            Type existingType = CreatorUtil.GetEmptyTypeDerivedFrom(genericType);
+
+            if (existingType == null)
+                return false;
+
+            GenericObjectDatabase.Add(_genericTypeWithoutArgs, _genericArgs, existingType);
+            AddConcreteComponent(existingType);
+            return true;
+        }
+
+        private void AddConcreteClassToFile()
+        {
+            string generatedFileName = GenericBehaviourUtil.GetGeneratedFileName(_genericTypeWithoutArgs);
+            string generatedFilePath = $"{Config.GeneratedTypesPath}/{generatedFileName}";
+            string generatedFileContent = File.ReadAllText(generatedFilePath);
+
+            string lineToAdd = GenerateConcreteClass(generatedFileContent);
+
+            int insertPos = generatedFileContent.Length - 1;
+            generatedFileContent = generatedFileContent.Insert(insertPos, lineToAdd);
+            File.WriteAllText(generatedFilePath, generatedFileContent);
+        }
+
+        private string GenerateConcreteClass(string fileContent)
+        {
+            string uniqueClassName = GetUniqueClassName(fileContent);
+            string typeWithBrackets = CreatorUtil.GetFullNameWithBrackets(_genericTypeWithoutArgs, _genericArgs);
+            string componentName = GetComponentName();
+
+            const string tab = Config.Tab;
+            const string nl = Config.NewLine;
+
+            return $"{tab}[UnityEngine.AddComponentMenu(\"Scripts/{componentName}\")]{nl}" +
+                   $"{tab}internal class {uniqueClassName} : {typeWithBrackets} {{ }}{nl}{nl}";
+        }
+
+        private void AddConcreteComponent(Type concreteType)
+        {
+            DestroySelectorComponent();
+            _gameObject.AddComponent(concreteType);
+        }
+
+        private void DestroySelectorComponent()
+        {
+            if (_gameObject.TryGetComponent(_selectorComponentType, out Component selectorComponent))
+            {
+                Object.DestroyImmediate(selectorComponent);
+            }
+        }
+
+        private string GetComponentName()
+        {
+            Assert.IsTrue(_genericTypeWithoutArgs.IsGenericTypeDefinition);
+
+            string shortName = _genericTypeWithoutArgs.Name;
             string typeNameWithoutSuffix = shortName.StripGenericSuffix();
 
-            var argumentNames = genericArgs
+            var argumentNames = _genericArgs
                 .Select(argument => argument.FullName)
                 .Select(fullName => fullName.ReplaceWithBuiltInName())
                 .Select(fullName => fullName.GetSubstringAfterLast('.'));
@@ -95,32 +142,13 @@
             return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
 
-        private static string GetUniqueClassName(Type genericTypeWithoutArgs, Type[] genericArgs, string generatedFileContent)
+        private string GetUniqueClassName(string generatedFileContent)
         {
-            string argumentNames = string.Join("_", genericArgs.Select(type => type.Name.MakeClassFriendly()));
-            string defaultClassName = $"{genericTypeWithoutArgs.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
+            string argumentNames = string.Join("_", _genericArgs.Select(type => type.Name.MakeClassFriendly()));
+            string defaultClassName = $"{_genericTypeWithoutArgs.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
 
-            int sameClassNamesCount = generatedFileContent.CountMatches(defaultClassName);
+            int sameClassNamesCount = generatedFileContent.CountSubstrings(defaultClassName);
             return sameClassNamesCount == 0 ? defaultClassName : $"{defaultClassName}_{sameClassNamesCount}";
-        }
-
-        public static string GetGeneratedFileName(Type genericTypeWithoutArgs)
-        {
-            string fileName = genericTypeWithoutArgs.FullName.MakeClassFriendly();
-            return $"{fileName}.cs";
-        }
-
-        private static int CountMatches(this string text, string match)
-        {
-            return ( text.Length - text.Replace(match, string.Empty).Length ) / match.Length;
-        }
-
-        private static void DestroySelectorComponent(GameObject gameObject, Type selectorComponentType)
-        {
-            if (gameObject.TryGetComponent(selectorComponentType, out Component selectorComponent))
-            {
-                Object.DestroyImmediate(selectorComponent);
-            }
         }
     }
 }
