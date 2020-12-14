@@ -98,7 +98,7 @@
         private string GetScriptContent(string className)
         {
             string genericTypeWithBrackets = CreatorUtil.GetFullNameWithBrackets(_genericType, _argumentTypes);
-            return $"namespace {Config.GeneratedTypesNamespace} {{ public class {className} : {genericTypeWithBrackets} {{ }} }}";
+            return $"namespace {Config.GeneratedTypesNamespace} {{ internal class {className} : {genericTypeWithBrackets} {{ }} }}";
         }
 
         private void CreateAssetInteractively()
