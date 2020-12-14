@@ -7,7 +7,7 @@
     /// A struct that holds all variables needed to create a MenuItem method.
     /// </summary>
     [Serializable]
-    public struct MenuItemMethod
+    internal struct MenuItemMethod
     {
         public string TypeName;
         public string FileName;

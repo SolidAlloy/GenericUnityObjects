@@ -10,7 +10,7 @@
     using UnityEngine;
 
     [CustomEditor(typeof(BehaviourSelector), true)]
-    public class BehaviourSelectorEditor : Editor
+    internal class BehaviourSelectorEditor : Editor
     {
         private SerializedProperty _typesArray;
         private ContentCache _contentCache;

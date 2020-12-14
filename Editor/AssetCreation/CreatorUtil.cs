@@ -11,7 +11,7 @@
     using UnityEngine.Assertions;
     using TypeCache = UnityEditor.TypeCache;
 
-    public static class CreatorUtil
+    internal static class CreatorUtil
     {
         [CanBeNull]
         public static Type GetEmptyTypeDerivedFrom(Type parentType)

@@ -1,6 +1,6 @@
 ﻿namespace GenericScriptableObjects
 {
-    public static class Config
+    internal static class Config
     {
         public const string GeneratedTypesNamespace = "GeneratedTypes";
         public const string MainFolderPath = "Assets/Generic Unity Objects";

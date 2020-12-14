@@ -12,7 +12,7 @@
     /// available assets.
     /// </summary>
     [CustomPropertyDrawer(typeof(GenericScriptableObject), true)]
-    public class GenericSODrawer : PropertyDrawer
+    internal class GenericSODrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

@@ -15,7 +15,7 @@
     /// Returns the asset created in the Assets/Resources folder, or null if there is none.
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
-    public abstract class SingletonScriptableObject<T> : ScriptableObject
+    internal abstract class SingletonScriptableObject<T> : ScriptableObject
         where T : ScriptableObject
     {
         private static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
