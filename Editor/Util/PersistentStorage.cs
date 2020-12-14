@@ -26,9 +26,6 @@
 
         public static bool NeedsBehaviourCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericBehaviourType?.Type != null;
 
-        public static TypeReference GenericSOType => Instance._genericSOType;
-        public static string FileName => Instance._fileName;
-
         public static MenuItemMethod[] MenuItemMethods
         {
             get => CreatedOnlyInstance == null ? null : CreatedOnlyInstance._menuItemMethods;
@@ -55,23 +52,28 @@
             Instance._fileName = fileName;
         }
 
-        public static void Clear()
-        {
-            Instance._genericSOType = null;
-            Instance._fileName = null;
-            Instance._gameObject = null;
-            Instance._genericBehaviourType = null;
-        }
-
         public static void SaveForAssemblyReload(GameObject gameObject, Type genericType)
         {
             Instance._gameObject = gameObject;
             Instance._genericBehaviourType = genericType;
         }
 
+        public static (Type, string) GetGenericSODetails()
+        {
+            return (Instance._genericSOType, Instance._fileName);
+        }
+
         public static (GameObject, Type) GetGenericBehaviourDetails()
         {
             return (Instance._gameObject, Instance._genericBehaviourType);
+        }
+
+        public static void Clear()
+        {
+            Instance._genericSOType = null;
+            Instance._fileName = null;
+            Instance._gameObject = null;
+            Instance._genericBehaviourType = null;
         }
     }
 }

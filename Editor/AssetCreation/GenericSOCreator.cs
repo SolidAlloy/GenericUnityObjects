@@ -21,18 +21,19 @@
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the
         /// <see cref="UnityEditor.MenuItem"/> attribute. Use it in classes that derive from <see cref="GenericSOCreator"/>.
         /// </summary>
-        /// <param name="genericType">The type of <see cref="GenericScriptableObject"/> to create.</param>
+        /// <param name="genericTypeWithoutArgs">The type of <see cref="GenericScriptableObject"/> to create.</param>
         /// <param name="fileName">Name for an asset.</param>
-        protected static void CreateAsset(Type genericType, string fileName)
+        protected static void CreateAsset(Type genericTypeWithoutArgs, string fileName)
         {
-            genericType = TypeHelper.MakeGenericTypeDefinition(genericType);
-            var constraints = genericType.GetGenericArguments()
+            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+
+            var constraints = genericTypeWithoutArgs.GetGenericArguments()
                 .Select(type => type.GetGenericParameterConstraints())
                 .ToArray();
 
-            TypeSelectionWindow.Create(constraints, paramTypes =>
+            TypeSelectionWindow.Create(constraints, genericArgs =>
             {
-                var creator = new GenericSOCreator(genericType, paramTypes, fileName);
+                var creator = new GenericSOCreator(genericTypeWithoutArgs, genericArgs, fileName);
                 creator.CreateAsset();
             });
         }
@@ -45,14 +46,11 @@
 
             try
             {
-                Type genericTypeWithoutArgs = PersistentStorage.GenericSOType.Type.GetGenericTypeDefinition();
-                var paramTypes = PersistentStorage.GenericSOType.Type.GenericTypeArguments;
+                (Type genericType, string fileName) = PersistentStorage.GetGenericSODetails();
+                Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+                var genericArgs = genericType.GetGenericArguments();
 
-                var creator = new GenericSOCreator(
-                    genericTypeWithoutArgs,
-                    paramTypes,
-                    PersistentStorage.FileName);
-
+                var creator = new GenericSOCreator(genericTypeWithoutArgs, genericArgs, fileName);
                 creator.CreateAssetFromExistingType();
             }
             finally
@@ -61,26 +59,28 @@
             }
         }
 
-        private readonly Type _genericType;
-        private readonly Type[] _argumentTypes;
+        private readonly Type _genericTypeWithoutArgs;
+        private readonly Type[] _genericArgs;
         private readonly string _fileName;
 
-        private GenericSOCreator(Type genericType, Type[] argumentTypes, string fileName)
+        protected GenericSOCreator() { }
+
+        private GenericSOCreator(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
         {
-            _genericType = genericType;
-            _argumentTypes = argumentTypes;
+            _genericTypeWithoutArgs = genericTypeWithoutArgs;
+            _genericArgs = genericArgs;
             _fileName = fileName;
         }
 
         private void CreateAsset()
         {
-            if (GenericObjectDatabase.ContainsKey(_genericType, _argumentTypes))
+            if (GenericObjectDatabase.ContainsKey(_genericTypeWithoutArgs, _genericArgs))
             {
                 CreateAssetInteractively();
                 return;
             }
 
-            Type genericTypeWithArgs = _genericType.MakeGenericType(_argumentTypes);
+            Type genericTypeWithArgs = _genericTypeWithoutArgs.MakeGenericType(_genericArgs);
 
             Type existingAssetType = CreatorUtil.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
 
@@ -97,7 +97,7 @@
 
         private void CreateAssetFromExistingType()
         {
-            Type genericTypeWithArgs = _genericType.MakeGenericType(_argumentTypes);
+            Type genericTypeWithArgs = _genericTypeWithoutArgs.MakeGenericType(_genericArgs);
             Type existingAssetType = CreatorUtil.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
             Assert.IsNotNull(existingAssetType);
             CreateAssetFromExistingType(existingAssetType);
@@ -110,15 +110,15 @@
         /// <returns>Unique class name.</returns>
         private string GetUniqueClassName()
         {
-            string argumentNames = string.Join("_", _argumentTypes.Select(type => type.Name.MakeClassFriendly()));
-            string className = $"{_genericType.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
+            string argumentNames = string.Join("_", _genericArgs.Select(type => type.Name.MakeClassFriendly()));
+            string className = $"{_genericTypeWithoutArgs.Name.MakeClassFriendly().StripGenericSuffix()}_{argumentNames}";
             int identicalNamesNum = AssetDatabase.FindAssets(className, new[] { Config.GeneratedTypesPath }).Length;
             return identicalNamesNum == 0 ? className : $"{className}_{identicalNamesNum}";
         }
 
         private void CreateAssetFromExistingType(Type assetType)
         {
-            GenericObjectDatabase.Add(_genericType, _argumentTypes, assetType);
+            GenericObjectDatabase.Add(_genericTypeWithoutArgs, _genericArgs, assetType);
             CreateAssetInteractively();
         }
 
@@ -145,13 +145,13 @@
 
         private string GetScriptContent(string className)
         {
-            string genericTypeWithBrackets = CreatorUtil.GetFullNameWithBrackets(_genericType, _argumentTypes);
+            string genericTypeWithBrackets = CreatorUtil.GetFullNameWithBrackets(_genericTypeWithoutArgs, _genericArgs);
             return $"namespace {Config.GeneratedTypesNamespace} {{ internal class {className} : {genericTypeWithBrackets} {{ }} }}";
         }
 
         private void CreateAssetInteractively()
         {
-            Type typeToCreate = _genericType.MakeGenericType(_argumentTypes);
+            Type typeToCreate = _genericTypeWithoutArgs.MakeGenericType(_genericArgs);
             var asset = GenericScriptableObject.CreateInstance(typeToCreate);
             Assert.IsNotNull(asset);
             AssetCreator.Create(asset, $"{_fileName}.asset");

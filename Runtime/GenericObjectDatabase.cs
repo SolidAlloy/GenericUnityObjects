@@ -38,14 +38,18 @@
         [HideInInspector]
         [SerializeField] private TypeDictionary[] _values;
 
+        /// <summary>
+        /// <see cref="EditorUtility.SetDirty"/> cannot be called in OnAfterDeserialize, so the need to call the
+        /// method must be saved and be called later (in <see cref="OnEnable"/>).
+        /// </summary>
         private bool _shouldSetDirty;
 
         public static void Add(Type genericType, Type value)
         {
-            var paramTypes = genericType.GetGenericArguments();
-            Assert.IsFalse(paramTypes.Length == 0);
-            Type genericTypeWithoutParams = genericType.GetGenericTypeDefinition();
-            Add(genericTypeWithoutParams, paramTypes, value);
+            var genericArgs = genericType.GetGenericArguments();
+            Assert.IsFalse(genericArgs.Length == 0);
+            Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+            Add(genericTypeWithoutArgs, genericArgs, value);
         }
 
         public static void Add(Type genericTypeWithoutArgs, Type[] key, Type value)
@@ -65,10 +69,10 @@
 
         public static bool TryGetValue(Type genericType, out Type value)
         {
-            var paramTypes = genericType.GetGenericArguments();
-            Assert.IsFalse(paramTypes.Length == 0);
-            Type genericTypeWithoutParams = genericType.GetGenericTypeDefinition();
-            return TryGetValue(genericTypeWithoutParams, paramTypes, out value);
+            var genericArgs = genericType.GetGenericArguments();
+            Assert.IsFalse(genericArgs.Length == 0);
+            Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+            return TryGetValue(genericTypeWithoutArgs, genericArgs, out value);
         }
 
         public static bool TryGetValue(Type genericTypeWithoutArgs, Type[] genericArgs, out Type value)

@@ -30,7 +30,7 @@
 
         /// <summary>
         /// Gets the type name for using in scripts.
-        /// It looks like this: Namespace.ClassName&lt;Namespace.FirstGenericArg, Namespace.SecondGenericArg>
+        /// It looks like this: Namespace.ClassName&lt;Namespace.FirstGenericArg, Namespace.SecondGenericArg>.
         /// </summary>
         public static string GetFullNameWithBrackets(Type genericTypeWithoutArgs, Type[] genericArgs)
         {
@@ -39,23 +39,23 @@
             string typeFullName = genericTypeWithoutArgs.FullName;
             Assert.IsNotNull(typeFullName);
 
-            string genericTypeNameWithoutParam = typeFullName.StripGenericSuffix();
+            string typeNameWithoutBrackets = typeFullName.StripGenericSuffix();
 
             var argumentNames = genericArgs
                 .Select(argument => argument.FullName)
                 .Select(fullName => fullName.ReplaceWithBuiltInName());
 
-            return $"{genericTypeNameWithoutParam}<{string.Join(",", argumentNames)}>";
+            return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";
         }
 
         /// <summary>
-        /// Gets the type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>
+        /// Gets the type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>.
         /// </summary>
         public static string GetShortNameWithBrackets(Type type, Type[] genericArgs)
         {
-            string typeNameWithoutArguments = type.Name.StripGenericSuffix();
+            string typeNameWithoutBrackets = type.Name.StripGenericSuffix();
             var argumentNames = genericArgs.Select(argument => argument.Name);
-            return $"{typeNameWithoutArguments}<{string.Join(",", argumentNames)}>";
+            return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";
         }
 
         public static void CheckInvalidName(string typeName)
@@ -69,16 +69,15 @@
 
         /// <summary>
         /// Gets the full type name with brackets but without generic arguments names.
-        /// It looks like this: Namespace.ClassName&lt;,>
+        /// It looks like this: Namespace.ClassName&lt;,>.
         /// </summary>
         public static string GetGenericTypeDefinitionName(Type type)
         {
             string fullTypeName = type.FullName;
             Assert.IsNotNull(fullTypeName);
-            string typeNameWithoutArguments = fullTypeName.Split('`')[0];
+            string typeNameWithoutBrackets = fullTypeName.StripGenericSuffix();
             int argsCount = type.GetGenericArguments().Length;
-            string suffix = $"<{new string(',', argsCount-1)}>";
-            return typeNameWithoutArguments + suffix;
+            return $"{typeNameWithoutBrackets}<{new string(',', argsCount-1)}>";
         }
 
         public static void WriteAllText(string filePath, string text, string directoryPath = null)
