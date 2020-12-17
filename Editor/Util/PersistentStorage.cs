@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System;
+    using MonoBehaviour;
     using ScriptableObject;
     using TypeReferences;
     using UnityEditor;
@@ -22,6 +23,8 @@
         [HideInInspector] [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
         [HideInInspector] [SerializeField] private bool _usageExampleTypesAreAdded;
 
+        [HideInInspector] [SerializeField] private GenericTypeInfo[] _genericTypeInfos = { };
+
         public static bool NeedsSOCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericSOType?.Type != null;
 
         public static bool NeedsBehaviourCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericBehaviourType?.Type != null;
@@ -32,7 +35,17 @@
             set
             {
                 CreatedOnlyInstance._menuItemMethods = value;
-                EditorUtility.SetDirty(Instance);
+                EditorUtility.SetDirty(CreatedOnlyInstance);
+            }
+        }
+
+        public static GenericTypeInfo[] GenericTypeInfos
+        {
+            get => CreatedOnlyInstance == null ? null : CreatedOnlyInstance._genericTypeInfos;
+            set
+            {
+                CreatedOnlyInstance._genericTypeInfos = value;
+                EditorUtility.SetDirty(CreatedOnlyInstance);
             }
         }
 

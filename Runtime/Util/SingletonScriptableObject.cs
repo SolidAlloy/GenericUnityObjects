@@ -71,7 +71,7 @@
         /// <see cref="Instance"/> is called, a new asset is created and replaces the old one which is harmful.
         /// So, only <see cref="CreatedOnlyInstance"/> must be used in DidReloadScripts, InitializeOnLoad and similar methods.
         /// </summary>
-        protected static T CreatedOnlyInstance
+        public static T CreatedOnlyInstance
         {
             get
             {

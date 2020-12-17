@@ -3,9 +3,9 @@
     using System;
     using System.IO;
     using System.Linq;
-    using GenericUnityObjects;
     using UnityEditor;
     using UnityEditor.Callbacks;
+    using UnityEngine;
     using Util;
 
     internal static class GenericBehaviourChecker
@@ -15,8 +15,23 @@
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
+            // Create the OldTypeAndAssembly field that will hold a previous type name if it was changed.
+            // Search for that field in the database.
+
+            // The type or namespace name 'GenericBehaviourTest<>' does not exist in the namespace 'Prototype' (are you missing an assembly reference?)
+            // error CS0234: Assets\Generic Unity Objects\GeneratedTypes\Prototype_GenericBehaviourTest_1.cs(10,61)
+
+            // If the error is output, the steps are:
+            // 1. Assemble type name and namespace.
+            // 2. Check if they match the file name.
+            // 3. If they match, find the new type by guid. (old name and assembly => database search => new name and assembly)
+            // 4. Get the full name of the new type.
+            // 5. Use it to rename the selector class and file.
+            // 6. Replace the full type name in the auto-generated property.
+            // 7. Replace the full type name excluding brackets in the auto-generated concrete classes.
+
             var types = TypeCache
-                .GetTypesWithAttribute<GenericMonoBehaviourAttribute>()
+                .GetTypesDerivedFrom<MonoBehaviour>()
                 .Where(type => type.IsGenericType);
 
             bool addedFiles = false;
