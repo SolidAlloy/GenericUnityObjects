@@ -17,7 +17,7 @@
             var oldTypes = PersistentStorage.GenericTypeInfos;
             var newTypes = TypeCache.GetTypesDerivedFrom<MonoBehaviour>()
                 .Where(type => type.IsGenericType)
-                .Select(type => new GenericTypeInfo(type))
+                .Select(type => new TypeInfo(type))
                 .ToArray();
 
             var (needAssemblyRemove, needAssemblyAdd, needAssemblyUpdate) = GetTypesForAssemblyChange(oldTypes, newTypes);
@@ -33,9 +33,9 @@
                 AssetDatabase.Refresh();
         }
 
-        private static void RemoveAssemblies(List<GenericTypeInfo> typesToRemove)
+        private static void RemoveAssemblies(List<TypeInfo> typesToRemove)
         {
-            foreach (GenericTypeInfo typeInfo in typesToRemove)
+            foreach (TypeInfo typeInfo in typesToRemove)
             {
                 Assert.IsFalse(string.IsNullOrEmpty(typeInfo.AssemblyName));
                 var dirInfo = new DirectoryInfo(PathToAssemblies);
@@ -47,9 +47,9 @@
             }
         }
 
-        private static void AddAssemblies(List<GenericTypeInfo> typesToAdd)
+        private static void AddAssemblies(List<TypeInfo> typesToAdd)
         {
-            foreach (GenericTypeInfo typeInfo in typesToAdd)
+            foreach (TypeInfo typeInfo in typesToAdd)
             {
                 // Find a name for assembly
                 // Find all the other needed info
@@ -69,10 +69,10 @@
         }
 
         public static (
-            List<GenericTypeInfo> typesToRemove,
-            List<GenericTypeInfo> typesToAdd,
+            List<TypeInfo> typesToRemove,
+            List<TypeInfo> typesToAdd,
             List<GenericTypeInfoPair> typesToUpdate
-            ) GetTypesForAssemblyChange(GenericTypeInfo[] oldTypes, GenericTypeInfo[] newTypes)
+            ) GetTypesForAssemblyChange(TypeInfo[] oldTypes, TypeInfo[] newTypes)
         {
             int oldTypesLength = oldTypes.Length;
             int newTypesLength = newTypes.Length;
@@ -80,38 +80,38 @@
             // Optimizations for some cases.
             if (oldTypesLength == 0 && newTypesLength == 0)
             {
-                return (new List<GenericTypeInfo>(),
-                    new List<GenericTypeInfo>(),
+                return (new List<TypeInfo>(),
+                    new List<TypeInfo>(),
                     new List<GenericTypeInfoPair>());
             }
 
             if (oldTypesLength == 0)
             {
-                return (new List<GenericTypeInfo>(),
-                    new List<GenericTypeInfo>(newTypes),
+                return (new List<TypeInfo>(),
+                    new List<TypeInfo>(newTypes),
                     new List<GenericTypeInfoPair>());
             }
 
             if (newTypesLength == 0)
             {
-                return (new List<GenericTypeInfo>(oldTypes),
-                    new List<GenericTypeInfo>(),
+                return (new List<TypeInfo>(oldTypes),
+                    new List<TypeInfo>(),
                     new List<GenericTypeInfoPair>());
             }
 
-            var oldTypesSet = new HashSet<GenericTypeInfo>(oldTypes);
-            var newTypesSet = new HashSet<GenericTypeInfo>(newTypes);
+            var oldTypesSet = new HashSet<TypeInfo>(oldTypes);
+            var newTypesSet = new HashSet<TypeInfo>(newTypes);
 
             var oldTypesOnly = oldTypesSet.ExceptWithAndCreateNew(newTypesSet).ToList();
             var newTypesOnly = newTypesSet.ExceptWithAndCreateNew(oldTypesSet);
             var needAssemblyUpdate = new List<GenericTypeInfoPair>(1);
-            var needAssemblyAdd = new List<GenericTypeInfo>(newTypesOnly.Count);
+            var needAssemblyAdd = new List<TypeInfo>(newTypesOnly.Count);
 
-            foreach (GenericTypeInfo newTypeInfo in newTypesOnly)
+            foreach (TypeInfo newTypeInfo in newTypesOnly)
             {
                 bool foundMatching = false;
 
-                foreach (GenericTypeInfo oldTypeInfo in oldTypesOnly)
+                foreach (TypeInfo oldTypeInfo in oldTypesOnly)
                 {
                     // Full names are equal but GUIDs are not
                     if (newTypeInfo.TypeFullName == oldTypeInfo.TypeFullName)

@@ -5,7 +5,7 @@
     using UnityEngine;
 
     [Serializable]
-    internal class GenericTypeInfo : IEquatable<GenericTypeInfo>
+    internal class TypeInfo : IEquatable<TypeInfo>
     {
         public string GUID;
         public string AssemblyName;
@@ -14,19 +14,19 @@
 
         public string TypeFullName => _typeFullName;
 
-        public GenericTypeInfo(string typeFullName, string guid)
+        public TypeInfo(string typeFullName, string guid)
         {
             _typeFullName = typeFullName;
             GUID = guid;
         }
 
-        public GenericTypeInfo(Type type)
+        public TypeInfo(Type type)
         {
             _typeFullName = type.FullName;
             GUID = AssetSearcher.GetClassGUID(type);
         }
 
-        public bool Equals(GenericTypeInfo p)
+        public bool Equals(TypeInfo p)
         {
             // If parameter is null, return false.
             if (ReferenceEquals(p, null))
@@ -52,19 +52,19 @@
             return TypeFullName == p.TypeFullName && GUID == p.GUID;
         }
 
-        public static bool operator ==(GenericTypeInfo lhs, GenericTypeInfo rhs)
+        public static bool operator ==(TypeInfo lhs, TypeInfo rhs)
         {
             return lhs?.Equals(rhs) ?? ReferenceEquals(rhs, null);
         }
 
-        public static bool operator !=(GenericTypeInfo lhs, GenericTypeInfo rhs)
+        public static bool operator !=(TypeInfo lhs, TypeInfo rhs)
         {
             return ! (lhs == rhs);
         }
 
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as GenericTypeInfo);
+            return this.Equals(obj as TypeInfo);
         }
 
         public override int GetHashCode()
@@ -80,10 +80,10 @@
 
     internal readonly struct GenericTypeInfoPair
     {
-        public readonly GenericTypeInfo OldType;
-        public readonly GenericTypeInfo NewType;
+        public readonly TypeInfo OldType;
+        public readonly TypeInfo NewType;
 
-        public GenericTypeInfoPair(GenericTypeInfo oldType, GenericTypeInfo newType)
+        public GenericTypeInfoPair(TypeInfo oldType, TypeInfo newType)
         {
             OldType = oldType;
             NewType = newType;

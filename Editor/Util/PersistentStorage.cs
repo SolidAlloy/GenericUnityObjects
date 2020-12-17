@@ -23,7 +23,7 @@
         [HideInInspector] [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
         [HideInInspector] [SerializeField] private bool _usageExampleTypesAreAdded;
 
-        [HideInInspector] [SerializeField] private GenericTypeInfo[] _genericTypeInfos = { };
+        [HideInInspector] [SerializeField] private TypeInfo[] _genericTypeInfos = { };
 
         public static bool NeedsSOCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericSOType?.Type != null;
 
@@ -39,7 +39,7 @@
             }
         }
 
-        public static GenericTypeInfo[] GenericTypeInfos
+        public static TypeInfo[] GenericTypeInfos
         {
             get => CreatedOnlyInstance == null ? null : CreatedOnlyInstance._genericTypeInfos;
             set
