@@ -10,9 +10,9 @@
             private static bool CallMethodBool() =>
                 _database.InstanceTryGetReferencedBehaviours(_firstArg, out _);
 
-            private static TypeInfo[] CallMethodArray()
+            private static BehaviourInfo[] CallMethodArray()
             {
-                _database.InstanceTryGetReferencedBehaviours(_firstArg, out TypeInfo[] behaviours);
+                _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] behaviours);
                 return behaviours;
             }
 

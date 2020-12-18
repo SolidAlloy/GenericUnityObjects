@@ -9,18 +9,18 @@
     {
         public class GetTypesForAssemblyChange
         {
-            private TypeInfo _firstInfo;
-            private TypeInfo _secondInfo;
-            private TypeInfo _thirdInfo;
-            private TypeInfo _fourthInfo;
+            private BehaviourInfo _firstInfo;
+            private BehaviourInfo _secondInfo;
+            private BehaviourInfo _thirdInfo;
+            private BehaviourInfo _fourthInfo;
 
             [OneTimeSetUp]
             public void BeforeAllTests()
             {
-                _firstInfo = new TypeInfo("firstFullName", "firstGUID");
-                _secondInfo = new TypeInfo("secondFullName", "secondGUID");
-                _thirdInfo = new TypeInfo("thirdFullName", "thirdGUID");
-                _fourthInfo = new TypeInfo("fourthFullName", "fourthGUID");
+                _firstInfo = new BehaviourInfo("firstFullName", "firstGUID");
+                _secondInfo = new BehaviourInfo("secondFullName", "secondGUID");
+                _thirdInfo = new BehaviourInfo("thirdFullName", "thirdGUID");
+                _fourthInfo = new BehaviourInfo("fourthFullName", "fourthGUID");
             }
 
             [Test]
@@ -46,7 +46,7 @@
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
 
-                var expectedTypesToAdd = new List<TypeInfo> { _thirdInfo };
+                var expectedTypesToAdd = new List<BehaviourInfo> { _thirdInfo };
 
                 Assert.IsEmpty(typesToRemove);
                 Assert.IsEmpty(typesToUpdate);
@@ -62,7 +62,7 @@
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
 
-                var expectedTypesToRemove = new List<TypeInfo> { _thirdInfo };
+                var expectedTypesToRemove = new List<BehaviourInfo> { _thirdInfo };
 
                 Assert.IsEmpty(typesToAdd);
                 Assert.IsEmpty(typesToUpdate);
@@ -72,8 +72,8 @@
             [Test]
             public void When_GUID_differs_returns_empty_collections()
             {
-                var firstTestInfo = new TypeInfo("testFullName", "testFirstGuid");
-                var secondTestInfo = new TypeInfo("testFullName", "testSecondGuid");
+                var firstTestInfo = new BehaviourInfo("testFullName", "testFirstGuid");
+                var secondTestInfo = new BehaviourInfo("testFullName", "testSecondGuid");
 
                 var oldTypes = new[] { _firstInfo, _secondInfo, firstTestInfo };
                 var newTypes = new[] { _firstInfo, _secondInfo, secondTestInfo };
@@ -89,8 +89,8 @@
             [Test]
             public void When_TypeFullName_differs_but_GUID_is_same_adds_types_to_needAssemblyUpdate()
             {
-                var firstTestInfo = new TypeInfo("firstTestType", "testGuid");
-                var secondTestInfo = new TypeInfo("secondTestType", "testGuid");
+                var firstTestInfo = new BehaviourInfo("firstTestType", "testGuid");
+                var secondTestInfo = new BehaviourInfo("secondTestType", "testGuid");
 
                 var oldTypes = new[] { _firstInfo, _secondInfo, firstTestInfo };
                 var newTypes = new[] { _firstInfo, _secondInfo, secondTestInfo };
@@ -98,9 +98,9 @@
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
 
-                var expectedTypesToUpdate = new List<GenericTypeInfoPair>
+                var expectedTypesToUpdate = new List<BehaviourInfoPair>
                 {
-                    new GenericTypeInfoPair(firstTestInfo, secondTestInfo)
+                    new BehaviourInfoPair(firstTestInfo, secondTestInfo)
                 };
 
                 Assert.IsEmpty(typesToRemove);
@@ -117,8 +117,8 @@
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
 
-                var expectedTypesToRemove = new List<TypeInfo> { _thirdInfo };
-                var expectedTypesToAdd = new List<TypeInfo> { _fourthInfo };
+                var expectedTypesToRemove = new List<BehaviourInfo> { _thirdInfo };
+                var expectedTypesToAdd = new List<BehaviourInfo> { _fourthInfo };
 
                 Assert.IsEmpty(typesToUpdate);
                 Assert.IsTrue(typesToRemove.SequenceEqual(expectedTypesToRemove));
@@ -128,8 +128,8 @@
             [Test]
             public void When_two_collections_are_empty_returns_empty_collections()
             {
-                TypeInfo[] oldTypes = { };
-                TypeInfo[] newTypes = { };
+                BehaviourInfo[] oldTypes = { };
+                BehaviourInfo[] newTypes = { };
 
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
@@ -142,8 +142,8 @@
             [Test]
             public void When_old_collection_is_empty_returns_full_needAssemblyAdd()
             {
-                TypeInfo[] oldTypes = { };
-                TypeInfo[] newTypes = { _firstInfo, _secondInfo };
+                BehaviourInfo[] oldTypes = { };
+                BehaviourInfo[] newTypes = { _firstInfo, _secondInfo };
 
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
@@ -156,8 +156,8 @@
             [Test]
             public void When_new_collection_is_empty_returns_full_needAssemblyRemove()
             {
-                TypeInfo[] oldTypes = { _firstInfo, _secondInfo };
-                TypeInfo[] newTypes = { };
+                BehaviourInfo[] oldTypes = { _firstInfo, _secondInfo };
+                BehaviourInfo[] newTypes = { };
 
                 var (typesToRemove, typesToAdd, typesToUpdate) =
                     AssembliesChecker.GetTypesForAssemblyChange(oldTypes, newTypes);
@@ -170,8 +170,8 @@
             [Test]
             public void When_TypeFullNames_match_and_new_GUID_is_empty_but_old_one_is_not_returns_empty_collections_and_updates_new_GUID()
             {
-                var firstTestInfo = new TypeInfo("TestType", "testGUID");
-                var secondTestInfo = new TypeInfo("TestType", string.Empty);
+                var firstTestInfo = new BehaviourInfo("TestType", "testGUID");
+                var secondTestInfo = new BehaviourInfo("TestType", string.Empty);
 
                 var oldTypes = new[] { _firstInfo, _secondInfo, firstTestInfo };
                 var newTypes = new[] { _firstInfo, _secondInfo, secondTestInfo };

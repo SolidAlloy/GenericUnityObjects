@@ -5,12 +5,12 @@
     [Serializable]
     internal class ConcreteClass : IEquatable<ConcreteClass>
     {
-        public readonly TypeInfo[] Arguments;
+        public readonly ArgumentInfo[] Arguments;
         public readonly string AssemblyGUID;
 
-        private static readonly ArrayEqualityComparer<TypeInfo> ArrayComparer = new ArrayEqualityComparer<TypeInfo>();
+        private static readonly ArrayEqualityComparer<ArgumentInfo> ArrayComparer = new ArrayEqualityComparer<ArgumentInfo>();
 
-        public ConcreteClass(TypeInfo[] arguments, string assemblyGUID)
+        public ConcreteClass(ArgumentInfo[] arguments, string assemblyGUID)
         {
             Arguments = arguments;
             AssemblyGUID = assemblyGUID;

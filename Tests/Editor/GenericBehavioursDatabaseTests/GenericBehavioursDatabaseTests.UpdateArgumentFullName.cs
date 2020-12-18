@@ -9,14 +9,14 @@
         public class UpdateArgumentFullName : GenericBehavioursDatabaseTests
         {
             private const string NewName = "newName";
-            private static TypeInfo _expectedArg;
+            private static ArgumentInfo _expectedArg;
 
             [SetUp]
             public override void BeforeEachTest()
             {
                 base.BeforeEachTest();
                 AddEntries();
-                _expectedArg = new TypeInfo(NewName, _firstArg.GUID);
+                _expectedArg = new ArgumentInfo(NewName, _firstArg.GUID);
             }
 
             [Test]
@@ -51,7 +51,7 @@
             {
                 _database.InstanceUpdateArgumentFullName(_firstArg, NewName);
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_expectedArg, out TypeInfo[] behaviours);
+                bool success = _database.InstanceTryGetReferencedBehaviours(_expectedArg, out BehaviourInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Length != 0);

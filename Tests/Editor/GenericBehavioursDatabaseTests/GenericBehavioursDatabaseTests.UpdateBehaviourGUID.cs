@@ -9,14 +9,14 @@
         public class UpdateBehaviourGUID : GenericBehavioursDatabaseTests
         {
             private const string NewGUID = "newGUID";
-            private static TypeInfo _expectedBehaviour;
+            private static BehaviourInfo _expectedBehaviour;
 
             [SetUp]
             public override void BeforeEachTest()
             {
                 base.BeforeEachTest();
                 AddEntries();
-                _expectedBehaviour = new TypeInfo(_behaviour.TypeFullName, NewGUID);
+                _expectedBehaviour = new BehaviourInfo(_behaviour.TypeFullName, NewGUID);
             }
 
             [Test]
@@ -40,7 +40,7 @@
             {
                 _database.InstanceUpdateBehaviourGUID(_behaviour, NewGUID);
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out TypeInfo[] behaviours);
+                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Any(behaviour => behaviour.GUID == NewGUID));

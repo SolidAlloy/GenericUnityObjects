@@ -9,14 +9,14 @@
     {
         public class RemoveGenericBehaviour : GenericBehavioursDatabaseTests
         {
-            private static TypeInfo _secondBehaviour;
+            private static BehaviourInfo _secondBehaviour;
 
             [SetUp]
             public override void BeforeEachTest()
             {
                 base.BeforeEachTest();
 
-                _secondBehaviour = new TypeInfo("secondBehaviourName", "secondBehaviourGUID");
+                _secondBehaviour = new BehaviourInfo("secondBehaviourName", "secondBehaviourGUID");
 
                 _database.InstanceAddGenericBehaviour(_behaviour);
                 _database.InstanceAddGenericBehaviour(_secondBehaviour);
@@ -38,11 +38,11 @@
             {
                 _database.InstanceRemoveGenericBehaviour(_behaviour);
 
-                bool firstSuccess = _database.InstanceTryGetReferencedBehaviours(_firstArg, out TypeInfo[] firstBehaviours);
+                bool firstSuccess = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] firstBehaviours);
                 Assert.IsTrue(firstSuccess);
                 Assert.IsFalse(firstBehaviours.Contains(_behaviour));
 
-                bool secondSuccess = _database.InstanceTryGetReferencedBehaviours(_secondArg, out TypeInfo[] secondBehaviours);
+                bool secondSuccess = _database.InstanceTryGetReferencedBehaviours(_secondArg, out BehaviourInfo[] secondBehaviours);
                 Assert.IsTrue(secondSuccess);
                 Assert.IsFalse(secondBehaviours.Contains(_behaviour));
             }

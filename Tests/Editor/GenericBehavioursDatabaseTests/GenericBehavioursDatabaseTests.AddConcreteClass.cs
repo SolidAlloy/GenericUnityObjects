@@ -41,7 +41,7 @@
             public void Adds_behaviour_to_each_argument_in_arguments_dict()
             {
                 _database.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
-                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out TypeInfo[] firstBehaviours);
+                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] firstBehaviours);
                 Assert.IsTrue(success);
                 Assert.IsTrue(firstBehaviours.SequenceEqual(_expectedBehaviours));
             }
@@ -49,14 +49,14 @@
             [Test]
             public void Adds_second_behaviour_to_each_argument_that_has_one()
             {
-                var secondBehaviour = new TypeInfo("secondBehaviourName", "secondBehaviourGUID");
+                var secondBehaviour = new BehaviourInfo("secondBehaviourName", "secondBehaviourGUID");
                 var expectedBehaviours = new[] { _behaviour, secondBehaviour };
 
                 _database.InstanceAddGenericBehaviour(secondBehaviour);
                 _database.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
                 _database.InstanceAddConcreteClass(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out TypeInfo[] actualBehaviours);
+                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] actualBehaviours);
                 Assert.IsTrue(success);
                 Assert.IsTrue(actualBehaviours.SequenceEqual(expectedBehaviours));
             }

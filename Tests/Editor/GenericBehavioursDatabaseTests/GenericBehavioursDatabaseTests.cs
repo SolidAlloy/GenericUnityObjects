@@ -10,11 +10,11 @@
         private const string AssemblyGUID = "testAssemblyGUID";
 
         private static GenericBehavioursDatabase _database;
-        private static TypeInfo _behaviour;
-        private static TypeInfo _firstArg;
-        private static TypeInfo _secondArg;
-        private static TypeInfo[] _firstSecondArgs;
-        private static TypeInfo[] _expectedBehaviours;
+        private static BehaviourInfo _behaviour;
+        private static ArgumentInfo _firstArg;
+        private static ArgumentInfo _secondArg;
+        private static ArgumentInfo[] _firstSecondArgs;
+        private static BehaviourInfo[] _expectedBehaviours;
         private static ConcreteClass _expectedConcreteClass;
 
         [SetUp]
@@ -23,9 +23,9 @@
             _database = ScriptableObject.CreateInstance<GenericBehavioursDatabase>();
             _database.OnAfterDeserialize();
 
-            _behaviour = new TypeInfo("genericBehaviourName", "genericBehaviourGUID");
-            _firstArg = new TypeInfo("firstArgumentName", "firstArgumentGUID");
-            _secondArg = new TypeInfo("secondArgumentName", "secondArgumentGUID");
+            _behaviour = new BehaviourInfo("genericBehaviourName", "genericBehaviourGUID");
+            _firstArg = new ArgumentInfo("firstArgumentName", "firstArgumentGUID");
+            _secondArg = new ArgumentInfo("secondArgumentName", "secondArgumentGUID");
             _firstSecondArgs = new[] { _firstArg, _secondArg };
             _expectedBehaviours = new[] { _behaviour };
             _expectedConcreteClass = new ConcreteClass(_firstSecondArgs, AssemblyGUID);

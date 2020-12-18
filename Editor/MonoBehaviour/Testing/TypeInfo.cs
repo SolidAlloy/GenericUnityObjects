@@ -5,10 +5,30 @@
     using UnityEngine;
 
     [Serializable]
-    public class TypeInfo : IEquatable<TypeInfo>
+    internal class BehaviourInfo : TypeInfo
     {
         public string AssemblyGUID;
 
+        public BehaviourInfo(string typeFullName, string guid)
+            : base(typeFullName, guid) { }
+
+        public BehaviourInfo(Type type)
+            : base(type) { }
+    }
+
+    [Serializable]
+    internal class ArgumentInfo : TypeInfo
+    {
+        public ArgumentInfo(string typeFullName, string guid)
+            : base(typeFullName, guid) { }
+
+        public ArgumentInfo(Type type)
+            : base(type) { }
+    }
+
+    [Serializable]
+    internal abstract class TypeInfo : IEquatable<TypeInfo>
+    {
         [SerializeField] private string _typeFullName;
         [SerializeField] private string _guid;
 
@@ -87,12 +107,12 @@
         public override string ToString() => _typeFullName;
     }
 
-    internal readonly struct GenericTypeInfoPair
+    internal readonly struct BehaviourInfoPair
     {
-        public readonly TypeInfo OldType;
-        public readonly TypeInfo NewType;
+        public readonly BehaviourInfo OldType;
+        public readonly BehaviourInfo NewType;
 
-        public GenericTypeInfoPair(TypeInfo oldType, TypeInfo newType)
+        public BehaviourInfoPair(BehaviourInfo oldType, BehaviourInfo newType)
         {
             OldType = oldType;
             NewType = newType;

@@ -27,22 +27,34 @@
                 Assert.IsTrue(concreteClasses.Length == 1);
             }
 
+            [Test]
             public void When_behaviour_exists_but_argument_does_not_returns_false_and_null()
             {
+                AddEntries();
+
                 _database.InstanceRemoveArgument(_firstArg, (assemblyGUID) => { });
+
                 AssertFalse();
             }
 
+            [Test]
             public void When_behaviour_does_not_exist_but_argument_does_returns_false_and_null()
             {
-                var secondBehaviour = new TypeInfo("secondName", "secondGUID");
+                // Set up
+                AddEntries();
+
+                var secondBehaviour = new BehaviourInfo("secondName", "secondGUID");
                 _database.InstanceAddGenericBehaviour(secondBehaviour);
                 _database.InstanceAddConcreteClass(secondBehaviour, _firstSecondArgs, AssemblyGUID);
+
+                // Action
                 _database.InstanceRemoveGenericBehaviour(_behaviour);
 
+                // Check
                 AssertFalse();
             }
 
+            [Test]
             public void When_behaviour_and_argument_do_not_exist_returns_false_and_null()
             {
                 AssertFalse();

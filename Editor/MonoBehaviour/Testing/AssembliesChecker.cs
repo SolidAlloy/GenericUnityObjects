@@ -14,10 +14,10 @@
 
         private static void OnAssembliesReload()
         {
-            var oldTypes = PersistentStorage.GenericTypeInfos;
+            var oldTypes = PersistentStorage.BehaviourInfos;
             var newTypes = TypeCache.GetTypesDerivedFrom<MonoBehaviour>()
                 .Where(type => type.IsGenericType)
-                .Select(type => new TypeInfo(type))
+                .Select(type => new BehaviourInfo(type))
                 .ToArray();
 
             var (needAssemblyRemove, needAssemblyAdd, needAssemblyUpdate) = GetTypesForAssemblyChange(oldTypes, newTypes);
@@ -27,15 +27,15 @@
             AddAssemblies(needAssemblyAdd);
 
 
-            PersistentStorage.GenericTypeInfos = newTypes;
+            PersistentStorage.BehaviourInfos = newTypes;
 
             if (needAssemblyRemove.Count != 0 || needAssemblyAdd.Count != 0 || needAssemblyUpdate.Count != 0)
                 AssetDatabase.Refresh();
         }
 
-        private static void RemoveAssemblies(List<TypeInfo> typesToRemove)
+        private static void RemoveAssemblies(List<BehaviourInfo> typesToRemove)
         {
-            foreach (TypeInfo typeInfo in typesToRemove)
+            foreach (BehaviourInfo typeInfo in typesToRemove)
             {
                 Assert.IsFalse(string.IsNullOrEmpty(typeInfo.AssemblyGUID));
                 var dirInfo = new DirectoryInfo(PathToAssemblies);
@@ -47,9 +47,9 @@
             }
         }
 
-        private static void AddAssemblies(List<TypeInfo> typesToAdd)
+        private static void AddAssemblies(List<BehaviourInfo> typesToAdd)
         {
-            foreach (TypeInfo typeInfo in typesToAdd)
+            foreach (BehaviourInfo typeInfo in typesToAdd)
             {
                 // Find a name for assembly
                 // Find all the other needed info
@@ -58,7 +58,7 @@
             }
         }
 
-        private static void UpdateAssemblies(List<GenericTypeInfoPair> typesToUpdate)
+        private static void UpdateAssemblies(List<BehaviourInfoPair> typesToUpdate)
         {
             foreach (var typesPair in typesToUpdate)
             {
@@ -69,10 +69,10 @@
         }
 
         public static (
-            List<TypeInfo> typesToRemove,
-            List<TypeInfo> typesToAdd,
-            List<GenericTypeInfoPair> typesToUpdate
-            ) GetTypesForAssemblyChange(TypeInfo[] oldTypes, TypeInfo[] newTypes)
+            List<BehaviourInfo> typesToRemove,
+            List<BehaviourInfo> typesToAdd,
+            List<BehaviourInfoPair> typesToUpdate
+            ) GetTypesForAssemblyChange(BehaviourInfo[] oldTypes, BehaviourInfo[] newTypes)
         {
             int oldTypesLength = oldTypes.Length;
             int newTypesLength = newTypes.Length;
@@ -80,38 +80,38 @@
             // Optimizations for some cases.
             if (oldTypesLength == 0 && newTypesLength == 0)
             {
-                return (new List<TypeInfo>(),
-                    new List<TypeInfo>(),
-                    new List<GenericTypeInfoPair>());
+                return (new List<BehaviourInfo>(),
+                    new List<BehaviourInfo>(),
+                    new List<BehaviourInfoPair>());
             }
 
             if (oldTypesLength == 0)
             {
-                return (new List<TypeInfo>(),
-                    new List<TypeInfo>(newTypes),
-                    new List<GenericTypeInfoPair>());
+                return (new List<BehaviourInfo>(),
+                    new List<BehaviourInfo>(newTypes),
+                    new List<BehaviourInfoPair>());
             }
 
             if (newTypesLength == 0)
             {
-                return (new List<TypeInfo>(oldTypes),
-                    new List<TypeInfo>(),
-                    new List<GenericTypeInfoPair>());
+                return (new List<BehaviourInfo>(oldTypes),
+                    new List<BehaviourInfo>(),
+                    new List<BehaviourInfoPair>());
             }
 
-            var oldTypesSet = new HashSet<TypeInfo>(oldTypes);
-            var newTypesSet = new HashSet<TypeInfo>(newTypes);
+            var oldTypesSet = new HashSet<BehaviourInfo>(oldTypes);
+            var newTypesSet = new HashSet<BehaviourInfo>(newTypes);
 
             var oldTypesOnly = oldTypesSet.ExceptWithAndCreateNew(newTypesSet).ToList();
             var newTypesOnly = newTypesSet.ExceptWithAndCreateNew(oldTypesSet).ToArray();
-            var needAssemblyUpdate = new List<GenericTypeInfoPair>(1);
-            var needAssemblyAdd = new List<TypeInfo>(newTypesOnly.Length);
+            var needAssemblyUpdate = new List<BehaviourInfoPair>(1);
+            var needAssemblyAdd = new List<BehaviourInfo>(newTypesOnly.Length);
 
-            foreach (TypeInfo newTypeInfo in newTypesOnly)
+            foreach (BehaviourInfo newTypeInfo in newTypesOnly)
             {
                 bool foundMatching = false;
 
-                foreach (TypeInfo oldTypeInfo in oldTypesOnly)
+                foreach (BehaviourInfo oldTypeInfo in oldTypesOnly)
                 {
                     // Full names are equal but GUIDs are not
                     if (newTypeInfo.TypeFullName == oldTypeInfo.TypeFullName)
@@ -129,7 +129,7 @@
                     if (newTypeInfo.GUID == oldTypeInfo.GUID)
                     {
                         oldTypesOnly.Remove(oldTypeInfo); // Remove old type from collection to optimize the next searches.
-                        needAssemblyUpdate.Add(new GenericTypeInfoPair(oldTypeInfo, newTypeInfo)); // Selector and all concrete classes need to be regenerated for this assembly.
+                        needAssemblyUpdate.Add(new BehaviourInfoPair(oldTypeInfo, newTypeInfo)); // Selector and all concrete classes need to be regenerated for this assembly.
                         foundMatching = true;
                         break; // Go to new newTypeInfo
                     }
