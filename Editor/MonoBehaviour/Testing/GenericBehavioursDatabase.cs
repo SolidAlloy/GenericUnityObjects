@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using UnityEditor;
     using UnityEngine;
@@ -21,81 +22,301 @@
 
         private bool _shouldSetDirty;
 
-        public static TypeInfo[] Arguments => CreatedOnlyInstance._argumentBehavioursDict.Keys.ToArray();
-        public static TypeInfo[] Behaviours => CreatedOnlyInstance._behaviourArgumentsDict.Keys.ToArray();
+        public static TypeInfo[] Arguments
+        {
+            get
+            {
+                if (CreatedOnlyInstance == null)
+                    throw new NoNullAllowedException("Check CreatedOnlyInstance for null before using the property");
+
+                return CreatedOnlyInstance.InstanceArguments;
+            }
+        }
+
+        public TypeInfo[] InstanceArguments => _argumentBehavioursDict.Keys.ToArray();
+
+        public static TypeInfo[] Behaviours
+        {
+            get
+            {
+                if (CreatedOnlyInstance == null)
+                    throw new NoNullAllowedException("Check CreatedOnlyInstance for null before using the property");
+
+                return CreatedOnlyInstance.InstanceBehaviours;
+            }
+        }
+
+        public TypeInfo[] InstanceBehaviours => _behaviourArgumentsDict.Keys.ToArray();
 
         public static void AddGenericBehaviour(TypeInfo genericBehaviour)
         {
-            CreatedOnlyInstance._behaviourArgumentsDict.Add(genericBehaviour, new List<ConcreteClass>());
-            EditorUtility.SetDirty(CreatedOnlyInstance);
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            CreatedOnlyInstance.InstanceAddGenericBehaviour(genericBehaviour);
         }
 
-        public static void AddConcreteClass(TypeInfo genericBehaviour, TypeInfo[] arguments, string assemblyName)
+        public void InstanceAddGenericBehaviour(TypeInfo genericBehaviour)
         {
-            CreatedOnlyInstance._behaviourArgumentsDict[genericBehaviour].Add(new ConcreteClass(arguments, assemblyName));
+            genericBehaviour = _typeInfoPool.GetOrAdd(genericBehaviour);
+            _behaviourArgumentsDict.Add(genericBehaviour, new List<ConcreteClass>());
+            EditorUtility.SetDirty(this);
+        }
 
-            foreach (TypeInfo argument in arguments)
+        public static void AddConcreteClass(TypeInfo genericBehaviour, TypeInfo[] arguments, string assemblyGUID)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            CreatedOnlyInstance.InstanceAddConcreteClass(genericBehaviour, arguments, assemblyGUID);
+        }
+
+        public void InstanceAddConcreteClass(TypeInfo genericBehaviour, TypeInfo[] arguments, string assemblyGUID)
+        {
+            if (!_behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
             {
-                if (CreatedOnlyInstance._argumentBehavioursDict.ContainsKey(argument))
+                throw new KeyNotFoundException($"Cannot add a concrete class to a generic behaviour '{genericBehaviour}' not present in the database.");
+            }
+
+            genericBehaviour = _typeInfoPool.GetOrAdd(genericBehaviour);
+
+            int argumentsLength = arguments.Length;
+
+            for (int i = 0; i < argumentsLength; i++ )
+            {
+                var argument = arguments[i];
+                argument = _typeInfoPool.GetOrAdd(argument);
+
+                if (_argumentBehavioursDict.ContainsKey(argument))
                 {
-                    CreatedOnlyInstance._argumentBehavioursDict[argument].Add(genericBehaviour);
+                    _argumentBehavioursDict[argument].Add(genericBehaviour);
                 }
                 else
                 {
-                    CreatedOnlyInstance._argumentBehavioursDict[argument] = new List<TypeInfo> { genericBehaviour };
+                    _argumentBehavioursDict[argument] = new List<TypeInfo> { genericBehaviour };
                 }
             }
 
-            EditorUtility.SetDirty(CreatedOnlyInstance);
+            var classToAdd = new ConcreteClass(arguments, assemblyGUID);
+
+            if (concreteClasses.Contains(classToAdd))
+            {
+                throw new ArgumentException($"The generic behaviour '{genericBehaviour}' already " +
+                                            "has the following concrete class in the database: " +
+                                            $"{string.Join(", ", arguments.Select(arg => arg.TypeFullName))}");
+            }
+
+            concreteClasses.Add(classToAdd);
+
+            EditorUtility.SetDirty(this);
         }
 
         public static void RemoveArgument(TypeInfo argument, Action<string> assemblyAction)
         {
-            if ( ! CreatedOnlyInstance._argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> genericBehaviours))
-                return;
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            CreatedOnlyInstance._argumentBehavioursDict.Remove(argument);
+            CreatedOnlyInstance.InstanceRemoveArgument(argument, assemblyAction);
+        }
+
+        public void InstanceRemoveArgument(TypeInfo argument, Action<string> assemblyAction)
+        {
+            if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> genericBehaviours))
+                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
+
+            _argumentBehavioursDict.Remove(argument);
 
             foreach (TypeInfo genericBehaviour in genericBehaviours)
             {
-                if ( ! CreatedOnlyInstance._behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
+                if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
                     continue;
 
-                foreach (ConcreteClass concreteClass in concreteClasses)
+                for (int i = concreteClasses.Count - 1; i >= 0; i--)
                 {
+                    ConcreteClass concreteClass = concreteClasses[i];
+
                     if (concreteClass.Arguments.Contains(argument))
                     {
-                        concreteClasses.Remove(concreteClass);
-                        assemblyAction(concreteClass.AssemblyName);
+                        concreteClasses.RemoveAt(i);
+                        assemblyAction(concreteClass.AssemblyGUID);
                     }
                 }
             }
 
-            EditorUtility.SetDirty(CreatedOnlyInstance);
+            EditorUtility.SetDirty(this);
         }
 
         public static void RemoveGenericBehaviour(TypeInfo genericBehaviour)
         {
-            if ( ! CreatedOnlyInstance._behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
-                return;
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            CreatedOnlyInstance._behaviourArgumentsDict.Remove(genericBehaviour);
+            CreatedOnlyInstance.InstanceRemoveGenericBehaviour(genericBehaviour);
+        }
+
+        public void InstanceRemoveGenericBehaviour(TypeInfo genericBehaviour)
+        {
+            if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Behaviour '{genericBehaviour}' was not found in the database.");
+
+            _behaviourArgumentsDict.Remove(genericBehaviour);
 
             foreach (ConcreteClass concreteClass in concreteClasses)
             {
                 foreach (TypeInfo argument in concreteClass.Arguments)
                 {
-                    if ( ! CreatedOnlyInstance._argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> behaviours))
+                    if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> behaviours))
                         continue;
 
                     behaviours.Remove(genericBehaviour);
 
                     if (behaviours.Count == 0)
-                        CreatedOnlyInstance._argumentBehavioursDict.Remove(argument);
+                        _argumentBehavioursDict.Remove(argument);
                 }
             }
 
-            EditorUtility.SetDirty(CreatedOnlyInstance);
+            EditorUtility.SetDirty(this);
+        }
+
+        public static bool TryGetReferencedBehaviours(TypeInfo argument, out TypeInfo[] referencedBehaviours)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceTryGetReferencedBehaviours(argument, out referencedBehaviours);
+        }
+
+        public bool InstanceTryGetReferencedBehaviours(TypeInfo argument, out TypeInfo[] referencedBehaviours)
+        {
+            bool success = _argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> behavioursList);
+            referencedBehaviours = success ? behavioursList.ToArray() : null;
+            return success;
+        }
+
+        public static bool TryGetConcreteClasses(TypeInfo behaviour, out ConcreteClass[] concreteClasses)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceTryGetConcreteClasses(behaviour, out concreteClasses);
+        }
+
+        public bool InstanceTryGetConcreteClasses(TypeInfo behaviour, out ConcreteClass[] concreteClasses)
+        {
+            bool success = _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClassesList);
+            concreteClasses = success ? concreteClassesList.ToArray() : null;
+            return success;
+        }
+
+        public static bool TryGetConcreteClassesByArgument(TypeInfo behaviour, TypeInfo argument, out ConcreteClass[] concreteClasses)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceTryGetConcreteClassesByArgument(behaviour, argument, out concreteClasses);
+        }
+
+        public bool InstanceTryGetConcreteClassesByArgument(TypeInfo behaviour, TypeInfo argument, out ConcreteClass[] concreteClasses)
+        {
+            if ( ! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClassesList))
+            {
+                concreteClasses = null;
+                return false;
+            }
+
+            concreteClasses = concreteClassesList
+                .Where(concreteClass => concreteClass.Arguments.Contains(argument))
+                .ToArray();
+
+            if (concreteClasses.Length != 0)
+                return true;
+
+            concreteClasses = null;
+            return false;
+        }
+
+        public static TypeInfo UpdateArgumentGUID(TypeInfo argument, string newGUID)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceUpdateArgumentGUID(argument, newGUID);
+        }
+
+        public TypeInfo InstanceUpdateArgumentGUID(TypeInfo argument, string newGUID)
+        {
+            if (! _argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> behaviours))
+                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
+
+            _argumentBehavioursDict.Remove(argument);
+            argument = _typeInfoPool.GetOrAdd(argument);
+            argument.UpdateGUID(newGUID);
+            _argumentBehavioursDict.Add(argument, behaviours);
+            EditorUtility.SetDirty(this);
+            return argument;
+        }
+
+        public static TypeInfo UpdateArgumentFullName(TypeInfo argument, string newName)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceUpdateArgumentFullName(argument, newName);
+        }
+
+        public TypeInfo InstanceUpdateArgumentFullName(TypeInfo argument, string newName)
+        {
+            if (! _argumentBehavioursDict.TryGetValue(argument, out List<TypeInfo> behaviours))
+                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
+
+            _argumentBehavioursDict.Remove(argument);
+            argument = _typeInfoPool.GetOrAdd(argument);
+            argument.UpdateFullName(newName);
+            _argumentBehavioursDict.Add(argument, behaviours);
+            EditorUtility.SetDirty(this);
+            return argument;
+        }
+
+        public static TypeInfo UpdateBehaviourGUID(TypeInfo behaviour, string newGUID)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceUpdateBehaviourGUID(behaviour, newGUID);
+        }
+
+        public TypeInfo InstanceUpdateBehaviourGUID(TypeInfo behaviour, string newGUID)
+        {
+            if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
+
+            _behaviourArgumentsDict.Remove(behaviour);
+            behaviour = _typeInfoPool.GetOrAdd(behaviour);
+            behaviour.UpdateGUID(newGUID);
+            _behaviourArgumentsDict.Add(behaviour, concreteClasses);
+            EditorUtility.SetDirty(this);
+            return behaviour;
+        }
+
+        public static TypeInfo UpdateBehaviourFullName(TypeInfo behaviour, string newName)
+        {
+            if (CreatedOnlyInstance == null)
+                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
+
+            return CreatedOnlyInstance.InstanceUpdateBehaviourFullName(behaviour, newName);
+        }
+
+        public TypeInfo InstanceUpdateBehaviourFullName(TypeInfo behaviour, string newName)
+        {
+            if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Argument '{behaviour}' was not found in the database.");
+
+            _behaviourArgumentsDict.Remove(behaviour);
+            behaviour = _typeInfoPool.GetOrAdd(behaviour);
+            behaviour.UpdateFullName(newName);
+            _behaviourArgumentsDict.Add(behaviour, concreteClasses);
+            EditorUtility.SetDirty(this);
+            return behaviour;
         }
 
         public void OnAfterDeserialize()
@@ -106,6 +327,14 @@
 
         private void InitializeArgumentBehavioursDict()
         {
+            // If it is a runtime-created asset and OnBeforeSerialize has never been called for it yet.
+            if (_genericArgumentKeys == null)
+            {
+                _argumentBehavioursDict = new Dictionary<TypeInfo, List<TypeInfo>>();
+                _typeInfoPool = new TypeInfoPool();
+                return;
+            }
+
             int keysLength = _genericArgumentKeys.Length;
             int valuesLength = _genericBehaviourValues.Length;
 
@@ -129,7 +358,7 @@
                 var valuesToAdd = new List<TypeInfo>(valuesArrayLength);
 
                 for (int valueIndex = 0; valueIndex < valuesArrayLength; valueIndex++)
-                    valuesToAdd[valueIndex] = _typeInfoPool.GetOrAdd(valuesArray[valueIndex]);
+                    valuesToAdd.Add(_typeInfoPool.GetOrAdd(valuesArray[valueIndex]));
 
                 _argumentBehavioursDict[_genericArgumentKeys[keyIndex]] = valuesToAdd;
             }
@@ -137,6 +366,13 @@
 
         private void InitializeBehaviourArgumentsDict()
         {
+            // If it is a runtime-created asset and OnBeforeSerialize has never been called for it yet.
+            if (_genericBehaviourKeys == null)
+            {
+                _behaviourArgumentsDict = new Dictionary<TypeInfo, List<ConcreteClass>>();
+                return;
+            }
+
             int keysLength = _genericBehaviourKeys.Length;
             int valuesLength = _genericArgumentValues.Length;
 
@@ -176,6 +412,10 @@
 
         private void SerializeArgumentBehavioursDict()
         {
+            // If OnAfterDeserialize() has never been called yet for this new asset.
+            if (_argumentBehavioursDict == null)
+                return;
+
             int dictLength = _argumentBehavioursDict.Count;
 
             _genericArgumentKeys = new TypeInfo[dictLength];
@@ -192,6 +432,10 @@
 
         private void SerializeBehaviourArgumentsDict()
         {
+            // If OnAfterDeserialize() has never been called yet for this new asset.
+            if (_behaviourArgumentsDict == null)
+                return;
+
             int dictLength = _behaviourArgumentsDict.Count;
 
             _genericBehaviourKeys = new TypeInfo[dictLength];
@@ -247,14 +491,7 @@
 
             public static implicit operator List<ConcreteClass>(ConcreteClassCollection concreteClassCollection)
             {
-                var concreteClasses = new List<ConcreteClass>(concreteClassCollection._array.Length);
-
-                for (int i = 0; i < concreteClasses.Count; i++)
-                {
-                    concreteClasses[i] = concreteClassCollection._array[i];
-                }
-
-                return concreteClasses;
+                return new List<ConcreteClass>(concreteClassCollection._array);
             }
 
             public static implicit operator ConcreteClassCollection(List<ConcreteClass> concreteClasses) =>
@@ -265,7 +502,7 @@
         {
             private readonly Dictionary<TypeInfo, TypeInfo> _dict;
 
-            public TypeInfoPool(int capacity)
+            public TypeInfoPool(int capacity = 0)
             {
                 _dict = new Dictionary<TypeInfo, TypeInfo>(capacity);
             }
@@ -287,19 +524,6 @@
                         _dict.Add(item, item);
                 }
             }
-        }
-    }
-
-    [Serializable]
-    internal class ConcreteClass
-    {
-        public TypeInfo[] Arguments;
-        public string AssemblyName;
-
-        public ConcreteClass(TypeInfo[] arguments, string assemblyName)
-        {
-            Arguments = arguments;
-            AssemblyName = assemblyName;
         }
     }
 }

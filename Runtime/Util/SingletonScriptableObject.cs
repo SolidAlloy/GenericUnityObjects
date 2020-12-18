@@ -20,7 +20,7 @@
     internal abstract class SingletonScriptableObject<T> : ScriptableObject
         where T : ScriptableObject
     {
-        private static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
+        public static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
 
         private static T _instance = null;
 

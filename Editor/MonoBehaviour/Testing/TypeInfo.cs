@@ -5,26 +5,32 @@
     using UnityEngine;
 
     [Serializable]
-    internal class TypeInfo : IEquatable<TypeInfo>
+    public class TypeInfo : IEquatable<TypeInfo>
     {
-        public string GUID;
-        public string AssemblyName;
+        public string AssemblyGUID;
 
         [SerializeField] private string _typeFullName;
+        [SerializeField] private string _guid;
 
         public string TypeFullName => _typeFullName;
+
+        public string GUID => _guid;
 
         public TypeInfo(string typeFullName, string guid)
         {
             _typeFullName = typeFullName;
-            GUID = guid;
+            _guid = guid;
         }
 
         public TypeInfo(Type type)
         {
             _typeFullName = type.FullName;
-            GUID = AssetSearcher.GetClassGUID(type);
+            _guid = AssetSearcher.GetClassGUID(type);
         }
+
+        public void UpdateGUID(string newGUID) => _guid = newGUID;
+
+        public void UpdateFullName(string newFullName) => _typeFullName = newFullName;
 
         public bool Equals(TypeInfo p)
         {
@@ -49,7 +55,7 @@
             // Return true if the fields match.
             // Note that the base class is not invoked because it is
             // System.Object, which defines Equals as reference equality.
-            return TypeFullName == p.TypeFullName && GUID == p.GUID;
+            return TypeFullName == p.TypeFullName && _guid == p._guid;
         }
 
         public static bool operator ==(TypeInfo lhs, TypeInfo rhs)
@@ -72,10 +78,13 @@
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + TypeFullName.GetHashCode();
+                hash = hash * 23 + _typeFullName.GetHashCode();
+                hash = hash * 23 + _guid.GetHashCode();
                 return hash;
             }
         }
+
+        public override string ToString() => _typeFullName;
     }
 
     internal readonly struct GenericTypeInfoPair

@@ -37,10 +37,10 @@
         {
             foreach (TypeInfo typeInfo in typesToRemove)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(typeInfo.AssemblyName));
+                Assert.IsFalse(string.IsNullOrEmpty(typeInfo.AssemblyGUID));
                 var dirInfo = new DirectoryInfo(PathToAssemblies);
 
-                foreach (var fileInfo in dirInfo.GetFiles($"{typeInfo.AssemblyName}*.dll"))
+                foreach (var fileInfo in dirInfo.GetFiles($"{typeInfo.AssemblyGUID}*.dll"))
                 {
                     FileUtil.DeleteFileOrDirectory(fileInfo.FullName);
                 }
@@ -103,9 +103,9 @@
             var newTypesSet = new HashSet<TypeInfo>(newTypes);
 
             var oldTypesOnly = oldTypesSet.ExceptWithAndCreateNew(newTypesSet).ToList();
-            var newTypesOnly = newTypesSet.ExceptWithAndCreateNew(oldTypesSet);
+            var newTypesOnly = newTypesSet.ExceptWithAndCreateNew(oldTypesSet).ToArray();
             var needAssemblyUpdate = new List<GenericTypeInfoPair>(1);
-            var needAssemblyAdd = new List<TypeInfo>(newTypesOnly.Count);
+            var needAssemblyAdd = new List<TypeInfo>(newTypesOnly.Length);
 
             foreach (TypeInfo newTypeInfo in newTypesOnly)
             {
@@ -118,7 +118,7 @@
                     {
                         // If the new GUID was not found, save the old GUID.
                         if (string.IsNullOrEmpty(newTypeInfo.GUID) && ! string.IsNullOrEmpty(oldTypeInfo.GUID))
-                            newTypeInfo.GUID = oldTypeInfo.GUID;
+                            newTypeInfo.UpdateGUID(oldTypeInfo.GUID); // TODO: check carefully that it doesn't create issues
 
                         oldTypesOnly.Remove(oldTypeInfo);
                         foundMatching = true;
