@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System;
+    using SolidUtilities.Helpers;
 
     [Serializable]
     internal class ConcreteClass : IEquatable<ConcreteClass>
