@@ -6,9 +6,9 @@
 
     internal partial class GenericBehavioursDatabaseTests
     {
-        public class UpdateArgumentFullName : GenericBehavioursDatabaseTests
+        public class UpdateArgumentGUID : GenericBehavioursDatabaseTests
         {
-            private const string NewName = "newName";
+            private const string NewGUID = "newGUID";
             private static ArgumentInfo _expectedArg;
 
             [SetUp]
@@ -16,29 +16,22 @@
             {
                 base.BeforeEachTest();
                 AddEntries();
-                _expectedArg = new ArgumentInfo(NewName, _firstArg.GUID);
+                _expectedArg = new ArgumentInfo(_firstArg.TypeNameAndAssembly, NewGUID);
             }
 
             [Test]
-            public void Returns_updated_argument()
+            public void Updates_argument_GUID_in_arguments_list()
             {
-                var actualArgument = _database.InstanceUpdateArgumentFullName(_firstArg, NewName);
-                Assert.AreEqual(actualArgument, _expectedArg);
-            }
-
-            [Test]
-            public void Updates_argument_name_in_arguments_list()
-            {
-                _database.InstanceUpdateArgumentFullName(_firstArg, NewName);
+                _database.InstanceUpdateArgumentGUID(ref _firstArg, NewGUID);
 
                 Assert.IsTrue(_database.InstanceArguments.Length == 2);
                 Assert.Contains(_expectedArg, _database.InstanceArguments);
             }
 
             [Test]
-            public void Updates_argument_name_in_concrete_classes()
+            public void Updates_argument_GUID_in_concrete_classes()
             {
-                _database.InstanceUpdateArgumentFullName(_firstArg, NewName);
+                _database.InstanceUpdateArgumentGUID(ref _firstArg, NewGUID);
 
                 bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
 
@@ -49,12 +42,19 @@
             [Test]
             public void Referenced_behaviours_can_be_found_by_new_argument()
             {
-                _database.InstanceUpdateArgumentFullName(_firstArg, NewName);
+                _database.InstanceUpdateArgumentGUID(ref _firstArg, NewGUID);
 
                 bool success = _database.InstanceTryGetReferencedBehaviours(_expectedArg, out BehaviourInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Length != 0);
+            }
+
+            [Test]
+            public void Updates_passed_argument_GUID()
+            {
+                _database.InstanceUpdateArgumentGUID(ref _firstArg, NewGUID);
+                Assert.IsTrue(_firstArg.GUID == NewGUID);
             }
         }
     }

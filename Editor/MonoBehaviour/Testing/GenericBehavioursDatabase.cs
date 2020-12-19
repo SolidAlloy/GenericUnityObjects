@@ -104,7 +104,7 @@
             {
                 throw new ArgumentException($"The generic behaviour '{genericBehaviour}' already " +
                                             "has the following concrete class in the database: " +
-                                            $"{string.Join(", ", arguments.Select(arg => arg.TypeFullName))}");
+                                            $"{string.Join(", ", arguments.Select(arg => arg.TypeNameAndAssembly))}");
             }
 
             concreteClasses.Add(classToAdd);
@@ -236,15 +236,15 @@
             return false;
         }
 
-        public static ArgumentInfo UpdateArgumentGUID(ArgumentInfo argument, string newGUID)
+        public static void UpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)
         {
             if (CreatedOnlyInstance == null)
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            return CreatedOnlyInstance.InstanceUpdateArgumentGUID(argument, newGUID);
+            CreatedOnlyInstance.InstanceUpdateArgumentGUID(ref argument, newGUID);
         }
 
-        public ArgumentInfo InstanceUpdateArgumentGUID(ArgumentInfo argument, string newGUID)
+        public void InstanceUpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)
         {
             if (! _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> behaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
@@ -254,39 +254,37 @@
             argument.UpdateGUID(newGUID);
             _argumentBehavioursDict.Add(argument, behaviours);
             EditorUtility.SetDirty(this);
-            return argument;
         }
 
-        public static ArgumentInfo UpdateArgumentFullName(ArgumentInfo argument, string newName)
+        public static void UpdateArgumentNameAndAssembly(ref ArgumentInfo argument, Type newType)
         {
             if (CreatedOnlyInstance == null)
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            return CreatedOnlyInstance.InstanceUpdateArgumentFullName(argument, newName);
+            CreatedOnlyInstance.InstanceUpdateArgumentNameAndAssembly(ref argument, newType);
         }
 
-        public ArgumentInfo InstanceUpdateArgumentFullName(ArgumentInfo argument, string newName)
+        public void InstanceUpdateArgumentNameAndAssembly(ref ArgumentInfo argument, Type newType)
         {
             if (! _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> behaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
             _argumentBehavioursDict.Remove(argument);
             argument = _argumentsPool.GetOrAdd(argument);
-            argument.UpdateFullName(newName);
+            argument.UpdateNameAndAssembly(newType);
             _argumentBehavioursDict.Add(argument, behaviours);
             EditorUtility.SetDirty(this);
-            return argument;
         }
 
-        public static BehaviourInfo UpdateBehaviourGUID(BehaviourInfo behaviour, string newGUID)
+        public static void UpdateBehaviourGUID(ref BehaviourInfo behaviour, string newGUID)
         {
             if (CreatedOnlyInstance == null)
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            return CreatedOnlyInstance.InstanceUpdateBehaviourGUID(behaviour, newGUID);
+            CreatedOnlyInstance.InstanceUpdateBehaviourGUID(ref behaviour, newGUID);
         }
 
-        public BehaviourInfo InstanceUpdateBehaviourGUID(BehaviourInfo behaviour, string newGUID)
+        public void InstanceUpdateBehaviourGUID(ref BehaviourInfo behaviour, string newGUID)
         {
             if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
@@ -296,28 +294,26 @@
             behaviour.UpdateGUID(newGUID);
             _behaviourArgumentsDict.Add(behaviour, concreteClasses);
             EditorUtility.SetDirty(this);
-            return behaviour;
         }
 
-        public static BehaviourInfo UpdateBehaviourFullName(BehaviourInfo behaviour, string newName)
+        public static void UpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, string typeFullName, string assemblyName)
         {
             if (CreatedOnlyInstance == null)
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            return CreatedOnlyInstance.InstanceUpdateBehaviourFullName(behaviour, newName);
+            CreatedOnlyInstance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, typeFullName, assemblyName);
         }
 
-        public BehaviourInfo InstanceUpdateBehaviourFullName(BehaviourInfo behaviour, string newName)
+        public void InstanceUpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, string typeFullName, string assemblyName)
         {
             if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Argument '{behaviour}' was not found in the database.");
 
             _behaviourArgumentsDict.Remove(behaviour);
             behaviour = _behavioursPool.GetOrAdd(behaviour);
-            behaviour.UpdateFullName(newName);
+            behaviour.UpdateNameAndAssembly(typeFullName, assemblyName);
             _behaviourArgumentsDict.Add(behaviour, concreteClasses);
             EditorUtility.SetDirty(this);
-            return behaviour;
         }
 
         public void OnAfterDeserialize()

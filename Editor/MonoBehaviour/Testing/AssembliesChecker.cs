@@ -114,7 +114,7 @@
                 foreach (BehaviourInfo oldTypeInfo in oldTypesOnly)
                 {
                     // Full names are equal but GUIDs are not
-                    if (newTypeInfo.TypeFullName == oldTypeInfo.TypeFullName)
+                    if (newTypeInfo.TypeNameAndAssembly == oldTypeInfo.TypeNameAndAssembly)
                     {
                         // If the new GUID was not found, save the old GUID.
                         if (string.IsNullOrEmpty(newTypeInfo.GUID) && ! string.IsNullOrEmpty(oldTypeInfo.GUID))

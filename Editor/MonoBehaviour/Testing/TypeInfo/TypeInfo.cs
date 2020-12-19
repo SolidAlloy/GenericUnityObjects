@@ -5,52 +5,40 @@
     using UnityEngine;
 
     [Serializable]
-    internal class BehaviourInfo : TypeInfo
-    {
-        public string AssemblyGUID;
-
-        public BehaviourInfo(string typeFullName, string guid)
-            : base(typeFullName, guid) { }
-
-        public BehaviourInfo(Type type)
-            : base(type) { }
-    }
-
-    [Serializable]
-    internal class ArgumentInfo : TypeInfo
-    {
-        public ArgumentInfo(string typeFullName, string guid)
-            : base(typeFullName, guid) { }
-
-        public ArgumentInfo(Type type)
-            : base(type) { }
-    }
-
-    [Serializable]
     internal abstract class TypeInfo : IEquatable<TypeInfo>
     {
-        [SerializeField] private string _typeFullName;
+        [SerializeField] private string _typeNameAndAssembly;
         [SerializeField] private string _guid;
 
-        public string TypeFullName => _typeFullName;
+        public string TypeNameAndAssembly => _typeNameAndAssembly;
 
         public string GUID => _guid;
 
-        public TypeInfo(string typeFullName, string guid)
+        protected TypeInfo(string typeNameAndAssembly, string guid)
         {
-            _typeFullName = typeFullName;
+            _typeNameAndAssembly = typeNameAndAssembly;
             _guid = guid;
         }
 
-        public TypeInfo(Type type)
+        protected TypeInfo(string typeFullName, string assemblyName, string guid)
         {
-            _typeFullName = type.FullName;
+            _typeNameAndAssembly = GetTypeNameAndAssembly(typeFullName, assemblyName);
+            _guid = guid;
+        }
+
+        protected TypeInfo(Type type)
+        {
+            _typeNameAndAssembly = type.FullName;
             _guid = AssetSearcher.GetClassGUID(type);
         }
 
         public void UpdateGUID(string newGUID) => _guid = newGUID;
 
-        public void UpdateFullName(string newFullName) => _typeFullName = newFullName;
+        public void UpdateNameAndAssembly(string newFullName, string newAssemblyName) =>
+            _typeNameAndAssembly = GetTypeNameAndAssembly(newFullName, newAssemblyName);
+
+        public void UpdateNameAndAssembly(Type newType) =>
+            _typeNameAndAssembly = GetTypeNameAndAssembly(newType);
 
         public bool Equals(TypeInfo p)
         {
@@ -75,7 +63,7 @@
             // Return true if the fields match.
             // Note that the base class is not invoked because it is
             // System.Object, which defines Equals as reference equality.
-            return TypeFullName == p.TypeFullName && _guid == p._guid;
+            return TypeNameAndAssembly == p.TypeNameAndAssembly && _guid == p._guid;
         }
 
         public static bool operator ==(TypeInfo lhs, TypeInfo rhs)
@@ -98,24 +86,26 @@
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + _typeFullName.GetHashCode();
+                hash = hash * 23 + _typeNameAndAssembly.GetHashCode();
                 hash = hash * 23 + _guid.GetHashCode();
                 return hash;
             }
         }
 
-        public override string ToString() => _typeFullName;
-    }
+        public override string ToString() => _typeNameAndAssembly;
 
-    internal readonly struct BehaviourInfoPair
-    {
-        public readonly BehaviourInfo OldType;
-        public readonly BehaviourInfo NewType;
-
-        public BehaviourInfoPair(BehaviourInfo oldType, BehaviourInfo newType)
+        public static string GetTypeNameAndAssembly(Type type)
         {
-            OldType = oldType;
-            NewType = newType;
+            if (type == null)
+                return string.Empty;
+
+            if (type.FullName == null)
+                throw new ArgumentException($"'{type}' does not have full name.", nameof(type));
+
+            return GetTypeNameAndAssembly(type.FullName, type.Assembly.GetName().Name);
         }
+
+        public static string GetTypeNameAndAssembly(string typeFullName, string assemblyName) =>
+            $"{typeFullName}, {assemblyName}";
     }
 }

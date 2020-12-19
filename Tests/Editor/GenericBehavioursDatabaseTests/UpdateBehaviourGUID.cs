@@ -6,9 +6,9 @@
 
     internal partial class GenericBehavioursDatabaseTests
     {
-        public class UpdateBehaviourFullName : GenericBehavioursDatabaseTests
+        public class UpdateBehaviourGUID : GenericBehavioursDatabaseTests
         {
-            private const string NewName = "newName";
+            private const string NewGUID = "newGUID";
             private static BehaviourInfo _expectedBehaviour;
 
             [SetUp]
@@ -16,45 +16,45 @@
             {
                 base.BeforeEachTest();
                 AddEntries();
-                _expectedBehaviour = new BehaviourInfo(NewName, _behaviour.GUID);
+                _expectedBehaviour = new BehaviourInfo(_behaviour.TypeNameAndAssembly, NewGUID);
             }
 
             [Test]
-            public void Returns_updated_behaviour()
+            public void Updates_behaviour_GUID_in_behaviours_list()
             {
-                var actualBehaviour = _database.InstanceUpdateBehaviourFullName(_behaviour, NewName);
-                Assert.AreEqual(actualBehaviour, _expectedBehaviour);
-            }
-
-            [Test]
-            public void Updates_behaviour_name_in_behaviours_list()
-            {
-                _database.InstanceUpdateBehaviourFullName(_behaviour, NewName);
+                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
 
                 Assert.IsTrue(_database.InstanceBehaviours.Length == 1);
                 Assert.Contains(_expectedBehaviour, _database.InstanceBehaviours);
             }
 
             [Test]
-            public void Updates_behaviour_name_in_referenced_behaviours()
+            public void Updates_behaviour_GUID_in_referenced_behaviours()
             {
-                _database.InstanceUpdateBehaviourFullName(_behaviour, NewName);
+                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
 
                 bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] behaviours);
 
                 Assert.IsTrue(success);
-                Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeFullName == NewName));
+                Assert.IsTrue(behaviours.Any(behaviour => behaviour.GUID == NewGUID));
             }
 
             [Test]
             public void Concrete_classes_can_be_found_by_new_behaviour()
             {
-                _database.InstanceUpdateBehaviourFullName(_behaviour, NewName);
+                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
 
                 bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Length != 0);
+            }
+
+            [Test]
+            public void Updates_passed_argument_GUID()
+            {
+                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
+                Assert.IsTrue(_behaviour.GUID == NewGUID);
             }
         }
     }
