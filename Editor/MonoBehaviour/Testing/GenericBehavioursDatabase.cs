@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using Sirenix.Utilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using Util;
@@ -55,6 +56,17 @@
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
             CreatedOnlyInstance.InstanceAddGenericBehaviour(genericBehaviour);
+        }
+
+        public static void CreateInstance()
+        {
+            var database = Instance;
+        }
+
+        public static void Clear()
+        {
+            CreatedOnlyInstance._argumentBehavioursDict.Clear();
+            CreatedOnlyInstance._behaviourArgumentsDict.Clear();
         }
 
         public void InstanceAddGenericBehaviour(BehaviourInfo genericBehaviour)
@@ -147,19 +159,20 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void RemoveGenericBehaviour(BehaviourInfo genericBehaviour)
+        public static void RemoveGenericBehaviour(BehaviourInfo genericBehaviour, Action<string> removeAssembly)
         {
             if (CreatedOnlyInstance == null)
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            CreatedOnlyInstance.InstanceRemoveGenericBehaviour(genericBehaviour);
+            CreatedOnlyInstance.InstanceRemoveGenericBehaviour(genericBehaviour, removeAssembly);
         }
 
-        public void InstanceRemoveGenericBehaviour(BehaviourInfo genericBehaviour)
+        public void InstanceRemoveGenericBehaviour(BehaviourInfo genericBehaviour, Action<string> removeAssembly)
         {
             if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Behaviour '{genericBehaviour}' was not found in the database.");
 
+            removeAssembly(genericBehaviour.AssemblyGUID);
             _behaviourArgumentsDict.Remove(genericBehaviour);
 
             foreach (ConcreteClass concreteClass in concreteClasses)
@@ -174,6 +187,8 @@
                     if (behaviours.Count == 0)
                         _argumentBehavioursDict.Remove(argument);
                 }
+
+                removeAssembly(concreteClass.AssemblyGUID);
             }
 
             EditorUtility.SetDirty(this);
@@ -250,8 +265,12 @@
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
             _argumentBehavioursDict.Remove(argument);
-            argument = _argumentsPool.GetOrAdd(argument);
-            argument.UpdateGUID(newGUID);
+
+            _argumentsPool.ChangeItem(ref argument, argumentToChange =>
+            {
+                argumentToChange.UpdateGUID(newGUID);
+            });
+
             _argumentBehavioursDict.Add(argument, behaviours);
             EditorUtility.SetDirty(this);
         }
@@ -270,8 +289,12 @@
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
             _argumentBehavioursDict.Remove(argument);
-            argument = _argumentsPool.GetOrAdd(argument);
-            argument.UpdateNameAndAssembly(newType);
+
+            _argumentsPool.ChangeItem(ref argument, argumentToChange =>
+            {
+                argumentToChange.UpdateNameAndAssembly(newType);
+            });
+
             _argumentBehavioursDict.Add(argument, behaviours);
             EditorUtility.SetDirty(this);
         }
@@ -290,28 +313,36 @@
                 throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
 
             _behaviourArgumentsDict.Remove(behaviour);
-            behaviour = _behavioursPool.GetOrAdd(behaviour);
-            behaviour.UpdateGUID(newGUID);
+
+            _behavioursPool.ChangeItem(ref behaviour, behaviourToChange =>
+            {
+                behaviourToChange.UpdateGUID(newGUID);
+            });
+
             _behaviourArgumentsDict.Add(behaviour, concreteClasses);
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, string typeFullName, string assemblyName)
+        public static void UpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, Type newType)
         {
             if (CreatedOnlyInstance == null)
                 throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
 
-            CreatedOnlyInstance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, typeFullName, assemblyName);
+            CreatedOnlyInstance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, newType);
         }
 
-        public void InstanceUpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, string typeFullName, string assemblyName)
+        public void InstanceUpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, Type newType)
         {
             if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Argument '{behaviour}' was not found in the database.");
 
             _behaviourArgumentsDict.Remove(behaviour);
-            behaviour = _behavioursPool.GetOrAdd(behaviour);
-            behaviour.UpdateNameAndAssembly(typeFullName, assemblyName);
+
+            _behavioursPool.ChangeItem(ref behaviour, behaviourToChange =>
+            {
+                behaviourToChange.UpdateNameAndAssembly(newType);
+            });
+
             _behaviourArgumentsDict.Add(behaviour, concreteClasses);
             EditorUtility.SetDirty(this);
         }
@@ -487,7 +518,7 @@
                 _array = concreteClasses.ToArray();
             }
 
-            public ConcreteClassCollection() : this(null) { }
+            public ConcreteClassCollection() : this(new List<ConcreteClass>()) { }
 
             public static implicit operator List<ConcreteClass>(ConcreteClassCollection concreteClassCollection)
             {
@@ -523,6 +554,19 @@
                     if (! _dict.ContainsKey(item))
                         _dict.Add(item, item);
                 }
+            }
+
+            public void ChangeItem(ref T item, Action<T> changeItem)
+            {
+                if (_dict.TryGetValue(item, out T existingItem))
+                {
+                    item = existingItem;
+                    _dict.Remove(item);
+                }
+
+                changeItem(item);
+
+                _dict[item] = item;
             }
         }
     }

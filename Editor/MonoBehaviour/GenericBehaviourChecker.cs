@@ -12,7 +12,7 @@
     {
         private static readonly string BehaviourSelectorFullName = typeof(BehaviourSelector).FullName;
 
-        [DidReloadScripts]
+        // [DidReloadScripts]
         private static void OnScriptsReload()
         {
             // Create the OldTypeAndAssembly field that will hold a previous type name if it was changed.

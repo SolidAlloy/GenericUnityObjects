@@ -11,6 +11,16 @@
             private const string NewName = "newName";
             private const string NewAssembly = "newAssembly";
             private static BehaviourInfo _expectedBehaviour;
+            private static TypeStub _typeStub;
+
+            private static void CallUpdateArgumentNameAndAssembly() =>
+                _database.InstanceUpdateBehaviourNameAndAssembly(ref _behaviour, _typeStub);
+
+            [OneTimeSetUp]
+            public void BeforeAllTests()
+            {
+                _typeStub = new TypeStub(NewName, NewAssembly);
+            }
 
             [SetUp]
             public override void BeforeEachTest()
@@ -23,7 +33,7 @@
             [Test]
             public void Updates_behaviour_name_in_behaviours_list()
             {
-                _database.InstanceUpdateBehaviourNameAndAssembly(ref _behaviour, NewName, NewAssembly);
+                CallUpdateArgumentNameAndAssembly();
 
                 Assert.IsTrue(_database.InstanceBehaviours.Length == 1);
                 Assert.Contains(_expectedBehaviour, _database.InstanceBehaviours);
@@ -32,7 +42,7 @@
             [Test]
             public void Updates_behaviour_name_in_referenced_behaviours()
             {
-                _database.InstanceUpdateBehaviourNameAndAssembly(ref _behaviour, NewName, NewAssembly);
+                CallUpdateArgumentNameAndAssembly();
 
                 bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] behaviours);
 
@@ -43,7 +53,7 @@
             [Test]
             public void Concrete_classes_can_be_found_by_new_behaviour()
             {
-                _database.InstanceUpdateBehaviourNameAndAssembly(ref _behaviour, NewName, NewAssembly);
+                CallUpdateArgumentNameAndAssembly();
 
                 bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
 
@@ -54,7 +64,7 @@
             [Test]
             public void Updates_passed_behaviour_TypeNameAndAssembly()
             {
-                _database.InstanceUpdateBehaviourNameAndAssembly(ref _behaviour, NewName, NewAssembly);
+                CallUpdateArgumentNameAndAssembly();
                 Assert.IsTrue(_behaviour.TypeNameAndAssembly == TypeInfo.GetTypeNameAndAssembly(NewName, NewAssembly));
             }
         }

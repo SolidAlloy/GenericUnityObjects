@@ -25,10 +25,12 @@
                 _database.InstanceAddConcreteClass(_secondBehaviour, _firstSecondArgs, AssemblyGUID);
             }
 
+            private void CallRemoveGenericBehaviour(BehaviourInfo behaviour) => _database.InstanceRemoveGenericBehaviour(behaviour, _ => { });
+
             [Test]
             public void Removes_behaviour_from_behaviours_list()
             {
-                _database.InstanceRemoveGenericBehaviour(_behaviour);
+                CallRemoveGenericBehaviour(_behaviour);
 
                 Assert.IsFalse(_database.InstanceBehaviours.Contains(_behaviour));
             }
@@ -36,7 +38,7 @@
             [Test]
             public void Removes_behaviour_from_referenced_behaviours_of_each_argument()
             {
-                _database.InstanceRemoveGenericBehaviour(_behaviour);
+                CallRemoveGenericBehaviour(_behaviour);
 
                 bool firstSuccess = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] firstBehaviours);
                 Assert.IsTrue(firstSuccess);
@@ -50,8 +52,8 @@
             [Test]
             public void When_argument_has_only_this_behaviour_referenced_removes_argument_from_arguments_list()
             {
-                _database.InstanceRemoveGenericBehaviour(_behaviour);
-                _database.InstanceRemoveGenericBehaviour(_secondBehaviour);
+                CallRemoveGenericBehaviour(_behaviour);
+                CallRemoveGenericBehaviour(_secondBehaviour);
 
                 Assert.IsEmpty(_database.InstanceArguments);
             }
@@ -59,12 +61,12 @@
             [Test]
             public void When_behaviour_is_not_found_throws_KeyNotFound_exception()
             {
-                _database.InstanceRemoveGenericBehaviour(_behaviour);
-                _database.InstanceRemoveGenericBehaviour(_secondBehaviour);
+                CallRemoveGenericBehaviour(_behaviour);
+                CallRemoveGenericBehaviour(_secondBehaviour);
 
                 Assert.Throws<KeyNotFoundException>(() =>
                 {
-                    _database.InstanceRemoveGenericBehaviour(_behaviour);
+                    _database.InstanceRemoveGenericBehaviour(_behaviour, _ => { });
                 });
             }
         }

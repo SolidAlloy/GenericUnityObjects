@@ -64,7 +64,7 @@
             [Test]
             public void When_behaviour_does_not_exist_throws_KeyNotFound_exception()
             {
-                _database.InstanceRemoveGenericBehaviour(_behaviour);
+                _database.InstanceRemoveGenericBehaviour(_behaviour, _ => { });
 
                 Assert.Throws<KeyNotFoundException>(() =>
                 {

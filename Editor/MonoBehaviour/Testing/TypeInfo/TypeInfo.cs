@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System;
+    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Editor.Helpers.AssetSearch;
     using UnityEngine;
 
@@ -10,9 +11,22 @@
         [SerializeField] private string _typeNameAndAssembly;
         [SerializeField] private string _guid;
 
+        private Type _type;
+
         public string TypeNameAndAssembly => _typeNameAndAssembly;
 
         public string GUID => _guid;
+
+        public Type Type => _type;
+
+        public string TypeFullName
+        {
+            get
+            {
+                int comaIndex = _typeNameAndAssembly.IndexOf(',');
+                return _typeNameAndAssembly.Substring(0, comaIndex);
+            }
+        }
 
         protected TypeInfo(string typeNameAndAssembly, string guid)
         {
@@ -28,9 +42,68 @@
 
         protected TypeInfo(Type type)
         {
+            _type = type;
             _typeNameAndAssembly = type.FullName;
             _guid = AssetSearcher.GetClassGUID(type);
         }
+
+        public bool RetrieveType(out Type type, out bool retrievedFromGUID)
+        {
+            retrievedFromGUID = false;
+
+            if (_type != null)
+            {
+                type = _type;
+                return true;
+            }
+
+            _type = Type.GetType(TypeNameAndAssembly);
+
+            if (_type != null)
+            {
+                type = _type;
+                UpdateGUIDIfNeeded();
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(GUID))
+            {
+                type = null;
+                return false;
+            }
+
+            _type = AssetDatabaseHelper.GetTypeFromGUID(GUID);
+            type = _type;
+            retrievedFromGUID = true;
+
+            return _type != null;
+        }
+
+        private void UpdateGUIDIfNeeded()
+        {
+            string currentGUID = AssetSearcher.GetClassGUID(_type);
+            if (GUID == currentGUID)
+                return;
+
+            if (this is ArgumentInfo)
+            {
+                UpdateArgumentInDatabase((ArgumentInfo) this, currentGUID);
+            }
+            else if (this is BehaviourInfo)
+            {
+                UpdateBehaviourInDatabase((BehaviourInfo) this, currentGUID);
+            }
+            else
+            {
+                throw new TypeLoadException($"{nameof(UpdateGUIDIfNeeded)} method doesn't know of this inheritor of {nameof(TypeInfo)} yet: {GetType()}.");
+            }
+        }
+
+        private static void UpdateArgumentInDatabase(ArgumentInfo argument, string newGUID) =>
+            GenericBehavioursDatabase.UpdateArgumentGUID(ref argument, newGUID);
+
+        private static void UpdateBehaviourInDatabase(BehaviourInfo behaviour, string newGUID) =>
+            GenericBehavioursDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
 
         public void UpdateGUID(string newGUID) => _guid = newGUID;
 

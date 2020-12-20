@@ -48,7 +48,7 @@
                 _database.InstanceAddConcreteClass(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 
                 // Action
-                _database.InstanceRemoveGenericBehaviour(_behaviour);
+                _database.InstanceRemoveGenericBehaviour(_behaviour, _ => { });
 
                 // Check
                 AssertFalse();
