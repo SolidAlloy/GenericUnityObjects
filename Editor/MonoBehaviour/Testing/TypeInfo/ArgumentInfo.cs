@@ -11,7 +11,7 @@
         public ArgumentInfo(string typeFullName, string assemblyName, string guid)
             : base(typeFullName, assemblyName, guid) { }
 
-        public ArgumentInfo(Type type)
-            : base(type) { }
+        public ArgumentInfo(Type type, string typeGUID = null)
+            : base(type, typeGUID) { }
     }
 }

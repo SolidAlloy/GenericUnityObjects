@@ -2,19 +2,24 @@
 {
     using System;
     using SolidUtilities.Helpers;
+    using UnityEngine;
 
     [Serializable]
     internal class ConcreteClass : IEquatable<ConcreteClass>
     {
-        public readonly ArgumentInfo[] Arguments;
-        public readonly string AssemblyGUID;
+        [SerializeField] private ArgumentInfo[] _arguments;
+        [SerializeField] private string _assemblyGUID;
+
+        public ArgumentInfo[] Arguments => _arguments;
+
+        public string AssemblyGUID => _assemblyGUID;
 
         private static readonly ArrayEqualityComparer<ArgumentInfo> ArrayComparer = new ArrayEqualityComparer<ArgumentInfo>();
 
         public ConcreteClass(ArgumentInfo[] arguments, string assemblyGUID)
         {
-            Arguments = arguments;
-            AssemblyGUID = assemblyGUID;
+            _arguments = arguments;
+            _assemblyGUID = assemblyGUID;
         }
 
         public bool Equals(ConcreteClass p)
@@ -40,7 +45,7 @@
             // Return true if the fields match.
             // Note that the base class is not invoked because it is
             // System.Object, which defines Equals as reference equality.
-            return ArrayComparer.Equals(Arguments, p.Arguments) && AssemblyGUID == p.AssemblyGUID;
+            return ArrayComparer.Equals(_arguments, p._arguments) && _assemblyGUID == p._assemblyGUID;
         }
 
         public static bool operator ==(ConcreteClass lhs, ConcreteClass rhs)
@@ -58,13 +63,14 @@
             return this.Equals(obj as ConcreteClass);
         }
 
+        // Can't make the fields readonly because Unity will not serialize them. Should be careful with not changing them instead.
         public override int GetHashCode()
         {
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + ArrayComparer.GetHashCode(Arguments);
-                hash = hash * 23 + AssemblyGUID.GetHashCode();
+                hash = hash * 23 + ArrayComparer.GetHashCode(_arguments);
+                hash = hash * 23 + _assemblyGUID.GetHashCode();
                 return hash;
             }
         }

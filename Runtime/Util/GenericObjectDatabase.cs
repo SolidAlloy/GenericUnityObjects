@@ -79,8 +79,26 @@
         {
             Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
             TypeDictionary assetDict = GetAssetDict(genericTypeWithoutArgs);
-            bool result = assetDict.TryGetValue(genericArgs, out value);
-            return result;
+            bool success = assetDict.TryGetValue(genericArgs, out value);
+
+            if ( ! success)
+            {
+                success = TryFindExistingType(genericTypeWithoutArgs, genericArgs, out value);
+            }
+
+            return success;
+        }
+
+        private static bool TryFindExistingType(Type genericTypeWithoutArgs, Type[] genericArgs, out Type existingType)
+        {
+            var genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
+            existingType = TypeHelper.GetEmptyTypeDerivedFrom(genericType);
+
+            if (existingType == null)
+                return false;
+
+            Add(genericTypeWithoutArgs, genericArgs, existingType);
+            return true;
         }
 
         public void OnAfterDeserialize()

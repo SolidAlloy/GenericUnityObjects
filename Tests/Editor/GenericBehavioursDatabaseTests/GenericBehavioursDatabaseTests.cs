@@ -3,7 +3,6 @@
     using Editor.MonoBehaviour;
     using NUnit.Framework;
     using UnityEngine;
-    using TypeInfo = Editor.MonoBehaviour.TypeInfo;
 
     internal partial class GenericBehavioursDatabaseTests
     {

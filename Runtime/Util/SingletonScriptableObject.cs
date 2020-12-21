@@ -2,12 +2,11 @@
 {
     using System.IO;
     using JetBrains.Annotations;
-    using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
 
 #if UNITY_EDITOR
-
+    using UnityEditor;
 #else
     using System.Linq;
 #endif
@@ -18,17 +17,14 @@
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
     internal abstract class SingletonScriptableObject<T> : ScriptableObject
-        where T : ScriptableObject
+        where T : SingletonScriptableObject<T>, ISerializationCallbackReceiver
     {
-        public static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
+        private static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
 
         private static T _instance = null;
 
-        /// <summary>
-        /// Retrieves an instance to the asset. DON'T call in DidReloadScripts and InitializeOnLoad!
-        /// Use <see cref="CreatedOnlyInstance"/> instead.
-        /// </summary>
-        protected static T Instance
+        /// <summary> Retrieves an instance to the asset. </summary>
+        public static T Instance
         {
             get
             {
@@ -43,42 +39,18 @@
                     return _instance;
                 }
 
-#if UNITY_2020_1_OR_NEWER
-                // FindObjectsOfType(true) returns less objects than FindObjectsOfTypeAll, thus speeding up the search
-                // of the necessary object.
-                var allInstances = FindObjectsOfType<T>(true);
-#else
-                var allInstances = Resources.FindObjectsOfTypeAll<T>();
-#endif
-
-                _instance = allInstances.Length == 0 ? CreateInstance<T>() : allInstances[0];
+                _instance = CreateInstance<T>();
                 Assert.IsNotNull(_instance);
 
 #if UNITY_EDITOR
+                Debug.Log($"The asset of type {typeof(T)} was created.");
                 Directory.CreateDirectory(Config.ResourcesPath);
                 AssetDatabase.CreateAsset(_instance, AssetPath);
+                _instance.OnAfterDeserialize();
                 EditorUtility.SetDirty(_instance);
 #else
                 Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
 #endif
-                return _instance;
-            }
-        }
-
-        /// <summary>
-        /// Sometimes, FindObjectsOfType and FindObjectsOfTypeAll return null even though the asset exists (this
-        /// happens in a DidReloadScripts method on editor launch, for example). In such a case, if
-        /// <see cref="Instance"/> is called, a new asset is created and replaces the old one which is harmful.
-        /// So, only <see cref="CreatedOnlyInstance"/> must be used in DidReloadScripts, InitializeOnLoad and similar methods.
-        /// </summary>
-        public static T CreatedOnlyInstance
-        {
-            get
-            {
-                if (_instance != null)
-                    return _instance;
-
-                _instance = GetInstanceFromAsset();
                 return _instance;
             }
         }

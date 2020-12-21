@@ -30,15 +30,15 @@
 
                 var cleanInstance = ScriptableObject.CreateInstance<GenericBehavioursDatabase>();
                 _instanceField.SetValue(null, cleanInstance);
-                GenericBehavioursDatabase.CreatedOnlyInstance.OnAfterDeserialize();
+                GenericBehavioursDatabase.Instance.OnAfterDeserialize();
                 GenericBehavioursDatabase.AddGenericBehaviour(_behaviour);
                 GenericBehavioursDatabase.AddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
             }
 
             private static void ReserializeDatabase()
             {
-                GenericBehavioursDatabase.CreatedOnlyInstance.OnBeforeSerialize();
-                GenericBehavioursDatabase.CreatedOnlyInstance.OnAfterDeserialize();
+                GenericBehavioursDatabase.Instance.OnBeforeSerialize();
+                GenericBehavioursDatabase.Instance.OnAfterDeserialize();
             }
 
             public void Restores_arguments()

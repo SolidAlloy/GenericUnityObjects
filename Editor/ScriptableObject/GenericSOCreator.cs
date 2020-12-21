@@ -11,6 +11,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
+    using TypeHelper = Util.TypeHelper;
 
     /// <summary>
     /// Inherit from this class and use the <see cref="CreateAsset"/> method to create an AssetCreate menu.
@@ -82,7 +83,7 @@
 
             Type genericTypeWithArgs = _genericTypeWithoutArgs.MakeGenericType(_genericArgs);
 
-            Type existingAssetType = CreatorUtil.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+            Type existingAssetType = TypeHelper.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
 
             if (existingAssetType != null)
             {
@@ -98,7 +99,7 @@
         private void CreateAssetFromExistingType()
         {
             Type genericTypeWithArgs = _genericTypeWithoutArgs.MakeGenericType(_genericArgs);
-            Type existingAssetType = CreatorUtil.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
+            Type existingAssetType = TypeHelper.GetEmptyTypeDerivedFrom(genericTypeWithArgs);
             Assert.IsNotNull(existingAssetType);
             CreateAssetFromExistingType(existingAssetType);
         }

@@ -14,23 +14,30 @@
 
     internal static class GenericBehavioursAnalyzer
     {
-        private static bool _needAssetDatabaseRefresh;
+        private static bool _needsAssetDatabaseRefresh;
 
         [DidReloadScripts]
         private static void OnScriptsReload()
         {
-            _needAssetDatabaseRefresh = false;
-            Directory.CreateDirectory(Config.AssembliesDirPath);
+            try
+            {
+                AssetDatabase.DisallowAutoRefresh();
+                AssetDatabase.StartAssetEditing();
 
-            // It happens on editor launch.
-            if (GenericBehavioursDatabase.CreatedOnlyInstance == null)
-                return;
+                _needsAssetDatabaseRefresh = false;
+                Directory.CreateDirectory(Config.AssembliesDirPath);
 
-            CheckArguments();
-            CheckBehaviours();
+                CheckArguments();
+                CheckBehaviours();
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.AllowAutoRefresh();
 
-            if (_needAssetDatabaseRefresh)
-                AssetDatabase.Refresh();
+                if (_needsAssetDatabaseRefresh)
+                    AssetDatabase.Refresh();
+            }
         }
 
         private static void CheckArguments()
@@ -55,14 +62,14 @@
         {
             var oldBehaviours = GenericBehavioursDatabase.Behaviours;
             var newBehaviours = TypeCache.GetTypesDerivedFrom<MonoBehaviour>()
-                .Where(type => type.IsGenericType)
+                .Where(type => type.IsGenericType && ! type.IsAbstract)
                 .Select(type => new BehaviourInfo(type))
                 .ToArray();
 
             int oldBehavioursLength = oldBehaviours.Length;
             int newBehavioursLength = newBehaviours.Length;
 
-            // Optimizations for some cases.
+            // Optimizations for common cases.
             if (oldBehavioursLength == 0 && newBehavioursLength == 0)
             {
                 return;
@@ -70,21 +77,13 @@
 
             if (oldBehavioursLength == 0)
             {
-                foreach (BehaviourInfo behaviour in newBehaviours)
-                {
-                    AddNewBehaviour(behaviour);
-                }
-
+                newBehaviours.ForEach(AddNewBehaviour);
                 return;
             }
 
             if (newBehavioursLength == 0)
             {
-                foreach (BehaviourInfo behaviour in oldBehaviours)
-                {
-                    GenericBehavioursDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
-                }
-
+                oldBehaviours.ForEach(RemoveBehaviour);
                 return;
             }
 
@@ -105,11 +104,13 @@
                     // Full names are equal but GUIDs are not
                     if (newBehaviour.TypeNameAndAssembly == oldBehaviour.TypeNameAndAssembly)
                     {
+                        oldBehavioursOnly.Remove(oldBehaviour);
+
                         // new type GUID is empty -> leave the old GUID
                         if (!string.IsNullOrEmpty(newBehaviour.GUID))
                         {
                             // new type GUID is not empty -> update old GUID
-                            GenericBehavioursDatabase.UpdateBehaviourGUID(ref oldBehaviour, newBehaviour.GUID);
+                            UpdateBehaviourGUID(oldBehaviour, newBehaviour.GUID);
                         }
 
                         foundMatching = true;
@@ -128,16 +129,25 @@
                 }
 
                 // There is no matching old type info, so a completely new assembly must be added for this type
-                if (!foundMatching)
+                if ( ! foundMatching)
                 {
                     AddNewBehaviour(newBehaviour);
                 }
             }
 
-            foreach (BehaviourInfo behaviour in oldBehavioursOnly)
-            {
-                GenericBehavioursDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
-            }
+            oldBehavioursOnly.ForEach(RemoveBehaviour);
+        }
+
+        private static void UpdateBehaviourGUID(BehaviourInfo behaviour, string newGUID)
+        {
+            DebugUtil.Log($"Behaviour GUID updated: {behaviour.GUID} => {newGUID}");
+            GenericBehavioursDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
+        }
+
+        private static void RemoveBehaviour(BehaviourInfo behaviour)
+        {
+            DebugUtil.Log($"Behaviour removed: {behaviour.TypeFullName}");
+            GenericBehavioursDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
         }
 
         private static void UpdateArgumentTypeName(ArgumentInfo argument, Type newType)
@@ -181,6 +191,8 @@
 
         private static void UpdateBehaviourTypeName(BehaviourInfo behaviour, Type newType)
         {
+            DebugUtil.Log($"Behaviour typename updated: {behaviour.TypeFullName} => {newType.FullName}");
+
             bool success = GenericBehavioursDatabase.TryGetConcreteClasses(behaviour, out ConcreteClass[] concreteClasses);
 
             Assert.IsTrue(success);
@@ -219,6 +231,8 @@
 
         private static void AddNewBehaviour(BehaviourInfo behaviour)
         {
+            DebugUtil.Log($"Behaviour added: {behaviour.TypeFullName}");
+
             Type behaviourType = behaviour.Type;
             Assert.IsNotNull(behaviourType);
 
@@ -229,7 +243,7 @@
 
             AssetDatabase.ImportAsset(assemblyPath);
             AssetDatabase.ImportAsset(assemblyPath + ".mdb");
-            _needAssetDatabaseRefresh = true;
+            _needsAssetDatabaseRefresh = true;
 
             behaviour.AssemblyGUID = AssetDatabase.AssetPathToGUID(assemblyPath);
 
@@ -242,7 +256,7 @@
             string mdbPath = $"{assemblyPath}.mdb";
             AssetDatabase.DeleteAsset(assemblyPath);
             AssetDatabase.DeleteAsset(mdbPath);
-            _needAssetDatabaseRefresh = true;
+            _needsAssetDatabaseRefresh = true;
         }
 
         private static void UpdateConcreteClassAssembly(Type behaviourType, ConcreteClass concreteClass)
@@ -288,30 +302,21 @@
 
         private static void UpdateConcreteClassAssembly(Type behaviourType, Type[] argumentTypes, ConcreteClass concreteClass)
         {
-            string newAssemblyName = GetAssemblyName(behaviourType, concreteClass);
+            string newAssemblyName;
 
-            Type genericTypeWithArgs = behaviourType.MakeGenericType(argumentTypes);
-            string componentName = "Scripts/" + GetComponentName(behaviourType, argumentTypes);
+            try
+            {
+                newAssemblyName = ConcreteClassCreator.GetConcreteClassAssemblyName(behaviourType, argumentTypes);
+            }
+            catch (TypeLoadException)
+            {
+                return;
+            }
 
             ReplaceAssembly(concreteClass.AssemblyGUID, newAssemblyName, () =>
             {
-                AssemblyCreator.CreateConcreteClass(newAssemblyName, genericTypeWithArgs, componentName);
+                ConcreteClassCreator.CreateConcreteClassAssembly(behaviourType, argumentTypes, newAssemblyName);
             });
-        }
-
-        private static string GetAssemblyName(Type behaviourType, ConcreteClass concreteClass)
-        {
-            var argumentsNames = concreteClass.Arguments.Select(argument => GetShortNameForNaming(argument.TypeFullName));
-            string newAssemblyName = $"{GetShortNameForNaming(behaviourType.FullName)}_{string.Join("_", argumentsNames)}";
-            var dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
-            int identicalFilesCount = dirInfo.GetFiles($"{newAssemblyName}*.dll").Length;
-
-            if (identicalFilesCount != 0)
-            {
-                newAssemblyName += $"_{identicalFilesCount}";
-            }
-
-            return newAssemblyName;
         }
 
         private static void ReplaceAssembly(string assemblyGUID, string newAssemblyName, Action createAssembly)
@@ -326,46 +331,12 @@
             string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{newAssemblyName}";
             File.Move($"{oldAssemblyPathWithoutExtension}.dll.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
             File.Move($"{oldAssemblyPathWithoutExtension}.dll.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
-            _needAssetDatabaseRefresh = true; // TODO: perhaps reimport asset instead of refresh, if refresh doesn't work
+            _needsAssetDatabaseRefresh = true;
         }
 
         private static string RemoveDLLExtension(string assemblyPath)
         {
             return assemblyPath.Substring(0, assemblyPath.Length - 4);
-        }
-
-        private static string GetShortNameForNaming(string fullName)
-        {
-            int lastDotIndex = fullName.LastIndexOf('.');
-
-            if (lastDotIndex != -1)
-            {
-                fullName = fullName.Substring(lastDotIndex, fullName.Length - lastDotIndex - 1);
-            }
-
-            int backtickIndex = fullName.IndexOf('`');
-
-            if (backtickIndex != -1)
-            {
-                fullName = fullName.Substring(0, backtickIndex);
-            }
-
-            return fullName;
-        }
-
-        private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)
-        {
-            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
-
-            string shortName = genericTypeWithoutArgs.Name;
-            string typeNameWithoutSuffix = shortName.StripGenericSuffix();
-
-            var argumentNames = genericArgs
-                .Select(argument => argument.FullName)
-                .Select(fullName => fullName.ReplaceWithBuiltInName())
-                .Select(fullName => fullName.GetSubstringAfterLast('.'));
-
-            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
     }
 }

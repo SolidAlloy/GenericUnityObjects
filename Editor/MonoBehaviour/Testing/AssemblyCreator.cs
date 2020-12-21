@@ -11,6 +11,8 @@
 
     public static class AssemblyCreator
     {
+        public const string ConcreteClassName = "ConcreteClass";
+
         public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs, string componentName)
         {
             const string className = "ClassSelector";
@@ -30,19 +32,15 @@
 
         public static void CreateConcreteClass(string assemblyName, Type genericBehaviourWithArgs, string componentName)
         {
-            // [UnityEngine.AddComponentMenu("Scripts/GenericBehaviourTest<bool>")]
-            // internal class GenericBehaviourTest_Boolean : Prototype.GenericBehaviourTest<bool> { }
-
-            const string className = "ConcreteClass";
-
             AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
             ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
 
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, genericBehaviourWithArgs);
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(ConcreteClassName, TypeAttributes.NotPublic, genericBehaviourWithArgs);
 
             AddComponentMenuAttribute(typeBuilder, componentName);
 
-            // Maybe add GenericUnityObjects.Editor to friendly assemblies
+            typeBuilder.CreateType();
+
             assemblyBuilder.Save($"{assemblyName}.dll");
         }
 

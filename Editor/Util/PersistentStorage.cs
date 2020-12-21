@@ -12,7 +12,7 @@
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
     /// creation, but also for MenuItem methods creation and Usage Example installation.
     /// </summary>
-    internal class PersistentStorage : SingletonScriptableObject<PersistentStorage>
+    internal class PersistentStorage : SingletonScriptableObject<PersistentStorage>, ISerializationCallbackReceiver
     {
         [HideInInspector] [SerializeField] private TypeReference _genericSOType;
         [HideInInspector] [SerializeField] private string _fileName;
@@ -25,27 +25,27 @@
 
         [HideInInspector] [SerializeField] private BehaviourInfo[] _behaviourInfos = { };
 
-        public static bool NeedsSOCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericSOType?.Type != null;
+        public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
 
-        public static bool NeedsBehaviourCreation => CreatedOnlyInstance != null && CreatedOnlyInstance._genericBehaviourType?.Type != null;
+        public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
 
         public static MenuItemMethod[] MenuItemMethods
         {
-            get => CreatedOnlyInstance == null ? null : CreatedOnlyInstance._menuItemMethods;
+            get => Instance._menuItemMethods;
             set
             {
-                CreatedOnlyInstance._menuItemMethods = value;
-                EditorUtility.SetDirty(CreatedOnlyInstance);
+                Instance._menuItemMethods = value;
+                EditorUtility.SetDirty(Instance);
             }
         }
 
         public static BehaviourInfo[] BehaviourInfos
         {
-            get => CreatedOnlyInstance == null ? null : CreatedOnlyInstance._behaviourInfos;
+            get => Instance._behaviourInfos;
             set
             {
-                CreatedOnlyInstance._behaviourInfos = value;
-                EditorUtility.SetDirty(CreatedOnlyInstance);
+                Instance._behaviourInfos = value;
+                EditorUtility.SetDirty(Instance);
             }
         }
 
@@ -88,5 +88,9 @@
             Instance._gameObject = null;
             Instance._genericBehaviourType = null;
         }
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize() { }
     }
 }

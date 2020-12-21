@@ -13,8 +13,8 @@
         public BehaviourInfo(string typeFullName, string assemblyName, string guid)
             : base(typeFullName, assemblyName, guid) { }
 
-        public BehaviourInfo(Type type)
-            : base(type) { }
+        public BehaviourInfo(Type type, string typeGUID = null)
+            : base(type, typeGUID) { }
     }
 
     internal readonly struct BehaviourInfoPair

@@ -24,49 +24,23 @@
 
         private bool _shouldSetDirty;
 
-        public static ArgumentInfo[] Arguments
-        {
-            get
-            {
-                if (CreatedOnlyInstance == null)
-                    throw new NoNullAllowedException("Check CreatedOnlyInstance for null before using the property");
-
-                return CreatedOnlyInstance.InstanceArguments;
-            }
-        }
+        public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
 
         public ArgumentInfo[] InstanceArguments => _argumentBehavioursDict.Keys.ToArray();
 
-        public static BehaviourInfo[] Behaviours
-        {
-            get
-            {
-                if (CreatedOnlyInstance == null)
-                    throw new NoNullAllowedException("Check CreatedOnlyInstance for null before using the property");
-
-                return CreatedOnlyInstance.InstanceBehaviours;
-            }
-        }
+        public static BehaviourInfo[] Behaviours => Instance.InstanceBehaviours;
 
         public BehaviourInfo[] InstanceBehaviours => _behaviourArgumentsDict.Keys.ToArray();
 
         public static void AddGenericBehaviour(BehaviourInfo genericBehaviour)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceAddGenericBehaviour(genericBehaviour);
-        }
-
-        public static void CreateInstance()
-        {
-            var database = Instance;
+            Instance.InstanceAddGenericBehaviour(genericBehaviour);
         }
 
         public static void Clear()
         {
-            CreatedOnlyInstance._argumentBehavioursDict.Clear();
-            CreatedOnlyInstance._behaviourArgumentsDict.Clear();
+            Instance._argumentBehavioursDict.Clear();
+            Instance._behaviourArgumentsDict.Clear();
         }
 
         public void InstanceAddGenericBehaviour(BehaviourInfo genericBehaviour)
@@ -76,12 +50,24 @@
             EditorUtility.SetDirty(this);
         }
 
+        public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID)
+        {
+            var behaviour = new BehaviourInfo(genericTypeWithoutArgs);
+
+            int genericArgsLength = genericArgs.Length;
+            var arguments = new ArgumentInfo[genericArgsLength];
+
+            for (int i = 0; i < genericArgsLength; i++)
+            {
+                arguments[i] = new ArgumentInfo(genericArgs[i]);
+            }
+
+            Instance.InstanceAddConcreteClass(behaviour, arguments, assemblyGUID);
+        }
+
         public static void AddConcreteClass(BehaviourInfo genericBehaviour, ArgumentInfo[] arguments, string assemblyGUID)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceAddConcreteClass(genericBehaviour, arguments, assemblyGUID);
+            Instance.InstanceAddConcreteClass(genericBehaviour, arguments, assemblyGUID);
         }
 
         public void InstanceAddConcreteClass(BehaviourInfo genericBehaviour, ArgumentInfo[] arguments, string assemblyGUID)
@@ -126,10 +112,7 @@
 
         public static void RemoveArgument(ArgumentInfo argument, Action<string> assemblyAction)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceRemoveArgument(argument, assemblyAction);
+            Instance.InstanceRemoveArgument(argument, assemblyAction);
         }
 
         public void InstanceRemoveArgument(ArgumentInfo argument, Action<string> assemblyAction)
@@ -161,10 +144,7 @@
 
         public static void RemoveGenericBehaviour(BehaviourInfo genericBehaviour, Action<string> removeAssembly)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceRemoveGenericBehaviour(genericBehaviour, removeAssembly);
+            Instance.InstanceRemoveGenericBehaviour(genericBehaviour, removeAssembly);
         }
 
         public void InstanceRemoveGenericBehaviour(BehaviourInfo genericBehaviour, Action<string> removeAssembly)
@@ -196,10 +176,7 @@
 
         public static bool TryGetReferencedBehaviours(ArgumentInfo argument, out BehaviourInfo[] referencedBehaviours)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            return CreatedOnlyInstance.InstanceTryGetReferencedBehaviours(argument, out referencedBehaviours);
+            return Instance.InstanceTryGetReferencedBehaviours(argument, out referencedBehaviours);
         }
 
         public bool InstanceTryGetReferencedBehaviours(ArgumentInfo argument, out BehaviourInfo[] referencedBehaviours)
@@ -211,10 +188,7 @@
 
         public static bool TryGetConcreteClasses(BehaviourInfo behaviour, out ConcreteClass[] concreteClasses)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            return CreatedOnlyInstance.InstanceTryGetConcreteClasses(behaviour, out concreteClasses);
+            return Instance.InstanceTryGetConcreteClasses(behaviour, out concreteClasses);
         }
 
         public bool InstanceTryGetConcreteClasses(BehaviourInfo behaviour, out ConcreteClass[] concreteClasses)
@@ -226,10 +200,7 @@
 
         public static bool TryGetConcreteClassesByArgument(BehaviourInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            return CreatedOnlyInstance.InstanceTryGetConcreteClassesByArgument(behaviour, argument, out concreteClasses);
+            return Instance.InstanceTryGetConcreteClassesByArgument(behaviour, argument, out concreteClasses);
         }
 
         public bool InstanceTryGetConcreteClassesByArgument(BehaviourInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
@@ -253,10 +224,7 @@
 
         public static void UpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceUpdateArgumentGUID(ref argument, newGUID);
+            Instance.InstanceUpdateArgumentGUID(ref argument, newGUID);
         }
 
         public void InstanceUpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)
@@ -277,10 +245,7 @@
 
         public static void UpdateArgumentNameAndAssembly(ref ArgumentInfo argument, Type newType)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceUpdateArgumentNameAndAssembly(ref argument, newType);
+            Instance.InstanceUpdateArgumentNameAndAssembly(ref argument, newType);
         }
 
         public void InstanceUpdateArgumentNameAndAssembly(ref ArgumentInfo argument, Type newType)
@@ -301,10 +266,7 @@
 
         public static void UpdateBehaviourGUID(ref BehaviourInfo behaviour, string newGUID)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceUpdateBehaviourGUID(ref behaviour, newGUID);
+            Instance.InstanceUpdateBehaviourGUID(ref behaviour, newGUID);
         }
 
         public void InstanceUpdateBehaviourGUID(ref BehaviourInfo behaviour, string newGUID)
@@ -325,10 +287,7 @@
 
         public static void UpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, Type newType)
         {
-            if (CreatedOnlyInstance == null)
-                throw new NoNullAllowedException("Check CreatedOnlyInstance for null before calling the method");
-
-            CreatedOnlyInstance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, newType);
+            Instance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, newType);
         }
 
         public void InstanceUpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, Type newType)

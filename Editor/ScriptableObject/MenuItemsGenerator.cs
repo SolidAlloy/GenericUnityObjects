@@ -97,7 +97,7 @@
                 return _oldContent;
             }
 
-            string emptyClass = $"namespace GenericScriptableObjects.Editor.AssetCreation{NewLine}" +
+            string emptyClass = $"namespace GenericUnityObjects.Editor.ScriptableObject{NewLine}" +
                                 $"{{{NewLine}" +
                                 $"{Tab}using UnityEditor;{NewLine}{NewLine}" +
                                 $"{Tab}internal class MenuItems : GenericSOCreator{NewLine}" +

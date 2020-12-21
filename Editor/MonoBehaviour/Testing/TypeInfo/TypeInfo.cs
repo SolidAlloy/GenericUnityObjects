@@ -40,11 +40,11 @@
             _guid = guid;
         }
 
-        protected TypeInfo(Type type)
+        protected TypeInfo(Type type, string typeGUID = null)
         {
             _type = type;
-            _typeNameAndAssembly = type.FullName;
-            _guid = AssetSearcher.GetClassGUID(type);
+            _typeNameAndAssembly = GetTypeNameAndAssembly(type);
+            _guid = typeGUID ?? AssetSearcher.GetClassGUID(type);
         }
 
         public bool RetrieveType(out Type type, out bool retrievedFromGUID)

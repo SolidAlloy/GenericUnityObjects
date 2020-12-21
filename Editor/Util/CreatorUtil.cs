@@ -13,20 +13,6 @@
 
     internal static class CreatorUtil
     {
-        [CanBeNull]
-        public static Type GetEmptyTypeDerivedFrom(Type parentType)
-        {
-            var foundTypes = TypeCache.GetTypesDerivedFrom(parentType);
-
-            if (foundTypes.Count == 0)
-                return null;
-
-            // Why would there be another empty type derived from the GenericScriptableObject other than the auto-generated one?
-            Assert.IsTrue(foundTypes.Count == 1);
-
-            Type matchingType = foundTypes.FirstOrDefault(type => type.IsEmpty());
-            return matchingType;
-        }
 
         /// <summary>
         /// Gets the type name for using in scripts.
