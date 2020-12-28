@@ -8,7 +8,7 @@
     {
         public static TypeReference[] CastToTypeReference(this Type[] types)
         {
-            return types.Select(type => new TypeReference(type, true)).ToArray();
+            return types.Select(type => new TypeReference(type, suppressLogs: true)).ToArray();
         }
 
         public static Type[] CastToType(this TypeReferenceWithBaseTypes[] typeReferences)

@@ -2,9 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Linq;
-    using Sirenix.Utilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using Util;
@@ -83,7 +81,7 @@
 
             for (int i = 0; i < argumentsLength; i++ )
             {
-                var argument = arguments[i];
+                ArgumentInfo argument = arguments[i];
                 argument = _argumentsPool.GetOrAdd(argument);
 
                 if (_argumentBehavioursDict.ContainsKey(argument))
@@ -378,7 +376,7 @@
 
             for (int keyIndex = 0; keyIndex < keysLength; keyIndex++)
             {
-                var key = _behavioursPool.GetOrAdd(_genericBehaviourKeys[keyIndex]);
+                BehaviourInfo key = _behavioursPool.GetOrAdd(_genericBehaviourKeys[keyIndex]);
 
                 List<ConcreteClass> value = _genericArgumentValues[keyIndex];
 
@@ -442,11 +440,11 @@
 
         private void OnEnable()
         {
-            if (_shouldSetDirty)
-            {
-                _shouldSetDirty = false;
-                EditorUtility.SetDirty(this);
-            }
+            if ( ! _shouldSetDirty)
+                return;
+
+            _shouldSetDirty = false;
+            EditorUtility.SetDirty(this);
         }
 
         [Serializable]

@@ -12,10 +12,11 @@
     public static class GameObjectExtensions
     {
         /// <summary>
-        /// Adds a component class of the generic type <paramref name="componentType"/> to the game object.
+        /// Adds a component class of the generic type <paramref name="componentType"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="componentType"></param>
+        /// <param name="gameObject">The game object that needs to obtain the component.</param>
+        /// <param name="componentType">The type of component to add.</param>
+        /// <returns>The added component.</returns>
         [PublicAPI, CanBeNull]
         public static Component AddGenericComponent(this GameObject gameObject, Type componentType)
         {
@@ -25,11 +26,11 @@
         }
 
         /// <summary>
-        /// Adds a component class of the generic type <typeparamref name="T"/> to the game object.
+        /// Adds a component class of the generic type <typeparamref name="T"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <param name="gameObject">The game object that needs to obtain the component.</param>
+        /// <typeparam name="T">The type of component to add.</typeparam>
+        /// <returns>The added component.</returns>
         [PublicAPI, CanBeNull]
         public static T AddGenericComponent<T>(this GameObject gameObject)
             where T : MonoBehaviour
@@ -38,11 +39,12 @@
         }
 
         /// <summary>
-        /// Returns the component of type <paramref name="componentType"/> if the game object has one attached,
-        /// null if it doesn't.
+        /// Returns the component of type <paramref name="componentType"/> if <paramref name="gameObject"/> has one attached,
+        /// <c>null</c> if it doesn't.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">The game object to check.</param>
         /// <param name="componentType">The type of component to retrieve.</param>
+        /// <returns>The component of type <paramref name="componentType"/> or <c>null</c>.</returns>
         [PublicAPI, CanBeNull]
         public static Component GetGenericComponent(this GameObject gameObject, Type componentType)
         {
@@ -52,12 +54,12 @@
         }
 
         /// <summary>
-        /// Returns the component of type <typeparamref name="T"/> if the game object has one attached,
+        /// Returns the component of type <typeparamref name="T"/> if <paramref name="gameObject"/> has one attached,
         /// null if it doesn't.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <typeparam name="T">The type of component to retrieve.</typeparam>
+        /// <returns>The found component or <c>null</c>.</returns>
         [PublicAPI, CanBeNull]
         public static T GetGenericComponent<T>(this GameObject gameObject)
             where T : MonoBehaviour
@@ -66,12 +68,12 @@
         }
 
         /// <summary>
-        /// Returns the component of type <paramref name="componentType"/> in the GameObject or any of its children
+        /// Returns the component of type <paramref name="componentType"/> in <paramref name="gameObject"/> or any of its children
         /// using depth first search.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">The game object to check.</param>
         /// <param name="componentType">The type of Component to retrieve.</param>
-        /// <param name="includeInactive"></param>
+        /// <param name="includeInactive">The type of component to retrieve.</param>
         /// <returns>A component of the matching type, if found.</returns>
         [PublicAPI, CanBeNull]
         public static Component GetGenericComponentInChildren(this GameObject gameObject, Type componentType,
@@ -83,12 +85,12 @@
         }
 
         /// <summary>
-        /// Returns the component of type <typeparamref name="T"/> in the GameObject or any of its children using
+        /// Returns the component of type <typeparamref name="T"/> in <paramref name="gameObject"/> or any of its children using
         /// depth first search.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="includeInactive"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <param name="includeInactive">Whether to include inactive children in the search.</param>
+        /// <typeparam name="T">The type of component to retrieve.</typeparam>
         /// <returns>A component of the matching type, if found.</returns>
         [PublicAPI, CanBeNull]
         public static T GetGenericComponentInChildren<T>(this GameObject gameObject, bool includeInactive = false)
@@ -98,12 +100,12 @@
         }
 
         /// <summary>
-        /// Retrieves the component of type <paramref name="componentType"/> in the GameObject or any of its parents.
+        /// Retrieves the component of type <paramref name="componentType"/> in <paramref name="gameObject"/> or any of its parents.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">The game object to check.</param>
         /// <param name="componentType">Type of the component to find.</param>
-        /// <param name="includeInactive"></param>
-        /// <returns>Returns a component if a component matching the type is found. Returns null otherwise.</returns>
+        /// <param name="includeInactive">Whether to include inactive parents in the search.</param>
+        /// <returns>A component if a component matching the type is found. Returns null otherwise.</returns>
         [PublicAPI, CanBeNull]
         public static Component GetGenericComponentInParent(this GameObject gameObject, Type componentType, bool includeInactive = false)
         {
@@ -113,12 +115,12 @@
         }
 
         /// <summary>
-        /// Retrieves the component of type <typeparamref name="T"/> in the GameObject or any of its parents.
+        /// Retrieves the component of type <typeparamref name="T"/> in <paramref name="gameObject"/> or any of its parents.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="includeInactive"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>Returns a component if a component matching the type is found. Returns null otherwise.</returns>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <param name="includeInactive">Whether to include inactive parents in the search.</param>
+        /// <typeparam name="T">The type of component to retrieve.</typeparam>
+        /// <returns>A component if a component matching the type is found. Returns null otherwise.</returns>
         [PublicAPI, CanBeNull]
         public static T GetGenericComponentInParent<T>(this GameObject gameObject, bool includeInactive)
             where T : MonoBehaviour
@@ -126,10 +128,10 @@
             return (T) gameObject.GetGenericComponentInParent(typeof(T), includeInactive);
         }
 
-        /// <summary> Returns all components of type <paramref name="componentType"/> in the GameObject. </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="componentType">The type of component to retrieve.</param>
-        /// <returns></returns>
+        /// <summary> Returns all components of type <paramref name="componentType"/> in <paramref name="gameObject"/>. </summary>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <param name="componentType">The type of components to retrieve.</param>
+        /// <returns>Found components of type <paramref name="componentType"/>>.</returns>
         [PublicAPI, NotNull]
         public static Component[] GetGenericComponents(this GameObject gameObject, Type componentType)
         {
@@ -138,10 +140,10 @@
                 : LogFailureArray(componentType);
         }
 
-        /// <summary> Returns all components of type <typeparamref name="T"/> in the GameObject. </summary>
-        /// <param name="gameObject"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <summary> Returns all components of type <typeparamref name="T"/> in <paramref name="gameObject"/>. </summary>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <typeparam name="T">The type of components to retrieve.</typeparam>
+        /// <returns>Found components.</returns>
         [PublicAPI, NotNull]
         public static T[] GetGenericComponents<T>(this GameObject gameObject)
             where T : MonoBehaviour
@@ -149,10 +151,13 @@
             return (T[]) gameObject.GetGenericComponents(typeof(T));
         }
 
-        /// <summary> Returns all components of type <paramref name="componentType"/> in the GameObject or any of its children. </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="componentType">The type of Component to retrieve.</param>
+        /// <summary>
+        /// Returns all components of type <paramref name="componentType"/> in <paramref name="gameObject"/> or any of its children.
+        /// </summary>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <param name="componentType">The type of components to retrieve.</param>
         /// <param name="includeInactive">Whether components on inactive GameObjects should be included in the found set.</param>
+        /// <returns>Found components of type <paramref name="componentType"/>>.</returns>
         [PublicAPI, NotNull]
         public static Component[] GetGenericComponentsInChildren(this GameObject gameObject, Type componentType,
             bool includeInactive = false)
@@ -162,11 +167,13 @@
                 : LogFailureArray(componentType);
         }
 
-        /// <summary> Returns all components of type <typeparamref name="T"/> in the GameObject or any of its children. </summary>
-        /// <param name="gameObject"></param>
+        /// <summary>
+        /// Returns all components of type <typeparamref name="T"/> in <paramref name="gameObject"/> or any of its children.
+        /// </summary>
+        /// <param name="gameObject">The game object to check.</param>
         /// <param name="includeInactive">Whether components on inactive GameObjects should be included in the found set.</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of components to retrieve.</typeparam>
+        /// <returns>Found components.</returns>
         [PublicAPI, NotNull]
         public static T[] GetGenericComponentsInChildren<T>(this GameObject gameObject, bool includeInactive = false)
             where T : MonoBehaviour
@@ -175,12 +182,12 @@
         }
 
         /// <summary>
-        /// Returns all components of type <paramref name="componentType"/> in the GameObject or any of its parents.
+        /// Returns all components of type <paramref name="componentType"/> in <paramref name="gameObject"/> or any of its parents.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="componentType">The type of Component to retrieve.</param>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <param name="componentType">The type of components to retrieve.</param>
         /// <param name="includeInactive">Whether components on inactive GameObjects should be included in the found set.</param>
-        /// <returns></returns>
+        /// <returns>Found components of type <paramref name="componentType"/>>.</returns>
         [PublicAPI, NotNull]
         public static Component[] GetGenericComponentsInParent(this GameObject gameObject, Type componentType,
             bool includeInactive = false)
@@ -191,12 +198,12 @@
         }
 
         /// <summary>
-        /// Returns all components of type <typeparamref name="T"/> in the GameObject or any of its parents.
+        /// Returns all components of type <typeparamref name="T"/> in <paramref name="gameObject"/> or any of its parents.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">The game object to check.</param>
         /// <param name="includeInactive">Whether components on inactive GameObjects should be included in the found set.</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of components to retrieve.</typeparam>
+        /// <returns>Found components.</returns>
         [PublicAPI, NotNull]
         public static T[] GetGenericComponentsInParent<T>(this GameObject gameObject, bool includeInactive = false)
             where T : MonoBehaviour

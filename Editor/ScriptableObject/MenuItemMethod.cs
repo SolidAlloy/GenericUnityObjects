@@ -1,52 +1,59 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObject
 {
     using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// A struct that holds all variables needed to create a MenuItem method.
     /// </summary>
     [Serializable]
-    internal struct MenuItemMethod
+    internal readonly struct MenuItemMethod : IEquatable<MenuItemMethod>
     {
-        public string TypeName;
-        public string FileName;
-        public string MenuName;
-        public int Order;
-        public Type Type;
+        public readonly string TypeName;
+        public readonly string FileName;
+        public readonly string MenuName;
+        public readonly int Order;
+        public readonly Type Type;
 
-        private static EqualityComparer _comparer;
-
-        public static EqualityComparer Comparer
+        public MenuItemMethod(string typeName, string fileName, string menuName, int order, Type type)
         {
-            get
-            {
-                if (_comparer == null)
-                    _comparer = new EqualityComparer();
+            TypeName = typeName;
+            FileName = fileName;
+            MenuName = menuName;
+            Order = order;
+            Type = type;
+        }
 
-                return _comparer;
+        public override bool Equals(object obj)
+        {
+            return obj is MenuItemMethod method && this.Equals(method);
+        }
+
+        public bool Equals(MenuItemMethod p)
+        {
+            return TypeName == p.TypeName && FileName == p.FileName && MenuName == p.MenuName && Order == p.Order;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + TypeName.GetHashCode();
+                hash = hash * 23 + FileName.GetHashCode();
+                hash = hash * 23 + MenuName.GetHashCode();
+                hash = hash * 23 + Order.GetHashCode();
+                return hash;
             }
         }
 
-        public class EqualityComparer : EqualityComparer<MenuItemMethod>
+        public static bool operator ==(MenuItemMethod lhs, MenuItemMethod rhs)
         {
-            public override bool Equals(MenuItemMethod x, MenuItemMethod y)
-            {
-                return x.TypeName == y.TypeName && x.FileName == y.FileName && x.MenuName == y.MenuName && x.Order == y.Order;
-            }
+            return lhs.Equals(rhs);
+        }
 
-            public override int GetHashCode(MenuItemMethod obj)
-            {
-                unchecked
-                {
-                    int hash = 17;
-                    hash = hash * 23 + obj.TypeName.GetHashCode();
-                    hash = hash * 23 + obj.FileName.GetHashCode();
-                    hash = hash * 23 + obj.MenuName.GetHashCode();
-                    hash = hash * 23 + obj.Order.GetHashCode();
-                    return hash;
-                }
-            }
+        public static bool operator !=(MenuItemMethod lhs, MenuItemMethod rhs)
+        {
+            return ! lhs.Equals(rhs);
         }
     }
 }

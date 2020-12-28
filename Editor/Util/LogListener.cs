@@ -1,8 +1,6 @@
 namespace GenericUnityObjects.Editor
 {
-    using System;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
     using MonoBehaviour;
@@ -29,7 +27,7 @@ namespace GenericUnityObjects.Editor
                 return;
 
             string failedScriptPath = PathRegex.Match(message).Value;
-            if (failedScriptPath == string.Empty)
+            if (failedScriptPath.Length == 0)
                 return;
 
             string classSafeParentTypeName = GetClassSafeParentTypeName(message);

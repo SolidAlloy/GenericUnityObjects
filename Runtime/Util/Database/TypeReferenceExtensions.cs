@@ -5,6 +5,6 @@
     internal static class TypeReferenceExtensions
     {
         public static bool TypeIsMissing(this TypeReference typeRef) =>
-            typeRef.Type == null && typeRef.GUID == string.Empty;
+            typeRef.Type == null && typeRef.GUID.Length == 0;
     }
 }

@@ -9,6 +9,7 @@
     public abstract class BehaviourSelector : MonoBehaviour
     {
         [SerializeField] internal TypeReferenceWithBaseTypes[] TypeRefs;
+
         public abstract Type GenericBehaviourType { get; }
 
         private void Reset()

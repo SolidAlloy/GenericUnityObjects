@@ -3,17 +3,13 @@
     using System;
     using System.IO;
     using System.Linq;
-    using JetBrains.Annotations;
-    using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
-    using TypeCache = UnityEditor.TypeCache;
 
     internal static class CreatorUtil
     {
-
         /// <summary>
         /// Gets the type name for using in scripts.
         /// It looks like this: Namespace.ClassName&lt;Namespace.FirstGenericArg, Namespace.SecondGenericArg>.

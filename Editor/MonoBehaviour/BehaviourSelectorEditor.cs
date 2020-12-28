@@ -18,8 +18,7 @@
 
         private void OnEnable()
         {
-            var targetSelector = target as BehaviourSelector;
-            if (targetSelector == null)
+            if ( ! (target is BehaviourSelector targetSelector))
                 return;
 
             _targetSelector = targetSelector;

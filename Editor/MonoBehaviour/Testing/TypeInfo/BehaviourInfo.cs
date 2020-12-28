@@ -16,16 +16,4 @@
         public BehaviourInfo(Type type, string typeGUID = null)
             : base(type, typeGUID) { }
     }
-
-    internal readonly struct BehaviourInfoPair
-    {
-        public readonly BehaviourInfo OldType;
-        public readonly BehaviourInfo NewType;
-
-        public BehaviourInfoPair(BehaviourInfo oldType, BehaviourInfo newType)
-        {
-            OldType = oldType;
-            NewType = newType;
-        }
-    }
 }

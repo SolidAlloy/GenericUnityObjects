@@ -30,8 +30,8 @@
             if (oldMethods == null)
                 return;
 
-            var oldMethodsSet = new HashSet<MenuItemMethod>(PersistentStorage.MenuItemMethods, MenuItemMethod.Comparer);
-            var newMethodsSet = new HashSet<MenuItemMethod>(newMethods, MenuItemMethod.Comparer);
+            var oldMethodsSet = new HashSet<MenuItemMethod>(PersistentStorage.MenuItemMethods);
+            var newMethodsSet = new HashSet<MenuItemMethod>(newMethods);
 
             if (oldMethodsSet.SetEquals(newMethodsSet))
                 return;
@@ -54,7 +54,7 @@
         private static string AddNewMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet,
             HashSet<MenuItemMethod> newMethodsSet)
         {
-            var methodsToAdd = newMethodsSet.ExceptWith(oldMethodsSet, MenuItemMethod.Comparer);
+            var methodsToAdd = newMethodsSet.ExceptWithAndCreateNew(oldMethodsSet);
 
             if (methodsToAdd.Count == 0)
                 return classContent;
@@ -72,7 +72,7 @@
 
         private static string RemoveOldMethods(string classContent, HashSet<MenuItemMethod> oldMethodsSet, HashSet<MenuItemMethod> newMethodsSet)
         {
-            var methodsToRemove = oldMethodsSet.ExceptWith(newMethodsSet, MenuItemMethod.Comparer);
+            var methodsToRemove = oldMethodsSet.ExceptWithAndCreateNew(newMethodsSet);
 
             foreach (MenuItemMethod method in methodsToRemove)
             {
@@ -85,8 +85,7 @@
         private static string RemoveMethod(string classContent, string typeName)
         {
             var regex = new Regex($@"\[MenuItem.*?{RawNewLine}.*?{typeName}.*?{RawNewLine}{RawNewLine}");
-            classContent = regex.Replace(classContent, string.Empty, 1);
-            return classContent;
+            return regex.Replace(classContent, string.Empty, 1);
         }
 
         private static string GetClassContent()
@@ -109,11 +108,13 @@
             return emptyClass;
         }
 
-        private static string CreateMenuItemMethod(MenuItemMethod method)
+        private static string CreateMenuItemMethod(in MenuItemMethod method)
         {
-            string fileName = method.FileName == string.Empty ? $"New {method.Type.Name}" : method.FileName;
+            string fileName = method.FileName.Length == 0
+                ? $"New {method.Type.Name}"
+                : method.FileName;
 
-            string menuName = method.MenuName == string.Empty
+            string menuName = method.MenuName.Length == 0
                 ? CreatorUtil.GetShortNameWithBrackets(method.Type, method.Type.GetGenericArguments())
                 : method.MenuName;
 

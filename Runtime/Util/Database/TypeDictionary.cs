@@ -19,7 +19,7 @@
 
         [SerializeField] private TypeReference[] _values = { };
 
-        public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), new TypeReference(value, true));
+        public void Add(Type[] key, Type value) => _dict.Add(key.CastToTypeReference(), new TypeReference(value, suppressLogs: true));
 
         public bool ContainsKey(Type[] key)
         {
@@ -56,6 +56,17 @@
 
                 _dict[_keys[i]] = _values[i];
             }
+
+            TypeReferenceCollection.CollectionChanged += OnCollectionChanged;
+        }
+
+        private void OnCollectionChanged(TypeReferenceCollection oldCollection, TypeReferenceCollection newCollection)
+        {
+            if ( ! _dict.TryGetValue(oldCollection, out TypeReference value))
+                return;
+
+            _dict.Remove(oldCollection);
+            _dict.Add(newCollection, value);
         }
 
         public void OnBeforeSerialize()
@@ -78,7 +89,7 @@
     /// A TypeReference[] container that is used because TypeReference[][] cannot be serialized by Unity.
     /// </summary>
     [Serializable]
-    internal class TypeReferenceCollection
+    internal class TypeReferenceCollection : ISerializationCallbackReceiver
     {
         [SerializeField] private TypeReference[] _array;
 
@@ -96,5 +107,37 @@
 
         public static implicit operator TypeReference[](TypeReferenceCollection typeRefCollection) =>
             typeRefCollection._array;
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize()
+        {
+            TypeReference.TypeRestoredFromGUID += OnElementChanged;
+        }
+
+        public static event Action<TypeReferenceCollection, TypeReferenceCollection> CollectionChanged;
+
+        private void OnElementChanged(TypeReference typeRef)
+        {
+            var previousArray = new TypeReference[_array.Length];
+
+            for (int i = 0; i < _array.Length; i++)
+            {
+                var currentTypeRef = _array[i];
+
+                if (currentTypeRef == typeRef)
+                {
+                    previousArray[i] = new TypeReference();
+                }
+                else
+                {
+                    previousArray[i] = currentTypeRef;
+                }
+            }
+
+            var previousCollection = new TypeReferenceCollection(previousArray);
+
+            CollectionChanged?.Invoke(previousCollection, this);
+        }
     }
 }

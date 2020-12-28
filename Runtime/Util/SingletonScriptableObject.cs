@@ -21,7 +21,7 @@
     {
         private static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
 
-        private static T _instance = null;
+        private static T _instance;
 
         /// <summary> Retrieves an instance to the asset. </summary>
         public static T Instance

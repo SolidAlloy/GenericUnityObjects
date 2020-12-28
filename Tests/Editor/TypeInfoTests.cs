@@ -63,8 +63,5 @@
 
             Assert.IsFalse(firstSet.SetEquals(secondSet));
         }
-
-        private class FirstType { }
-        private class SecondType { }
     }
 }

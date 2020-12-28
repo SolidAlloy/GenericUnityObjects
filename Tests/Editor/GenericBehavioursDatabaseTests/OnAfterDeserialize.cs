@@ -6,7 +6,6 @@
     using NUnit.Framework;
     using UnityEngine;
     using Util;
-    using TypeInfo = Editor.MonoBehaviour.TypeInfo;
 
     internal partial class GenericBehavioursDatabaseTests
     {
@@ -18,7 +17,7 @@
             public void BeforeAllTests()
             {
                 _instanceField = typeof(SingletonScriptableObject<GenericBehavioursDatabase>)
-                    .GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static);
+                    .GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(_instanceField);
             }

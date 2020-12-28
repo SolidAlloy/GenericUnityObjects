@@ -36,14 +36,12 @@
                 if (assetMenuAttribute == null)
                     continue;
 
-                menuItemMethods.Add(new MenuItemMethod
-                {
-                    TypeName = type.FullName.MakeClassFriendly(),
-                    FileName = assetMenuAttribute.FileName,
-                    MenuName = assetMenuAttribute.MenuName,
-                    Order = assetMenuAttribute.Order,
-                    Type = type
-                });
+                menuItemMethods.Add(new MenuItemMethod(
+                    type.FullName.MakeClassFriendly(),
+                    assetMenuAttribute.FileName,
+                    assetMenuAttribute.MenuName,
+                    assetMenuAttribute.Order,
+                    type));
             }
 
             MenuItemsGenerator.GenerateClass(menuItemMethods.ToArray());

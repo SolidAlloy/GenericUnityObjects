@@ -11,23 +11,6 @@
         [SerializeField] private string _typeNameAndAssembly;
         [SerializeField] private string _guid;
 
-        private Type _type;
-
-        public string TypeNameAndAssembly => _typeNameAndAssembly;
-
-        public string GUID => _guid;
-
-        public Type Type => _type;
-
-        public string TypeFullName
-        {
-            get
-            {
-                int comaIndex = _typeNameAndAssembly.IndexOf(',');
-                return _typeNameAndAssembly.Substring(0, comaIndex);
-            }
-        }
-
         protected TypeInfo(string typeNameAndAssembly, string guid)
         {
             _typeNameAndAssembly = typeNameAndAssembly;
@@ -42,26 +25,55 @@
 
         protected TypeInfo(Type type, string typeGUID = null)
         {
-            _type = type;
+            Type = type;
             _typeNameAndAssembly = GetTypeNameAndAssembly(type);
             _guid = typeGUID ?? AssetSearcher.GetClassGUID(type);
         }
+
+        public string TypeNameAndAssembly => _typeNameAndAssembly;
+
+        public string GUID => _guid;
+
+        public Type Type { get; private set; }
+
+        public string TypeFullName
+        {
+            get
+            {
+                int comaIndex = _typeNameAndAssembly.IndexOf(',');
+                return _typeNameAndAssembly.Substring(0, comaIndex);
+            }
+        }
+
+        public static string GetTypeNameAndAssembly(Type type)
+        {
+            if (type == null)
+                return string.Empty;
+
+            if (type.FullName == null)
+                throw new ArgumentException($"'{type}' does not have full name.", nameof(type));
+
+            return GetTypeNameAndAssembly(type.FullName, type.Assembly.GetName().Name);
+        }
+
+        public static string GetTypeNameAndAssembly(string typeFullName, string assemblyName) =>
+            $"{typeFullName}, {assemblyName}";
 
         public bool RetrieveType(out Type type, out bool retrievedFromGUID)
         {
             retrievedFromGUID = false;
 
-            if (_type != null)
+            if (Type != null)
             {
-                type = _type;
+                type = Type;
                 return true;
             }
 
-            _type = Type.GetType(TypeNameAndAssembly);
+            Type = Type.GetType(TypeNameAndAssembly);
 
-            if (_type != null)
+            if (Type != null)
             {
-                type = _type;
+                type = Type;
                 UpdateGUIDIfNeeded();
                 return true;
             }
@@ -72,16 +84,24 @@
                 return false;
             }
 
-            _type = AssetDatabaseHelper.GetTypeFromGUID(GUID);
-            type = _type;
+            Type = AssetDatabaseHelper.GetTypeFromGUID(GUID);
+            type = Type;
             retrievedFromGUID = true;
 
-            return _type != null;
+            return Type != null;
         }
+
+        public void UpdateGUID(string newGUID) => _guid = newGUID;
+
+        public void UpdateNameAndAssembly(string newFullName, string newAssemblyName) =>
+            _typeNameAndAssembly = GetTypeNameAndAssembly(newFullName, newAssemblyName);
+
+        public void UpdateNameAndAssembly(Type newType) =>
+            _typeNameAndAssembly = GetTypeNameAndAssembly(newType);
 
         private void UpdateGUIDIfNeeded()
         {
-            string currentGUID = AssetSearcher.GetClassGUID(_type);
+            string currentGUID = AssetSearcher.GetClassGUID(Type);
             if (GUID == currentGUID)
                 return;
 
@@ -104,14 +124,6 @@
 
         private static void UpdateBehaviourInDatabase(BehaviourInfo behaviour, string newGUID) =>
             GenericBehavioursDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
-
-        public void UpdateGUID(string newGUID) => _guid = newGUID;
-
-        public void UpdateNameAndAssembly(string newFullName, string newAssemblyName) =>
-            _typeNameAndAssembly = GetTypeNameAndAssembly(newFullName, newAssemblyName);
-
-        public void UpdateNameAndAssembly(Type newType) =>
-            _typeNameAndAssembly = GetTypeNameAndAssembly(newType);
 
         public bool Equals(TypeInfo p)
         {
@@ -166,19 +178,5 @@
         }
 
         public override string ToString() => _typeNameAndAssembly;
-
-        public static string GetTypeNameAndAssembly(Type type)
-        {
-            if (type == null)
-                return string.Empty;
-
-            if (type.FullName == null)
-                throw new ArgumentException($"'{type}' does not have full name.", nameof(type));
-
-            return GetTypeNameAndAssembly(type.FullName, type.Assembly.GetName().Name);
-        }
-
-        public static string GetTypeNameAndAssembly(string typeFullName, string assemblyName) =>
-            $"{typeFullName}, {assemblyName}";
     }
 }

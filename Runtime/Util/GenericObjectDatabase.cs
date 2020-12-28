@@ -30,7 +30,7 @@
         ISerializationCallbackReceiver
     {
         private readonly Dictionary<TypeReference, TypeDictionary> _dict =
-            new Dictionary<TypeReference, TypeDictionary>(new TypeReferenceComparer());
+            new Dictionary<TypeReference, TypeDictionary>();
 
         [HideInInspector]
         [SerializeField] private TypeReference[] _keys;
@@ -89,18 +89,6 @@
             return success;
         }
 
-        private static bool TryFindExistingType(Type genericTypeWithoutArgs, Type[] genericArgs, out Type existingType)
-        {
-            var genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
-            existingType = TypeHelper.GetEmptyTypeDerivedFrom(genericType);
-
-            if (existingType == null)
-                return false;
-
-            Add(genericTypeWithoutArgs, genericArgs, existingType);
-            return true;
-        }
-
         public void OnAfterDeserialize()
         {
             int keysLength = _keys.Length;
@@ -128,6 +116,24 @@
 
             if (_dict.Count != keysLength)
                 _shouldSetDirty = true;
+
+            TypeReference.TypeRestoredFromGUID += ReAddKey;
+        }
+
+        private void ReAddKey(TypeReference typeRef)
+        {
+            var previousTypeRef = new TypeReference( (Type)null, typeRef.GUID);
+
+            if ( ! _dict.TryGetValue(previousTypeRef, out TypeDictionary typeDict))
+                return;
+
+            _dict.Remove(previousTypeRef);
+            SetDirty();
+
+            if (_dict.ContainsKey(typeRef))
+                return;
+
+            _dict[typeRef] = typeDict;
         }
 
         public void OnBeforeSerialize()
@@ -146,24 +152,36 @@
             }
         }
 
+        private static bool TryFindExistingType(Type genericTypeWithoutArgs, Type[] genericArgs, out Type existingType)
+        {
+            var genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
+            existingType = TypeHelper.GetEmptyTypeDerivedFrom(genericType);
+
+            if (existingType == null)
+                return false;
+
+            Add(genericTypeWithoutArgs, genericArgs, existingType);
+            return true;
+        }
+
         private static TypeDictionary GetAssetDict(Type genericType)
         {
             if (Instance._dict.TryGetValue(genericType, out TypeDictionary assetDict))
                 return assetDict;
 
             assetDict = new TypeDictionary();
-            Instance._dict.Add(new TypeReference(genericType, true), assetDict);
+            Instance._dict.Add(new TypeReference(genericType, suppressLogs: true), assetDict);
             SetInstanceDirty();
             return assetDict;
         }
 
         private void OnEnable()
         {
-            if (_shouldSetDirty)
-            {
-                _shouldSetDirty = false;
-                SetDirty();
-            }
+            if ( ! _shouldSetDirty)
+                return;
+
+            _shouldSetDirty = false;
+            SetDirty();
         }
 
         [Conditional("UNITY_EDITOR")]

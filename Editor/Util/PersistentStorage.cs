@@ -23,8 +23,6 @@
         [HideInInspector] [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
         [HideInInspector] [SerializeField] private bool _usageExampleTypesAreAdded;
 
-        [HideInInspector] [SerializeField] private BehaviourInfo[] _behaviourInfos = { };
-
         public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
 
         public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
@@ -35,16 +33,6 @@
             set
             {
                 Instance._menuItemMethods = value;
-                EditorUtility.SetDirty(Instance);
-            }
-        }
-
-        public static BehaviourInfo[] BehaviourInfos
-        {
-            get => Instance._behaviourInfos;
-            set
-            {
-                Instance._behaviourInfos = value;
                 EditorUtility.SetDirty(Instance);
             }
         }
@@ -71,12 +59,12 @@
             Instance._genericBehaviourType = genericType;
         }
 
-        public static (Type, string) GetGenericSODetails()
+        public static (Type genericSOType, string fileName) GetGenericSODetails()
         {
             return (Instance._genericSOType, Instance._fileName);
         }
 
-        public static (GameObject, Type) GetGenericBehaviourDetails()
+        public static (GameObject gameObject, Type genericBehaviourType) GetGenericBehaviourDetails()
         {
             return (Instance._gameObject, Instance._genericBehaviourType);
         }

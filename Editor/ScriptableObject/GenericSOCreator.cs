@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using GenericUnityObjects;
+    using JetBrains.Annotations;
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Helpers;
     using UnityEditor;
@@ -24,6 +25,7 @@
         /// </summary>
         /// <param name="genericTypeWithoutArgs">The type of <see cref="GenericScriptableObject"/> to create.</param>
         /// <param name="fileName">Name for an asset.</param>
+        [UsedImplicitly]
         protected static void CreateAsset(Type genericTypeWithoutArgs, string fileName)
         {
             Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);

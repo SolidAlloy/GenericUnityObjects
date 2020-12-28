@@ -62,7 +62,12 @@
 
         private static void AddComponentMenuAttribute(TypeBuilder typeBuilder, string componentName)
         {
-            ConstructorInfo classCtorInfo = typeof(AddComponentMenu).GetConstructor( new[] { typeof(string) });
+            ConstructorInfo classCtorInfo = typeof(AddComponentMenu).GetConstructor(
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                new[] { typeof(string) },
+                null);
+
             Assert.IsNotNull(classCtorInfo);
 
             var attributeBuilder = new CustomAttributeBuilder(classCtorInfo, new object[] { componentName });
@@ -90,7 +95,10 @@
 
             MethodInfo getTypeFromHandle = typeof(Type).GetMethod(
                 nameof(Type.GetTypeFromHandle),
-                BindingFlags.Static | BindingFlags.Public);
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly,
+                null,
+                new[] { typeof(RuntimeTypeHandle) },
+                null);
 
             Assert.IsNotNull(getTypeFromHandle);
 
