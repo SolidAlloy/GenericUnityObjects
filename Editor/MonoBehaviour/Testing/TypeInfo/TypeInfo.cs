@@ -91,6 +91,12 @@
             return Type != null;
         }
 
+        public Type RetrieveType()
+        {
+            RetrieveType(out Type type, out bool _);
+            return type;
+        }
+
         public void UpdateGUID(string newGUID) => _guid = newGUID;
 
         public void UpdateNameAndAssembly(string newFullName, string newAssemblyName) =>

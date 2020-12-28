@@ -38,6 +38,47 @@
                 if (_needsAssetDatabaseRefresh)
                     AssetDatabase.Refresh();
             }
+
+            InitializeBehavioursDatabase();
+        }
+
+        private static void InitializeBehavioursDatabase()
+        {
+            var behaviours = GenericBehavioursDatabase.Behaviours;
+            var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
+
+            foreach (BehaviourInfo behaviourInfo in behaviours)
+            {
+                GenericBehavioursDatabase.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
+
+                Type behaviourType = behaviourInfo.RetrieveType();
+
+                var concreteClassesDict = new Dictionary<Type[], Type>(concreteClasses.Length, default(TypeArrayComparer));
+
+                foreach (ConcreteClass concreteClass in concreteClasses)
+                {
+                    int argsLength = concreteClass.Arguments.Length;
+
+                    Type[] key = new Type[argsLength];
+
+                    for (int i = 0; i < argsLength; i++)
+                    {
+                        var type = concreteClass.Arguments[i].RetrieveType();
+                        Assert.IsNotNull(type);
+                        key[i] = type;
+                    }
+
+                    string assemblyPath = AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID);
+                    MonoScript script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
+                    Type value = script.GetClass();
+
+                    concreteClassesDict.Add(key, value);
+                }
+
+                dict.Add(behaviourType, concreteClassesDict);
+            }
+
+            BehavioursDatabase.Initialize(dict);
         }
 
         private static void CheckArguments()

@@ -14,7 +14,7 @@
         public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
-            CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
+            Type generatedType = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
 
             AssetDatabase.StartAssetEditing();
@@ -25,13 +25,13 @@
             string assemblyGUID = AssetDatabase.AssetPathToGUID(assemblyPath);
             Assert.IsFalse(string.IsNullOrEmpty(assemblyGUID));
 
-            GenericBehavioursDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+            GenericBehavioursDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID, generatedType);
         }
 
-        public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
+        public static Type CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
         {
             string componentName = "Scripts/" + GetComponentName(genericTypeWithoutArgs, argumentTypes);
-            AssemblyCreator.CreateConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), componentName);
+            return AssemblyCreator.CreateConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), componentName);
         }
 
         private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)

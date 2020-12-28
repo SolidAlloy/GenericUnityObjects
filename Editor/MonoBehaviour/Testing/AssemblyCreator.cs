@@ -30,7 +30,7 @@
             assemblyBuilder.Save($"{assemblyName}.dll");
         }
 
-        public static void CreateConcreteClass(string assemblyName, Type genericBehaviourWithArgs, string componentName)
+        public static Type CreateConcreteClass(string assemblyName, Type genericBehaviourWithArgs, string componentName)
         {
             AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
             ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
@@ -39,9 +39,11 @@
 
             AddComponentMenuAttribute(typeBuilder, componentName);
 
-            typeBuilder.CreateType();
+            Type type = typeBuilder.CreateType();
 
             assemblyBuilder.Save($"{assemblyName}.dll");
+
+            return type;
         }
 
         private static AssemblyBuilder GetAssemblyBuilder(string assemblyName)

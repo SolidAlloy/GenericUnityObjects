@@ -33,12 +33,12 @@
         public static void AddGenericBehaviour(BehaviourInfo genericBehaviour)
         {
             Instance.InstanceAddGenericBehaviour(genericBehaviour);
-        }
 
-        public static void Clear()
-        {
-            Instance._argumentBehavioursDict.Clear();
-            Instance._behaviourArgumentsDict.Clear();
+            /*
+            Type type = genericBehaviour.RetrieveType();
+            Assert.IsNotNull(type);
+            BehavioursDatabase.AddBehaviour(type);
+            */
         }
 
         public void InstanceAddGenericBehaviour(BehaviourInfo genericBehaviour)
@@ -48,8 +48,10 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID)
+        public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID, Type generatedType)
         {
+            // BehavioursDatabase.AddConcreteClass(genericTypeWithoutArgs, genericArgs, generatedType);
+
             var behaviour = new BehaviourInfo(genericTypeWithoutArgs);
 
             int genericArgsLength = genericArgs.Length;
@@ -61,11 +63,6 @@
             }
 
             Instance.InstanceAddConcreteClass(behaviour, arguments, assemblyGUID);
-        }
-
-        public static void AddConcreteClass(BehaviourInfo genericBehaviour, ArgumentInfo[] arguments, string assemblyGUID)
-        {
-            Instance.InstanceAddConcreteClass(genericBehaviour, arguments, assemblyGUID);
         }
 
         public void InstanceAddConcreteClass(BehaviourInfo genericBehaviour, ArgumentInfo[] arguments, string assemblyGUID)

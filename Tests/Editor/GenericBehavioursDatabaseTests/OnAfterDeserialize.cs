@@ -31,7 +31,7 @@
                 _instanceField.SetValue(null, cleanInstance);
                 GenericBehavioursDatabase.Instance.OnAfterDeserialize();
                 GenericBehavioursDatabase.AddGenericBehaviour(_behaviour);
-                GenericBehavioursDatabase.AddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
+                GenericBehavioursDatabase.Instance.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
             }
 
             private static void ReserializeDatabase()
