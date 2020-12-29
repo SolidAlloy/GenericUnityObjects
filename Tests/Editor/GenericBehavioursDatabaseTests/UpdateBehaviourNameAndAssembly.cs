@@ -3,6 +3,7 @@
     using System.Linq;
     using Editor.MonoBehaviour;
     using NUnit.Framework;
+    using Util;
 
     internal partial class GenericBehavioursDatabaseTests
     {
@@ -47,7 +48,7 @@
                 bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] behaviours);
 
                 Assert.IsTrue(success);
-                Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeInfo.GetTypeNameAndAssembly(NewName, NewAssembly)));
+                Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly)));
             }
 
             [Test]
@@ -65,7 +66,7 @@
             public void Updates_passed_behaviour_TypeNameAndAssembly()
             {
                 CallUpdateArgumentNameAndAssembly();
-                Assert.IsTrue(_behaviour.TypeNameAndAssembly == TypeInfo.GetTypeNameAndAssembly(NewName, NewAssembly));
+                Assert.IsTrue(_behaviour.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly));
             }
         }
     }

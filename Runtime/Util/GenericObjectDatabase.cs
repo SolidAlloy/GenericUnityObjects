@@ -185,12 +185,6 @@
         }
 
         [Conditional("UNITY_EDITOR")]
-        private new void SetDirty()
-        {
-            EditorUtility.SetDirty(this);
-        }
-
-        [Conditional("UNITY_EDITOR")]
         private static void SetInstanceDirty()
         {
             EditorUtility.SetDirty(Instance);

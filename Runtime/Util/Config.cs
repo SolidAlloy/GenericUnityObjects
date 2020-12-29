@@ -14,6 +14,10 @@
 
         public const string AssembliesDirPath = MainFolderPath + "/Assemblies";
 
-        public const bool Debug = true;
+        // Not const so that analyzers don't complain that the expression is always true/false.
+        public static readonly bool Debug = true;
+
+        public const int AssemblyGenerationOrder = 1;
+        public const int UnityObjectCreationOrder = 2;
     }
 }

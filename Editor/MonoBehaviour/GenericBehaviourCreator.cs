@@ -17,7 +17,7 @@
             creator.AddComponent();
         }
 
-        [DidReloadScripts]
+        [DidReloadScripts(Config.UnityObjectCreationOrder)]
         private static void OnScriptsReload()
         {
             if ( ! PersistentStorage.NeedsBehaviourCreation)
@@ -28,10 +28,8 @@
                 (GameObject gameObject, Type genericType) =
                     PersistentStorage.GetGenericBehaviourDetails();
 
-                Type concreteType = TypeHelper.GetEmptyTypeDerivedFrom(genericType);
-                Assert.IsNotNull(concreteType);
-
-                GenericObjectDatabase.Add(genericType, concreteType);
+                bool success = BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteType);
+                Assert.IsTrue(success);
                 gameObject.AddComponent(concreteType);
             }
             finally

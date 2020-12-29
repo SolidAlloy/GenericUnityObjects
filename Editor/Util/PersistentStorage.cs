@@ -27,6 +27,8 @@
 
         public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
 
+        // public static
+
         public static MenuItemMethod[] MenuItemMethods
         {
             get => Instance._menuItemMethods;

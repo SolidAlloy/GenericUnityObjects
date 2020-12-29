@@ -16,7 +16,7 @@
             [OneTimeSetUp]
             public void BeforeAllTests()
             {
-                _instanceField = typeof(SingletonScriptableObject<GenericBehavioursDatabase>)
+                _instanceField = typeof(SingletonScriptableObject<BehavioursGenerationDatabase>)
                     .GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(_instanceField);
@@ -27,35 +27,35 @@
             {
                 base.BeforeEachTest();
 
-                var cleanInstance = ScriptableObject.CreateInstance<GenericBehavioursDatabase>();
+                var cleanInstance = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
                 _instanceField.SetValue(null, cleanInstance);
-                GenericBehavioursDatabase.Instance.OnAfterDeserialize();
-                GenericBehavioursDatabase.AddGenericBehaviour(_behaviour);
-                GenericBehavioursDatabase.Instance.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
+                BehavioursGenerationDatabase.Instance.OnAfterDeserialize();
+                BehavioursGenerationDatabase.AddGenericBehaviour(_behaviour);
+                BehavioursGenerationDatabase.Instance.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
             }
 
             private static void ReserializeDatabase()
             {
-                GenericBehavioursDatabase.Instance.OnBeforeSerialize();
-                GenericBehavioursDatabase.Instance.OnAfterDeserialize();
+                BehavioursGenerationDatabase.Instance.OnBeforeSerialize();
+                BehavioursGenerationDatabase.Instance.OnAfterDeserialize();
             }
 
             public void Restores_arguments()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(GenericBehavioursDatabase.Arguments.SequenceEqual(_firstSecondArgs));
+                Assert.IsTrue(BehavioursGenerationDatabase.Arguments.SequenceEqual(_firstSecondArgs));
             }
 
             public void Restores_behaviours()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(GenericBehavioursDatabase.Behaviours.SequenceEqual(_expectedBehaviours));
+                Assert.IsTrue(BehavioursGenerationDatabase.Behaviours.SequenceEqual(_expectedBehaviours));
             }
 
             public void Restores_referenced_behaviours()
             {
                 ReserializeDatabase();
-                bool behavioursSuccess = GenericBehavioursDatabase.TryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] referencedBehaviours);
+                bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] referencedBehaviours);
                 Assert.IsTrue(behavioursSuccess);
                 Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedBehaviours));
             }
@@ -63,7 +63,7 @@
             public void Restores_concrete_classes()
             {
                 ReserializeDatabase();
-                bool concreteClassesSuccess = GenericBehavioursDatabase.TryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
+                bool concreteClassesSuccess = BehavioursGenerationDatabase.TryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
                 Assert.IsTrue(concreteClassesSuccess);
                 Assert.IsTrue(concreteClasses.Length == 1);
                 Assert.IsTrue(concreteClasses[0] == _expectedConcreteClass);

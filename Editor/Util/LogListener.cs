@@ -23,6 +23,25 @@ namespace GenericUnityObjects.Editor
 
         private static void OnLogMessageReceived(string message, string _, LogType logType)
         {
+            HandleGeneratedScriptsAndMenuItemMethods(message, logType);
+            HandleMissingRoslynFolder(message, logType);
+        }
+
+        private static void HandleMissingRoslynFolder(string message, LogType logType)
+        {
+            if (logType != LogType.Exception)
+                return;
+
+            const string pattern = @"^DirectoryNotFoundException: Could not find a part of the path '.*?\\Temp\\RoslynAnalysisRunner'\.$";
+
+            if (Regex.IsMatch(message, pattern))
+            {
+                Directory.CreateDirectory("Temp/RoslynAnalysisRunner");
+            }
+        }
+
+        private static void HandleGeneratedScriptsAndMenuItemMethods(string message, LogType logType)
+        {
             if ( ! MissingTypeError(logType, message))
                 return;
 

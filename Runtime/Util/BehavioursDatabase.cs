@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using UnityEditor;
     using UnityEngine;
     using Util;
 
@@ -22,7 +21,7 @@
         public void InitializeImpl(Dictionary<Type, Dictionary<Type[], Type>> dict)
         {
             _dict = dict;
-            EditorUtility.SetDirty(this);
+            SetDirty();
         }
 
         public void OnBeforeSerialize()
@@ -77,11 +76,39 @@
             Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
             Type[] genericArgs = genericType.GetGenericArguments();
 
-            if (_dict.TryGetValue(genericTypeWithoutArgs, out var concreteClassesDict))
-                return concreteClassesDict.TryGetValue(genericArgs, out concreteType);
+            if (_dict.TryGetValue(genericTypeWithoutArgs, out var concreteClassesDict)
+                && concreteClassesDict.TryGetValue(genericArgs, out concreteType))
+            {
+                return true;
+            }
 
-            concreteType = null;
-            return false;
+            return TryGetEmptyDerivedType(genericType, out concreteType);
+        }
+
+        public bool TryGetEmptyDerivedType(Type genericType, out Type derivedType)
+        {
+            derivedType = TypeHelper.GetEmptyTypeDerivedFrom(genericType);
+
+            if (derivedType == null)
+                return false;
+
+            AddImpl(genericType, derivedType);
+            return true;
+        }
+
+        public void AddImpl(Type genericType, Type concreteType)
+        {
+            Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+            Type[] genericArgs = genericType.GetGenericArguments();
+
+            if (_dict.TryGetValue(genericTypeWithoutArgs, out var concreteClassesDict))
+            {
+                concreteClassesDict.Add(genericArgs, concreteType);
+            }
+            else
+            {
+                _dict.Add(genericTypeWithoutArgs, new Dictionary<Type[], Type>(default(TypeArrayComparer)) { { genericArgs, concreteType } });
+            }
         }
     }
 
@@ -207,7 +234,7 @@
         public SerializableType(Type type)
         {
             _value = type;
-            _typeNameAndAssembly = TypeInfo.GetTypeNameAndAssembly(type);
+            _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(type);
             _triedSettingTypeOnce = false;
         }
 

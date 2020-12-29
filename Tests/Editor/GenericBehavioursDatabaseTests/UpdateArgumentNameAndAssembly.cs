@@ -3,6 +3,7 @@
     using System.Linq;
     using Editor.MonoBehaviour;
     using NUnit.Framework;
+    using Util;
     using TypeInfo = Editor.MonoBehaviour.TypeInfo;
 
     internal partial class GenericBehavioursDatabaseTests
@@ -67,7 +68,7 @@
             public void Updates_passed_argument_TypeNameAndAssembly()
             {
                 CallUpdateArgumentNameAndAssembly();
-                Assert.IsTrue(_firstArg.TypeNameAndAssembly == TypeInfo.GetTypeNameAndAssembly(NewName, NewAssembly));
+                Assert.IsTrue(_firstArg.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly));
             }
         }
     }

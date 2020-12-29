@@ -14,18 +14,18 @@
         public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
-            Type generatedType = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
 
-            AssetDatabase.StartAssetEditing();
-            AssetDatabase.ImportAsset(assemblyPath);
-            AssetDatabase.ImportAsset(assemblyPath + ".mdb");
-            AssetDatabase.StopAssetEditing();
+            Type generatedType = null;
+            string assemblyGUID = null;
 
-            string assemblyGUID = AssetDatabase.AssetPathToGUID(assemblyPath);
-            Assert.IsFalse(string.IsNullOrEmpty(assemblyGUID));
+            AssemblyGeneration.WithDisabledAssetDatabase(() =>
+            {
+                generatedType = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
+                assemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
+            });
 
-            GenericBehavioursDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID, generatedType);
+            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID, generatedType);
         }
 
         public static Type CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)

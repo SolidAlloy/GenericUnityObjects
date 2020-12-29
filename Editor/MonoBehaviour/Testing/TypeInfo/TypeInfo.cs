@@ -4,6 +4,7 @@
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Editor.Helpers.AssetSearch;
     using UnityEngine;
+    using Util;
 
     [Serializable]
     internal abstract class TypeInfo : IEquatable<TypeInfo>
@@ -19,14 +20,14 @@
 
         protected TypeInfo(string typeFullName, string assemblyName, string guid)
         {
-            _typeNameAndAssembly = GetTypeNameAndAssembly(typeFullName, assemblyName);
+            _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(typeFullName, assemblyName);
             _guid = guid;
         }
 
         protected TypeInfo(Type type, string typeGUID = null)
         {
             Type = type;
-            _typeNameAndAssembly = GetTypeNameAndAssembly(type);
+            _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(type);
             _guid = typeGUID ?? AssetSearcher.GetClassGUID(type);
         }
 
@@ -44,20 +45,6 @@
                 return _typeNameAndAssembly.Substring(0, comaIndex);
             }
         }
-
-        public static string GetTypeNameAndAssembly(Type type)
-        {
-            if (type == null)
-                return string.Empty;
-
-            if (type.FullName == null)
-                throw new ArgumentException($"'{type}' does not have full name.", nameof(type));
-
-            return GetTypeNameAndAssembly(type.FullName, type.Assembly.GetName().Name);
-        }
-
-        public static string GetTypeNameAndAssembly(string typeFullName, string assemblyName) =>
-            $"{typeFullName}, {assemblyName}";
 
         public bool RetrieveType(out Type type, out bool retrievedFromGUID)
         {
@@ -100,15 +87,16 @@
         public void UpdateGUID(string newGUID) => _guid = newGUID;
 
         public void UpdateNameAndAssembly(string newFullName, string newAssemblyName) =>
-            _typeNameAndAssembly = GetTypeNameAndAssembly(newFullName, newAssemblyName);
+            _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(newFullName, newAssemblyName);
 
         public void UpdateNameAndAssembly(Type newType) =>
-            _typeNameAndAssembly = GetTypeNameAndAssembly(newType);
+            _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(newType);
 
         private void UpdateGUIDIfNeeded()
         {
             string currentGUID = AssetSearcher.GetClassGUID(Type);
-            if (GUID == currentGUID)
+
+            if (GUID == currentGUID || string.IsNullOrEmpty(currentGUID))
                 return;
 
             if (this is ArgumentInfo)
@@ -126,10 +114,10 @@
         }
 
         private static void UpdateArgumentInDatabase(ArgumentInfo argument, string newGUID) =>
-            GenericBehavioursDatabase.UpdateArgumentGUID(ref argument, newGUID);
+            BehavioursGenerationDatabase.UpdateArgumentGUID(ref argument, newGUID);
 
         private static void UpdateBehaviourInDatabase(BehaviourInfo behaviour, string newGUID) =>
-            GenericBehavioursDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
+            BehavioursGenerationDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
 
         public bool Equals(TypeInfo p)
         {

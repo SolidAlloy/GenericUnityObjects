@@ -8,7 +8,7 @@
     using Util;
     using Debug = UnityEngine.Debug;
 
-    internal class GenericBehavioursDatabase : SingletonScriptableObject<GenericBehavioursDatabase>, ISerializationCallbackReceiver
+    internal class BehavioursGenerationDatabase : SingletonScriptableObject<BehavioursGenerationDatabase>, ISerializationCallbackReceiver
     {
         private Dictionary<ArgumentInfo, List<BehaviourInfo>> _argumentBehavioursDict;
         private Dictionary<BehaviourInfo, List<ConcreteClass>> _behaviourArgumentsDict;
@@ -33,12 +33,6 @@
         public static void AddGenericBehaviour(BehaviourInfo genericBehaviour)
         {
             Instance.InstanceAddGenericBehaviour(genericBehaviour);
-
-            /*
-            Type type = genericBehaviour.RetrieveType();
-            Assert.IsNotNull(type);
-            BehavioursDatabase.AddBehaviour(type);
-            */
         }
 
         public void InstanceAddGenericBehaviour(BehaviourInfo genericBehaviour)
@@ -50,8 +44,6 @@
 
         public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID, Type generatedType)
         {
-            // BehavioursDatabase.AddConcreteClass(genericTypeWithoutArgs, genericArgs, generatedType);
-
             var behaviour = new BehaviourInfo(genericTypeWithoutArgs);
 
             int genericArgsLength = genericArgs.Length;

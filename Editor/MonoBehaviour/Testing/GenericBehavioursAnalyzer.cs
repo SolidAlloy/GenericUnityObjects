@@ -16,40 +16,32 @@
     {
         private static bool _needsAssetDatabaseRefresh;
 
-        [DidReloadScripts]
+        [DidReloadScripts(Config.AssemblyGenerationOrder)]
         private static void OnScriptsReload()
         {
-            try
+            _needsAssetDatabaseRefresh = false;
+
+            AssemblyGeneration.WithDisabledAssetDatabase(() =>
             {
-                AssetDatabase.DisallowAutoRefresh();
-                AssetDatabase.StartAssetEditing();
-
-                _needsAssetDatabaseRefresh = false;
                 Directory.CreateDirectory(Config.AssembliesDirPath);
-
                 CheckArguments();
                 CheckBehaviours();
-            }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
-                AssetDatabase.AllowAutoRefresh();
-
-                if (_needsAssetDatabaseRefresh)
-                    AssetDatabase.Refresh();
-            }
+            });
 
             InitializeBehavioursDatabase();
+
+            if (_needsAssetDatabaseRefresh)
+                AssetDatabase.Refresh();
         }
 
         private static void InitializeBehavioursDatabase()
         {
-            var behaviours = GenericBehavioursDatabase.Behaviours;
+            var behaviours = BehavioursGenerationDatabase.Behaviours;
             var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
 
             foreach (BehaviourInfo behaviourInfo in behaviours)
             {
-                GenericBehavioursDatabase.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
+                BehavioursGenerationDatabase.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
 
                 Type behaviourType = behaviourInfo.RetrieveType();
 
@@ -83,7 +75,7 @@
 
         private static void CheckArguments()
         {
-            foreach (ArgumentInfo argument in GenericBehavioursDatabase.Arguments)
+            foreach (ArgumentInfo argument in BehavioursGenerationDatabase.Arguments)
             {
                 if (argument.RetrieveType(out Type type, out bool retrievedFromGUID))
                 {
@@ -94,14 +86,14 @@
                 }
                 else
                 {
-                    GenericBehavioursDatabase.RemoveArgument(argument, RemoveAssembly);
+                    BehavioursGenerationDatabase.RemoveArgument(argument, RemoveAssembly);
                 }
             }
         }
 
         private static void CheckBehaviours()
         {
-            var oldBehaviours = GenericBehavioursDatabase.Behaviours;
+            var oldBehaviours = BehavioursGenerationDatabase.Behaviours;
             var newBehaviours = TypeCache.GetTypesDerivedFrom<MonoBehaviour>()
                 .Where(type => type.IsGenericType && ! type.IsAbstract)
                 .Select(type => new BehaviourInfo(type))
@@ -182,22 +174,22 @@
         private static void UpdateBehaviourGUID(BehaviourInfo behaviour, string newGUID)
         {
             DebugUtil.Log($"Behaviour GUID updated: {behaviour.GUID} => {newGUID}");
-            GenericBehavioursDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
+            BehavioursGenerationDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
         }
 
         private static void RemoveBehaviour(BehaviourInfo behaviour)
         {
             DebugUtil.Log($"Behaviour removed: {behaviour.TypeFullName}");
-            GenericBehavioursDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
+            BehavioursGenerationDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
         }
 
         private static void UpdateArgumentTypeName(ArgumentInfo argument, Type newType)
         {
             // Retrieve the array of generic arguments where the old argument was listed
-            bool behavioursSuccess = GenericBehavioursDatabase.TryGetReferencedBehaviours(argument, out BehaviourInfo[] referencedBehaviours);
+            bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedBehaviours(argument, out BehaviourInfo[] referencedBehaviours);
 
             // update argument typename in database before updating assemblies and trying to find behaviour because behaviour might also need to be updated, and the argument should already be new
-            GenericBehavioursDatabase.UpdateArgumentNameAndAssembly(ref argument, newType);
+            BehavioursGenerationDatabase.UpdateArgumentNameAndAssembly(ref argument, newType);
 
             Assert.IsTrue(behavioursSuccess);
 
@@ -215,11 +207,11 @@
                 }
                 else
                 {
-                    GenericBehavioursDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
+                    BehavioursGenerationDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
                     continue; // concrete classes are already removed, no need to iterate through them.
                 }
 
-                bool concreteClassesSuccess = GenericBehavioursDatabase.TryGetConcreteClassesByArgument(behaviour, argument, out ConcreteClass[] concreteClasses);
+                bool concreteClassesSuccess = BehavioursGenerationDatabase.TryGetConcreteClassesByArgument(behaviour, argument, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(concreteClassesSuccess);
 
@@ -234,12 +226,12 @@
         {
             DebugUtil.Log($"Behaviour typename updated: {behaviour.TypeFullName} => {newType.FullName}");
 
-            bool success = GenericBehavioursDatabase.TryGetConcreteClasses(behaviour, out ConcreteClass[] concreteClasses);
+            bool success = BehavioursGenerationDatabase.TryGetConcreteClasses(behaviour, out ConcreteClass[] concreteClasses);
 
             Assert.IsTrue(success);
 
             // Update database before operating on assemblies
-            GenericBehavioursDatabase.UpdateBehaviourNameAndAssembly(ref behaviour, newType);
+            BehavioursGenerationDatabase.UpdateBehaviourNameAndAssembly(ref behaviour, newType);
 
             // update selector assembly
             UpdateSelectorAssembly(behaviour.AssemblyGUID, newType);
@@ -281,14 +273,10 @@
             CreateSelectorAssembly(behaviourType, assemblyName);
 
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
-
-            AssetDatabase.ImportAsset(assemblyPath);
-            AssetDatabase.ImportAsset(assemblyPath + ".mdb");
+            behaviour.AssemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
             _needsAssetDatabaseRefresh = true;
 
-            behaviour.AssemblyGUID = AssetDatabase.AssetPathToGUID(assemblyPath);
-
-            GenericBehavioursDatabase.AddGenericBehaviour(behaviour);
+            BehavioursGenerationDatabase.AddGenericBehaviour(behaviour);
         }
 
         private static void RemoveAssembly(string assemblyGUID)
@@ -330,7 +318,7 @@
                 }
                 else
                 {
-                    GenericBehavioursDatabase.RemoveArgument(argument, RemoveAssembly);
+                    BehavioursGenerationDatabase.RemoveArgument(argument, RemoveAssembly);
 
                     // Since one of the arguments was not found, the assembly associated with the concrete class
                     // already has been removed, and there is no need to try updating it.

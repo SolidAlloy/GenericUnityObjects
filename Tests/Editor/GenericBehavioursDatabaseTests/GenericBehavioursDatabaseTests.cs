@@ -8,7 +8,7 @@
     {
         private const string AssemblyGUID = "testAssemblyGUID";
 
-        private static GenericBehavioursDatabase _database;
+        private static BehavioursGenerationDatabase _database;
         private static BehaviourInfo _behaviour;
         private static ArgumentInfo _firstArg;
         private static ArgumentInfo _secondArg;
@@ -19,7 +19,7 @@
         [SetUp]
         public virtual void BeforeEachTest()
         {
-            _database = ScriptableObject.CreateInstance<GenericBehavioursDatabase>();
+            _database = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
             _database.OnAfterDeserialize();
 
             _behaviour = new BehaviourInfo("genericBehaviourName", "genericBehaviourGUID");

@@ -1,10 +1,11 @@
 ﻿namespace GenericUnityObjects.Util
 {
+    using System.Diagnostics;
     using System.IO;
     using JetBrains.Annotations;
     using UnityEngine;
     using UnityEngine.Assertions;
-
+    using Debug = UnityEngine.Debug;
 #if UNITY_EDITOR
     using UnityEditor;
 #else
@@ -76,6 +77,12 @@
             }
 
             return instance;
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        protected new void SetDirty()
+        {
+            EditorUtility.SetDirty(this);
         }
     }
 }
