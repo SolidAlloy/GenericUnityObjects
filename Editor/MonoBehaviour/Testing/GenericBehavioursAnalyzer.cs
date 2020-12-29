@@ -4,12 +4,12 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using NUnit.Framework;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
+    using UnityEngine.Assertions;
     using Util;
 
     internal static class GenericBehavioursAnalyzer
@@ -62,7 +62,7 @@
 
                     string assemblyPath = AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID);
                     MonoScript script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
-                    Type value = script.GetClass();
+                    Type value = script.GetClass(); // TODO: seems that AssetDatabase.LoadAssetAtPath doesn't work on editor launch
 
                     concreteClassesDict.Add(key, value);
                 }

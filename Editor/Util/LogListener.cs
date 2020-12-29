@@ -4,10 +4,10 @@ namespace GenericUnityObjects.Editor
     using System.Reflection;
     using System.Text.RegularExpressions;
     using MonoBehaviour;
-    using NUnit.Framework;
     using ScriptableObject;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Assertions;
     using Util;
 
     [InitializeOnLoad]
@@ -75,7 +75,7 @@ namespace GenericUnityObjects.Editor
         private static string GetClassSafeParentTypeName(string message)
         {
             string parentTypeName = ParentTypeRegex.Match(message).Value;
-            Assert.IsNotEmpty(parentTypeName);
+            Assert.IsFalse(parentTypeName.Length == 0);
 
             int genericArgsCount = parentTypeName.IndexOf('>') - parentTypeName.IndexOf('<');
 
@@ -104,7 +104,7 @@ namespace GenericUnityObjects.Editor
         private static void RemoveMenuItemMethod(string message, string parentTypeName)
         {
             string namespaceName = NamespaceRegex.Match(message).Value;
-            Assert.IsNotEmpty(namespaceName);
+            Assert.IsFalse(namespaceName.Length == 0);
 
             string fullTypeName = $"{namespaceName.Replace('.', '_')}_{parentTypeName}";
             MenuItemsGenerator.RemoveMethod(fullTypeName);
