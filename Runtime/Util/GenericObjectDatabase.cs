@@ -184,10 +184,11 @@
             SetDirty();
         }
 
-        [Conditional("UNITY_EDITOR")]
         private static void SetInstanceDirty()
         {
+#if UNITY_EDITOR
             EditorUtility.SetDirty(Instance);
+#endif
         }
     }
 }

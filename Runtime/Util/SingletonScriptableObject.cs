@@ -79,10 +79,11 @@
             return instance;
         }
 
-        [Conditional("UNITY_EDITOR")]
         protected new void SetDirty()
         {
+#if UNITY_EDITOR
             EditorUtility.SetDirty(this);
+#endif
         }
     }
 }
