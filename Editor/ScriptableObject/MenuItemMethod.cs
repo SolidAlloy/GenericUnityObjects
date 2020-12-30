@@ -6,13 +6,14 @@
     /// A struct that holds all variables needed to create a MenuItem method.
     /// </summary>
     [Serializable]
-    internal readonly struct MenuItemMethod : IEquatable<MenuItemMethod>
+    internal struct MenuItemMethod : IEquatable<MenuItemMethod>
     {
-        public readonly string TypeName;
-        public readonly string FileName;
-        public readonly string MenuName;
-        public readonly int Order;
         public readonly Type Type;
+
+        public string TypeName;
+        public string FileName;
+        public string MenuName;
+        public int Order;
 
         public MenuItemMethod(string typeName, string fileName, string menuName, int order, Type type)
         {
