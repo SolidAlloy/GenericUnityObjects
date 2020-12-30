@@ -8,7 +8,7 @@
     using Util;
     using Debug = UnityEngine.Debug;
 
-    internal class BehavioursGenerationDatabase : SingletonScriptableObject<BehavioursGenerationDatabase>, ISerializationCallbackReceiver
+    internal class BehavioursGenerationDatabase : EditorOnlySingletonSO<BehavioursGenerationDatabase>, ISerializationCallbackReceiver, ICanBeInitialized
     {
         private Dictionary<ArgumentInfo, List<BehaviourInfo>> _argumentBehavioursDict;
         private Dictionary<BehaviourInfo, List<ConcreteClass>> _behaviourArgumentsDict;
@@ -299,9 +299,19 @@
             InitializeBehaviourArgumentsDict();
         }
 
+        public void Initialize()
+        {
+            if (_genericArgumentKeys != null)
+                throw new InvalidOperationException("The asset is already initialized.");
+
+            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<BehaviourInfo>>();
+            _argumentsPool = new Pool<ArgumentInfo>();
+            _behaviourArgumentsDict = new Dictionary<BehaviourInfo, List<ConcreteClass>>();
+            _behavioursPool = new Pool<BehaviourInfo>();
+        }
+
         private void InitializeArgumentBehavioursDict()
         {
-            // If it is a runtime-created asset and OnBeforeSerialize has never been called for it yet.
             if (_genericArgumentKeys == null)
             {
                 _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<BehaviourInfo>>();
@@ -342,14 +352,6 @@
 
         private void InitializeBehaviourArgumentsDict()
         {
-            // If it is a runtime-created asset and OnBeforeSerialize has never been called for it yet.
-            if (_genericBehaviourKeys == null)
-            {
-                _behaviourArgumentsDict = new Dictionary<BehaviourInfo, List<ConcreteClass>>();
-                _behavioursPool = new Pool<BehaviourInfo>();
-                return;
-            }
-
             int keysLength = _genericBehaviourKeys.Length;
             int valuesLength = _genericArgumentValues.Length;
 

@@ -3,9 +3,9 @@
     using System.Linq;
     using System.Reflection;
     using Editor.MonoBehaviour;
+    using Editor.Util;
     using NUnit.Framework;
     using UnityEngine;
-    using Util;
 
     internal partial class GenericBehavioursDatabaseTests
     {
@@ -16,7 +16,7 @@
             [OneTimeSetUp]
             public void BeforeAllTests()
             {
-                _instanceField = typeof(SingletonScriptableObject<BehavioursGenerationDatabase>)
+                _instanceField = typeof(EditorOnlySingletonSO<BehavioursGenerationDatabase>)
                     .GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(_instanceField);
@@ -29,7 +29,7 @@
 
                 var cleanInstance = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
                 _instanceField.SetValue(null, cleanInstance);
-                BehavioursGenerationDatabase.Instance.OnAfterDeserialize();
+                BehavioursGenerationDatabase.Instance.Initialize();
                 BehavioursGenerationDatabase.AddGenericBehaviour(_behaviour);
                 BehavioursGenerationDatabase.Instance.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
             }
@@ -40,18 +40,21 @@
                 BehavioursGenerationDatabase.Instance.OnAfterDeserialize();
             }
 
+            [Test]
             public void Restores_arguments()
             {
                 ReserializeDatabase();
                 Assert.IsTrue(BehavioursGenerationDatabase.Arguments.SequenceEqual(_firstSecondArgs));
             }
 
+            [Test]
             public void Restores_behaviours()
             {
                 ReserializeDatabase();
                 Assert.IsTrue(BehavioursGenerationDatabase.Behaviours.SequenceEqual(_expectedBehaviours));
             }
 
+            [Test]
             public void Restores_referenced_behaviours()
             {
                 ReserializeDatabase();
@@ -60,6 +63,7 @@
                 Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedBehaviours));
             }
 
+            [Test]
             public void Restores_concrete_classes()
             {
                 ReserializeDatabase();

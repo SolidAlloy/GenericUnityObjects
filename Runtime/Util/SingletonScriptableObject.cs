@@ -1,15 +1,12 @@
 ﻿namespace GenericUnityObjects.Util
 {
-    using System.Diagnostics;
     using System.IO;
     using JetBrains.Annotations;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using Debug = UnityEngine.Debug;
+
 #if UNITY_EDITOR
     using UnityEditor;
-#else
-    using System.Linq;
 #endif
 
     /// <summary>
@@ -18,7 +15,7 @@
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
     internal abstract class SingletonScriptableObject<T> : ScriptableObject
-        where T : SingletonScriptableObject<T>, ISerializationCallbackReceiver
+        where T : SingletonScriptableObject<T>
     {
         private static readonly string AssetPath = Config.ResourcesPath + '/' + typeof(T).Name + ".asset";
 
@@ -40,20 +37,23 @@
                     return _instance;
                 }
 
-                _instance = CreateInstance<T>();
-                Assert.IsNotNull(_instance);
-
-#if UNITY_EDITOR
-                Debug.Log($"The asset of type {typeof(T)} was created.");
-                Directory.CreateDirectory(Config.ResourcesPath);
-                AssetDatabase.CreateAsset(_instance, AssetPath);
-                _instance.OnAfterDeserialize();
-                EditorUtility.SetDirty(_instance);
-#else
-                Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
-#endif
+                _instance = CreateAsset();
                 return _instance;
             }
+        }
+
+        private static T CreateAsset()
+        {
+            var instance = CreateInstance<T>();
+#if UNITY_EDITOR
+            DebugUtil.Log($"The asset of type {typeof(T)} was created.");
+            Directory.CreateDirectory(Config.ResourcesPath);
+            AssetDatabase.CreateAsset(instance, AssetPath);
+            EditorUtility.SetDirty(instance);
+#else
+            Debug.Log($"The asset of type {typeof(T)} was not created. Please go to editor and create it.");
+#endif
+            return instance;
         }
 
         [CanBeNull]
@@ -66,13 +66,13 @@
 #if UNITY_EDITOR
                 instance = AssetDatabase.LoadAssetAtPath<T>(AssetPath);
 #else
-                instance = Resources.FindObjectsOfTypeAll<T>().FirstOrDefault();
+                instance = Resources.Load<T>(typeof(T).Name);
 #endif
             }
             catch (UnityException)
             {
-                Debug.LogError("GenericScriptableObject.CreateInstance() cannot be called in the field " +
-                               "initializer. Please initialize GenericScriptableObjects in Awake or Start.");
+                Debug.LogError($"{nameof(GenericScriptableObject)}.{nameof(GenericScriptableObject.CreateInstance)}()" +
+                               " cannot be called in the field initializer. Please initialize GenericScriptableObjects in Awake or Start.");
                 throw;
             }
 

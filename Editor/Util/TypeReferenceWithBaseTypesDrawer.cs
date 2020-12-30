@@ -1,14 +1,14 @@
-﻿namespace GenericUnityObjects.Editor
+﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
     using System.Collections.Generic;
+    using GenericUnityObjects.Util;
     using TypeReferences;
     using TypeReferences.Editor.Drawers;
     using TypeReferences.Editor.Util;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
-    using Util;
     using TypeCache = TypeReferences.Editor.Util.TypeCache;
 
     [CustomPropertyDrawer(typeof(TypeReferenceWithBaseTypes))]

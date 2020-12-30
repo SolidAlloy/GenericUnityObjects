@@ -1,12 +1,12 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System.Linq;
+    using GenericUnityObjects.Util;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
-    using Util;
 
     [CustomEditor(typeof(BehaviourSelector), true)]
     internal class BehaviourSelectorEditor : Editor

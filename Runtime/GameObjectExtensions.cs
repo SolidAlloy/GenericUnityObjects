@@ -11,6 +11,15 @@
     /// </summary>
     public static class GameObjectExtensions
     {
+        private static bool TryGetConcreteType(Type genericTypeWithArgs, out Type concreteType)
+        {
+            if (BehavioursDatabase.TryGetConcreteType(genericTypeWithArgs, out concreteType))
+                return true;
+
+            concreteType = BehaviourCache.GetClass(genericTypeWithArgs);
+            return concreteType != null;
+        }
+
         /// <summary>
         /// Adds a component class of the generic type <paramref name="componentType"/> to <paramref name="gameObject"/>.
         /// </summary>
@@ -20,7 +29,7 @@
         [PublicAPI, CanBeNull]
         public static Component AddGenericComponent(this GameObject gameObject, Type componentType)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.AddComponent(concreteType)
                 : LogFailure(componentType);
         }
@@ -48,7 +57,7 @@
         [PublicAPI, CanBeNull]
         public static Component GetGenericComponent(this GameObject gameObject, Type componentType)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.GetComponent(concreteType)
                 : LogFailure(componentType);
         }
@@ -79,7 +88,7 @@
         public static Component GetGenericComponentInChildren(this GameObject gameObject, Type componentType,
             bool includeInactive = false)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.GetComponentInChildren(concreteType, includeInactive)
                 : LogFailure(componentType);
         }
@@ -109,7 +118,7 @@
         [PublicAPI, CanBeNull]
         public static Component GetGenericComponentInParent(this GameObject gameObject, Type componentType, bool includeInactive = false)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.GetComponentInParent(concreteType, includeInactive)
                 : LogFailure(componentType);
         }
@@ -135,7 +144,7 @@
         [PublicAPI, NotNull]
         public static Component[] GetGenericComponents(this GameObject gameObject, Type componentType)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.GetComponents(concreteType)
                 : LogFailureArray(componentType);
         }
@@ -162,7 +171,7 @@
         public static Component[] GetGenericComponentsInChildren(this GameObject gameObject, Type componentType,
             bool includeInactive = false)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.GetComponentsInChildren(concreteType, includeInactive)
                 : LogFailureArray(componentType);
         }
@@ -192,7 +201,7 @@
         public static Component[] GetGenericComponentsInParent(this GameObject gameObject, Type componentType,
             bool includeInactive = false)
         {
-            return GenericObjectDatabase.TryGetValue(componentType, out Type concreteType)
+            return TryGetConcreteType(componentType, out Type concreteType)
                 ? gameObject.GetComponentsInParent(concreteType, includeInactive)
                 : LogFailureArray(componentType);
         }
@@ -214,7 +223,8 @@
         private static Component LogFailure(Type componentType)
         {
             Debug.LogWarning($"There is no {componentType.GetGenericTypeDefinition()} derivative with type parameters " +
-                             $"{string.Join(", ", componentType.GetGenericArguments().Select(typeParam => typeParam.Name))}. " +
+                             $"{string.Join(", ", componentType.GetGenericArguments().Select(typeParam => typeParam.Name))} " +
+                             "and a type cannot be created dynamically in an IL2CPP build. " +
                              "Please add a component with such type parameters in inspector once to be able to use it in code.");
 
             return null;

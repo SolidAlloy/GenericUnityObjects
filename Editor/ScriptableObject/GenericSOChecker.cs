@@ -8,6 +8,7 @@
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
+    using Util;
 
     /// <summary>
     /// This class verifies that the GenericScriptableObject scripts are named appropriately and regenerates the

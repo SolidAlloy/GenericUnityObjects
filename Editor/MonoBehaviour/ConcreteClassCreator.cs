@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using GenericUnityObjects.Util;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
@@ -19,7 +20,7 @@
             Type generatedType = null;
             string assemblyGUID = null;
 
-            AssemblyGeneration.WithDisabledAssetDatabase(() =>
+            CreatorUtil.WithDisabledAssetDatabase(() =>
             {
                 generatedType = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
                 assemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);

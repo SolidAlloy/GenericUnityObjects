@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using GenericUnityObjects.Util;
+    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
@@ -21,7 +23,7 @@
         {
             _needsAssetDatabaseRefresh = false;
 
-            AssemblyGeneration.WithDisabledAssetDatabase(() =>
+            CreatorUtil.WithDisabledAssetDatabase(() =>
             {
                 Directory.CreateDirectory(Config.AssembliesDirPath);
                 CheckArguments();
@@ -61,8 +63,11 @@
                     }
 
                     string assemblyPath = AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID);
-                    MonoScript script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
-                    Type value = script.GetClass(); // TODO: seems that AssetDatabase.LoadAssetAtPath doesn't work on editor launch
+                    var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
+
+                    // There was once NullReferenceReference here because Unity lost a MonoScript asset connected to
+                    // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
+                    Type value = script.GetClass();
 
                     concreteClassesDict.Add(key, value);
                 }
@@ -294,6 +299,8 @@
                 return;
 
             UpdateConcreteClassAssembly(behaviourType, argumentTypes, concreteClass);
+            LogHelper.RemoveLogEntriesByMode(LogModes.EditorErrors);
+            LogHelper.RemoveLogEntriesByMode(LogModes.UserAndEditorWarnings);
         }
 
         private static bool GetArgumentTypes(ConcreteClass concreteClass, out Type[] argumentTypes)

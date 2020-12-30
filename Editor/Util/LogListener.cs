@@ -1,14 +1,12 @@
-namespace GenericUnityObjects.Editor
+namespace GenericUnityObjects.Editor.Util
 {
     using System.IO;
-    using System.Reflection;
     using System.Text.RegularExpressions;
-    using MonoBehaviour;
+    using GenericUnityObjects.Util;
     using ScriptableObject;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
-    using Util;
 
     [InitializeOnLoad]
     internal static class LogListener
@@ -108,28 +106,6 @@ namespace GenericUnityObjects.Editor
 
             string fullTypeName = $"{namespaceName.Replace('.', '_')}_{parentTypeName}";
             MenuItemsGenerator.RemoveMethod(fullTypeName);
-        }
-
-        private static void ClearConsoleOnConcreteClass(string message, LogType logType)
-        {
-            if (logType != LogType.Error)
-                return;
-
-            if (message ==
-                $"'{AssemblyCreator.ConcreteClassName}' is missing the class attribute 'ExtensionOfNativeClass'!")
-            {
-                RemoveLogsByMode(2); // Removes "'{AssemblyCreator.ConcreteClassName}' is missing the class attribute 'ExtensionOfNativeClass'!"
-                RemoveLogsByMode(512); // Removes "GameObject (named 'Test Object') references runtime script in scene file. Fixing!"
-            }
-        }
-
-        private static void RemoveLogsByMode(int mode)
-        {
-            var assembly = Assembly.GetAssembly(typeof(Editor));
-            var type = assembly.GetType("UnityEditor.LogEntry");
-            var method = type.GetMethod("RemoveLogEntriesByMode", BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.IsNotNull(method);
-            method.Invoke(new object(), new object[] { mode });
         }
     }
 }

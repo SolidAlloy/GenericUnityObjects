@@ -1,18 +1,16 @@
-﻿namespace GenericUnityObjects.Editor
+﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
-    using MonoBehaviour;
     using ScriptableObject;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
-    using Util;
 
     /// <summary>
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
     /// creation, but also for MenuItem methods creation and Usage Example installation.
     /// </summary>
-    internal class PersistentStorage : SingletonScriptableObject<PersistentStorage>, ISerializationCallbackReceiver
+    internal class PersistentStorage : EditorOnlySingletonSO<PersistentStorage>, ICanBeInitialized
     {
         [HideInInspector] [SerializeField] private TypeReference _genericSOType;
         [HideInInspector] [SerializeField] private string _fileName;
@@ -26,8 +24,6 @@
         public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
 
         public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
-
-        // public static
 
         public static MenuItemMethod[] MenuItemMethods
         {
@@ -79,8 +75,6 @@
             Instance._genericBehaviourType = null;
         }
 
-        public void OnBeforeSerialize() { }
-
-        public void OnAfterDeserialize() { }
+        public void Initialize() { }
     }
 }

@@ -5,9 +5,9 @@
     using System.Globalization;
     using System.Reflection;
     using System.Reflection.Emit;
+    using GenericUnityObjects.Util;
     using UnityEngine;
     using UnityEngine.Assertions;
-    using Util;
 
     public static class AssemblyCreator
     {

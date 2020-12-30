@@ -1,46 +1,19 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
-    using System;
     using System.IO;
     using System.Text;
     using UnityEditor;
 
     internal static class AssemblyGeneration
     {
-        private static GUID GetGUID()
-        {
-            GUID newGUID;
-
-            do
-            {
-                newGUID = GUID.Generate();
-            }
-            while ( ! string.IsNullOrEmpty(AssetDatabase.GUIDToAssetPath(newGUID.ToString())));
-
-            return newGUID;
-        }
-
-        public static void WithDisabledAssetDatabase(Action doAction)
-        {
-            try
-            {
-                AssetDatabase.DisallowAutoRefresh();
-                AssetDatabase.StartAssetEditing();
-
-                doAction();
-            }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
-                AssetDatabase.AllowAutoRefresh();
-            }
-        }
-
         public static string ImportAssemblyAsset(string assemblyPath)
         {
-            string assemblyGUID = GetGUID().ToString();
+            string assemblyGUID = GetUniqueGUID();
             string metaContent = GetMetaFileContent(assemblyGUID);
 
+            // Starting from Unity 2019, .meta files are hidden and their direct editing via File.WriteAllText can
+            // raise exceptions. Operating on a file through FileStream is safer and allows to be sure the file will be
+            // edited without issues.
             using (var fs = new FileStream($"{assemblyPath}.meta", FileMode.Create))
             {
                 using (TextWriter tw = new StreamWriter(fs, Encoding.UTF8, 1024, true))
@@ -55,6 +28,19 @@
             AssetDatabase.ImportAsset($"{assemblyPath}.mdb");
 
             return assemblyGUID;
+        }
+
+        private static string GetUniqueGUID()
+        {
+            GUID newGUID;
+
+            do
+            {
+                newGUID = GUID.Generate();
+            }
+            while ( ! string.IsNullOrEmpty(AssetDatabase.GUIDToAssetPath(newGUID.ToString())));
+
+            return newGUID.ToString();
         }
 
         private static string GetMetaFileContent(string guid)

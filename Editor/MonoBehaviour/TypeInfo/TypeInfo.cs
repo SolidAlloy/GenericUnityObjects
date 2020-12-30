@@ -1,10 +1,10 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System;
+    using GenericUnityObjects.Util;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Editor.Helpers.AssetSearch;
     using UnityEngine;
-    using Util;
 
     [Serializable]
     internal abstract class TypeInfo : IEquatable<TypeInfo>

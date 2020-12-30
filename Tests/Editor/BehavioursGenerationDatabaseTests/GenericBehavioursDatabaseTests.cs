@@ -20,7 +20,7 @@
         public virtual void BeforeEachTest()
         {
             _database = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
-            _database.OnAfterDeserialize();
+            _database.Initialize();
 
             _behaviour = new BehaviourInfo("genericBehaviourName", "genericBehaviourGUID");
             _firstArg = new ArgumentInfo("firstArgumentName", "firstArgumentGUID");

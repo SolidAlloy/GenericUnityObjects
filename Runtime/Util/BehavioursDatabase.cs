@@ -1,10 +1,9 @@
-﻿namespace GenericUnityObjects.Editor.MonoBehaviour
+﻿namespace GenericUnityObjects.Util
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
-    using Util;
 
     internal class BehavioursDatabase : SingletonScriptableObject<BehavioursDatabase>, ISerializationCallbackReceiver
     {

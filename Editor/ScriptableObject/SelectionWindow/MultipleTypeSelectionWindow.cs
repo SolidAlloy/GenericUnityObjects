@@ -2,12 +2,12 @@
 {
     using System;
     using System.Linq;
+    using GenericUnityObjects.Util;
     using SolidUtilities.Editor.Extensions;
     using SolidUtilities.Editor.Helpers;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
-    using Util;
 
     /// <summary>
     /// A window that has as many TypeReference fields as needed for the asset creation. The user has to choose all

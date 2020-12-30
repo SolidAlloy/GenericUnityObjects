@@ -7,6 +7,7 @@
         public const string ResourcesPath = MainFolderPath + "/Resources";
         public const string GeneratedTypesPath = MainFolderPath + "/GeneratedTypes";
         public const string MenuItemsPath = ResourcesPath + "/Editor/MenuItems.cs";
+        public const string EditorResources = MainFolderPath + "/EditorResources";
 
         public const string NewLine = "\r\n";
         public const string RawNewLine = @"\r\n";

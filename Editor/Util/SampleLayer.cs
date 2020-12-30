@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.Editor
+﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
     using JetBrains.Annotations;
@@ -14,8 +14,8 @@
         {
             public static bool UsageExampleTypesAreAdded
             {
-                get => Editor.PersistentStorage.UsageExampleTypesAreAdded;
-                set => Editor.PersistentStorage.UsageExampleTypesAreAdded = value;
+                get => Util.PersistentStorage.UsageExampleTypesAreAdded;
+                set => Util.PersistentStorage.UsageExampleTypesAreAdded = value;
             }
         }
 
@@ -23,10 +23,10 @@
         public static class GenericObjectDatabase
         {
             public static bool ContainsKey(Type genericType, Type[] key) =>
-                Util.GenericObjectDatabase.ContainsKey(genericType, key);
+                GenericUnityObjects.Util.GenericObjectDatabase.ContainsKey(genericType, key);
 
             public static void Add(Type genericTypeWithoutArgs, Type[] key, Type value) =>
-                Util.GenericObjectDatabase.Add(genericTypeWithoutArgs, key, value);
+                GenericUnityObjects.Util.GenericObjectDatabase.Add(genericTypeWithoutArgs, key, value);
         }
     }
 }

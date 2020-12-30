@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using GenericUnityObjects;
+    using GenericUnityObjects.Util;
     using JetBrains.Annotations;
     using SolidUtilities.Editor.EditorWindows;
     using SolidUtilities.Helpers;
@@ -12,7 +13,7 @@
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
-    using TypeHelper = Util.TypeHelper;
+    using TypeHelper = GenericUnityObjects.Util.TypeHelper;
 
     /// <summary>
     /// Inherit from this class and use the <see cref="CreateAsset"/> method to create an AssetCreate menu.

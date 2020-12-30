@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.Editor
+﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
     using System.IO;
@@ -10,6 +10,22 @@
 
     internal static class CreatorUtil
     {
+        public static void WithDisabledAssetDatabase(Action doAction)
+        {
+            try
+            {
+                AssetDatabase.DisallowAutoRefresh();
+                AssetDatabase.StartAssetEditing();
+
+                doAction();
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.AllowAutoRefresh();
+            }
+        }
+
         /// <summary>
         /// Gets the type name for using in scripts.
         /// It looks like this: Namespace.ClassName&lt;Namespace.FirstGenericArg, Namespace.SecondGenericArg>.
