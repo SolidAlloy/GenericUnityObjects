@@ -9,11 +9,11 @@
         private const string AssemblyGUID = "testAssemblyGUID";
 
         private static BehavioursGenerationDatabase _database;
-        private static BehaviourInfo _behaviour;
+        private static GenericTypeInfo _behaviour;
         private static ArgumentInfo _firstArg;
         private static ArgumentInfo _secondArg;
         private static ArgumentInfo[] _firstSecondArgs;
-        private static BehaviourInfo[] _expectedBehaviours;
+        private static GenericTypeInfo[] _expectedBehaviours;
         private static ConcreteClass _expectedConcreteClass;
 
         [SetUp]
@@ -22,7 +22,7 @@
             _database = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
             _database.Initialize();
 
-            _behaviour = new BehaviourInfo("genericBehaviourName", "genericBehaviourGUID");
+            _behaviour = new GenericTypeInfo("genericBehaviourName", "genericBehaviourGUID", new[] { "genericArg" });
             _firstArg = new ArgumentInfo("firstArgumentName", "firstArgumentGUID");
             _secondArg = new ArgumentInfo("secondArgumentName", "secondArgumentGUID");
             _firstSecondArgs = new[] { _firstArg, _secondArg };

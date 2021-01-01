@@ -58,7 +58,7 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_expectedArg, out BehaviourInfo[] behaviours);
+                bool success = _database.InstanceTryGetReferencedBehaviours(_expectedArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Length != 0);

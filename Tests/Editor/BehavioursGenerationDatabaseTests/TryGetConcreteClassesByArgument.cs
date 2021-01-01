@@ -43,7 +43,7 @@
                 // Set up
                 AddEntries();
 
-                var secondBehaviour = new BehaviourInfo("secondName", "secondGUID");
+                var secondBehaviour = new GenericTypeInfo("secondName", "secondGUID", new[] { "secondArgs" });
                 _database.InstanceAddGenericBehaviour(secondBehaviour);
                 _database.InstanceAddConcreteClass(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 

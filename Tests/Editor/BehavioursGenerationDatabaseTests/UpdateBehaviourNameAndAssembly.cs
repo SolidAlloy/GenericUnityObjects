@@ -11,7 +11,7 @@
         {
             private const string NewName = "newName";
             private const string NewAssembly = "newAssembly";
-            private static BehaviourInfo _expectedBehaviour;
+            private static GenericTypeInfo _expectedBehaviour;
             private static TypeStub _typeStub;
 
             private static void CallUpdateArgumentNameAndAssembly() =>
@@ -28,7 +28,7 @@
             {
                 base.BeforeEachTest();
                 AddEntries();
-                _expectedBehaviour = new BehaviourInfo(NewName, NewAssembly, _behaviour.GUID);
+                _expectedBehaviour = new GenericTypeInfo(NewName, NewAssembly, _behaviour.GUID, _behaviour.ArgNames);
             }
 
             [Test]
@@ -45,7 +45,7 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] behaviours);
+                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly)));

@@ -7,14 +7,14 @@
     [Serializable]
     internal class ConcreteClass : IEquatable<ConcreteClass>
     {
+        private static readonly ArrayEqualityComparer<ArgumentInfo> ArrayComparer = new ArrayEqualityComparer<ArgumentInfo>();
+
         [SerializeField] private ArgumentInfo[] _arguments;
         [SerializeField] private string _assemblyGUID;
 
         public ArgumentInfo[] Arguments => _arguments;
 
         public string AssemblyGUID => _assemblyGUID;
-
-        private static readonly ArrayEqualityComparer<ArgumentInfo> ArrayComparer = new ArrayEqualityComparer<ArgumentInfo>();
 
         public ConcreteClass(ArgumentInfo[] arguments, string assemblyGUID)
         {

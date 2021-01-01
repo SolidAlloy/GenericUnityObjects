@@ -103,9 +103,9 @@
             {
                 UpdateArgumentInDatabase((ArgumentInfo) this, currentGUID);
             }
-            else if (this is BehaviourInfo)
+            else if (this is GenericTypeInfo)
             {
-                UpdateBehaviourInDatabase((BehaviourInfo) this, currentGUID);
+                UpdateBehaviourInDatabase((GenericTypeInfo) this, currentGUID);
             }
             else
             {
@@ -116,7 +116,7 @@
         private static void UpdateArgumentInDatabase(ArgumentInfo argument, string newGUID) =>
             BehavioursGenerationDatabase.UpdateArgumentGUID(ref argument, newGUID);
 
-        private static void UpdateBehaviourInDatabase(BehaviourInfo behaviour, string newGUID) =>
+        private static void UpdateBehaviourInDatabase(GenericTypeInfo behaviour, string newGUID) =>
             BehavioursGenerationDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
 
         public bool Equals(TypeInfo p)

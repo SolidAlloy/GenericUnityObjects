@@ -9,14 +9,14 @@
     {
         public class RemoveGenericBehaviour : GenericBehavioursDatabaseTests
         {
-            private static BehaviourInfo _secondBehaviour;
+            private static GenericTypeInfo _secondBehaviour;
 
             [SetUp]
             public override void BeforeEachTest()
             {
                 base.BeforeEachTest();
 
-                _secondBehaviour = new BehaviourInfo("secondBehaviourName", "secondBehaviourGUID");
+                _secondBehaviour = new GenericTypeInfo("secondBehaviourName", "secondBehaviourGUID", new[] { "secondArgs" });
 
                 _database.InstanceAddGenericBehaviour(_behaviour);
                 _database.InstanceAddGenericBehaviour(_secondBehaviour);
@@ -25,7 +25,7 @@
                 _database.InstanceAddConcreteClass(_secondBehaviour, _firstSecondArgs, AssemblyGUID);
             }
 
-            private void CallRemoveGenericBehaviour(BehaviourInfo behaviour) => _database.InstanceRemoveGenericBehaviour(behaviour, _ => { });
+            private void CallRemoveGenericBehaviour(GenericTypeInfo behaviour) => _database.InstanceRemoveGenericBehaviour(behaviour, _ => { });
 
             [Test]
             public void Removes_behaviour_from_behaviours_list()
@@ -40,11 +40,11 @@
             {
                 CallRemoveGenericBehaviour(_behaviour);
 
-                bool firstSuccess = _database.InstanceTryGetReferencedBehaviours(_firstArg, out BehaviourInfo[] firstBehaviours);
+                bool firstSuccess = _database.InstanceTryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] firstBehaviours);
                 Assert.IsTrue(firstSuccess);
                 Assert.IsFalse(firstBehaviours.Contains(_behaviour));
 
-                bool secondSuccess = _database.InstanceTryGetReferencedBehaviours(_secondArg, out BehaviourInfo[] secondBehaviours);
+                bool secondSuccess = _database.InstanceTryGetReferencedBehaviours(_secondArg, out GenericTypeInfo[] secondBehaviours);
                 Assert.IsTrue(secondSuccess);
                 Assert.IsFalse(secondBehaviours.Contains(_behaviour));
             }

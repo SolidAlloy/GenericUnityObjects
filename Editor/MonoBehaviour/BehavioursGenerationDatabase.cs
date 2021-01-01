@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEngine;
     using Util;
@@ -10,14 +11,14 @@
 
     internal class BehavioursGenerationDatabase : EditorOnlySingletonSO<BehavioursGenerationDatabase>, ISerializationCallbackReceiver, ICanBeInitialized
     {
-        private Dictionary<ArgumentInfo, List<BehaviourInfo>> _argumentBehavioursDict;
-        private Dictionary<BehaviourInfo, List<ConcreteClass>> _behaviourArgumentsDict;
+        private Dictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentBehavioursDict;
+        private Dictionary<GenericTypeInfo, List<ConcreteClass>> _behaviourArgumentsDict;
         private Pool<ArgumentInfo> _argumentsPool;
-        private Pool<BehaviourInfo> _behavioursPool;
+        private Pool<GenericTypeInfo> _behavioursPool;
 
         [HideInInspector] [SerializeField] private ArgumentInfo[] _genericArgumentKeys;
         [HideInInspector] [SerializeField] private BehaviourCollection[] _genericBehaviourValues;
-        [HideInInspector] [SerializeField] private BehaviourInfo[] _genericBehaviourKeys;
+        [HideInInspector] [SerializeField] private GenericTypeInfo[] _genericBehaviourKeys;
         [HideInInspector] [SerializeField] private ConcreteClassCollection[] _genericArgumentValues;
 
         private bool _shouldSetDirty;
@@ -26,16 +27,16 @@
 
         public ArgumentInfo[] InstanceArguments => _argumentBehavioursDict.Keys.ToArray();
 
-        public static BehaviourInfo[] Behaviours => Instance.InstanceBehaviours;
+        public static GenericTypeInfo[] Behaviours => Instance.InstanceBehaviours;
 
-        public BehaviourInfo[] InstanceBehaviours => _behaviourArgumentsDict.Keys.ToArray();
+        public GenericTypeInfo[] InstanceBehaviours => _behaviourArgumentsDict.Keys.ToArray();
 
-        public static void AddGenericBehaviour(BehaviourInfo genericBehaviour)
+        public static void AddGenericBehaviour(GenericTypeInfo genericBehaviour)
         {
             Instance.InstanceAddGenericBehaviour(genericBehaviour);
         }
 
-        public void InstanceAddGenericBehaviour(BehaviourInfo genericBehaviour)
+        public void InstanceAddGenericBehaviour(GenericTypeInfo genericBehaviour)
         {
             genericBehaviour = _behavioursPool.GetOrAdd(genericBehaviour);
             _behaviourArgumentsDict.Add(genericBehaviour, new List<ConcreteClass>());
@@ -44,7 +45,7 @@
 
         public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID, Type generatedType)
         {
-            var behaviour = new BehaviourInfo(genericTypeWithoutArgs);
+            var behaviour = new GenericTypeInfo(genericTypeWithoutArgs);
 
             int genericArgsLength = genericArgs.Length;
             var arguments = new ArgumentInfo[genericArgsLength];
@@ -57,7 +58,7 @@
             Instance.InstanceAddConcreteClass(behaviour, arguments, assemblyGUID);
         }
 
-        public void InstanceAddConcreteClass(BehaviourInfo genericBehaviour, ArgumentInfo[] arguments, string assemblyGUID)
+        public void InstanceAddConcreteClass(GenericTypeInfo genericBehaviour, ArgumentInfo[] arguments, string assemblyGUID)
         {
             if (!_behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
             {
@@ -79,7 +80,7 @@
                 }
                 else
                 {
-                    _argumentBehavioursDict[argument] = new List<BehaviourInfo> { genericBehaviour };
+                    _argumentBehavioursDict[argument] = new List<GenericTypeInfo> { genericBehaviour };
                 }
             }
 
@@ -104,12 +105,12 @@
 
         public void InstanceRemoveArgument(ArgumentInfo argument, Action<string> assemblyAction)
         {
-            if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> genericBehaviours))
+            if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> genericBehaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
             _argumentBehavioursDict.Remove(argument);
 
-            foreach (BehaviourInfo genericBehaviour in genericBehaviours)
+            foreach (GenericTypeInfo genericBehaviour in genericBehaviours)
             {
                 if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
                     continue;
@@ -129,12 +130,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void RemoveGenericBehaviour(BehaviourInfo genericBehaviour, Action<string> removeAssembly)
+        public static void RemoveGenericBehaviour(GenericTypeInfo genericBehaviour, Action<string> removeAssembly)
         {
             Instance.InstanceRemoveGenericBehaviour(genericBehaviour, removeAssembly);
         }
 
-        public void InstanceRemoveGenericBehaviour(BehaviourInfo genericBehaviour, Action<string> removeAssembly)
+        public void InstanceRemoveGenericBehaviour(GenericTypeInfo genericBehaviour, Action<string> removeAssembly)
         {
             if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Behaviour '{genericBehaviour}' was not found in the database.");
@@ -146,7 +147,7 @@
             {
                 foreach (ArgumentInfo argument in concreteClass.Arguments)
                 {
-                    if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> behaviours))
+                    if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
                         continue;
 
                     behaviours.Remove(genericBehaviour);
@@ -161,36 +162,36 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static bool TryGetReferencedBehaviours(ArgumentInfo argument, out BehaviourInfo[] referencedBehaviours)
+        public static bool TryGetReferencedBehaviours(ArgumentInfo argument, out GenericTypeInfo[] referencedBehaviours)
         {
             return Instance.InstanceTryGetReferencedBehaviours(argument, out referencedBehaviours);
         }
 
-        public bool InstanceTryGetReferencedBehaviours(ArgumentInfo argument, out BehaviourInfo[] referencedBehaviours)
+        public bool InstanceTryGetReferencedBehaviours(ArgumentInfo argument, out GenericTypeInfo[] referencedBehaviours)
         {
-            bool success = _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> behavioursList);
+            bool success = _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behavioursList);
             referencedBehaviours = success ? behavioursList.ToArray() : null;
             return success;
         }
 
-        public static bool TryGetConcreteClasses(BehaviourInfo behaviour, out ConcreteClass[] concreteClasses)
+        public static bool TryGetConcreteClasses(GenericTypeInfo behaviour, out ConcreteClass[] concreteClasses)
         {
             return Instance.InstanceTryGetConcreteClasses(behaviour, out concreteClasses);
         }
 
-        public bool InstanceTryGetConcreteClasses(BehaviourInfo behaviour, out ConcreteClass[] concreteClasses)
+        public bool InstanceTryGetConcreteClasses(GenericTypeInfo behaviour, out ConcreteClass[] concreteClasses)
         {
             bool success = _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClassesList);
             concreteClasses = success ? concreteClassesList.ToArray() : null;
             return success;
         }
 
-        public static bool TryGetConcreteClassesByArgument(BehaviourInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
+        public static bool TryGetConcreteClassesByArgument(GenericTypeInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
             return Instance.InstanceTryGetConcreteClassesByArgument(behaviour, argument, out concreteClasses);
         }
 
-        public bool InstanceTryGetConcreteClassesByArgument(BehaviourInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
+        public bool InstanceTryGetConcreteClassesByArgument(GenericTypeInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
             if ( ! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClassesList))
             {
@@ -216,7 +217,7 @@
 
         public void InstanceUpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)
         {
-            if (! _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> behaviours))
+            if (! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
             _argumentBehavioursDict.Remove(argument);
@@ -237,7 +238,7 @@
 
         public void InstanceUpdateArgumentNameAndAssembly(ref ArgumentInfo argument, Type newType)
         {
-            if (! _argumentBehavioursDict.TryGetValue(argument, out List<BehaviourInfo> behaviours))
+            if (! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
             _argumentBehavioursDict.Remove(argument);
@@ -251,12 +252,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateBehaviourGUID(ref BehaviourInfo behaviour, string newGUID)
+        public static void UpdateBehaviourGUID(ref GenericTypeInfo behaviour, string newGUID)
         {
             Instance.InstanceUpdateBehaviourGUID(ref behaviour, newGUID);
         }
 
-        public void InstanceUpdateBehaviourGUID(ref BehaviourInfo behaviour, string newGUID)
+        public void InstanceUpdateBehaviourGUID(ref GenericTypeInfo behaviour, string newGUID)
         {
             if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
@@ -272,12 +273,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, Type newType)
+        public static void UpdateBehaviourNameAndAssembly(ref GenericTypeInfo behaviour, Type newType)
         {
             Instance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, newType);
         }
 
-        public void InstanceUpdateBehaviourNameAndAssembly(ref BehaviourInfo behaviour, Type newType)
+        public void InstanceUpdateBehaviourNameAndAssembly(ref GenericTypeInfo behaviour, Type newType)
         {
             if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Argument '{behaviour}' was not found in the database.");
@@ -304,17 +305,17 @@
             if (_genericArgumentKeys != null)
                 throw new InvalidOperationException("The asset is already initialized.");
 
-            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<BehaviourInfo>>();
+            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
             _argumentsPool = new Pool<ArgumentInfo>();
-            _behaviourArgumentsDict = new Dictionary<BehaviourInfo, List<ConcreteClass>>();
-            _behavioursPool = new Pool<BehaviourInfo>();
+            _behaviourArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>();
+            _behavioursPool = new Pool<GenericTypeInfo>();
         }
 
         private void InitializeArgumentBehavioursDict()
         {
             if (_genericArgumentKeys == null)
             {
-                _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<BehaviourInfo>>();
+                _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
                 _argumentsPool = new Pool<ArgumentInfo>();
                 return;
             }
@@ -322,12 +323,12 @@
             int keysLength = _genericArgumentKeys.Length;
             int valuesLength = _genericBehaviourValues.Length;
 
-            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<BehaviourInfo>>(keysLength);
+            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>(keysLength);
 
             _argumentsPool = new Pool<ArgumentInfo>(keysLength);
             _argumentsPool.AddRange(_genericArgumentKeys);
 
-            _behavioursPool = new Pool<BehaviourInfo>(valuesLength);
+            _behavioursPool = new Pool<GenericTypeInfo>(valuesLength);
 
             if (keysLength != valuesLength)
             {
@@ -339,9 +340,9 @@
 
             for (int keyIndex = 0; keyIndex < keysLength; ++keyIndex)
             {
-                BehaviourInfo[] valuesArray = _genericBehaviourValues[keyIndex];
+                GenericTypeInfo[] valuesArray = _genericBehaviourValues[keyIndex];
                 int valuesArrayLength = valuesArray.Length;
-                var valuesToAdd = new List<BehaviourInfo>(valuesArrayLength);
+                var valuesToAdd = new List<GenericTypeInfo>(valuesArrayLength);
 
                 for (int valueIndex = 0; valueIndex < valuesArrayLength; valueIndex++)
                     valuesToAdd.Add(_behavioursPool.GetOrAdd(valuesArray[valueIndex]));
@@ -355,7 +356,7 @@
             int keysLength = _genericBehaviourKeys.Length;
             int valuesLength = _genericArgumentValues.Length;
 
-            _behaviourArgumentsDict = new Dictionary<BehaviourInfo, List<ConcreteClass>>(keysLength);
+            _behaviourArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>(keysLength);
 
             if (keysLength != valuesLength)
             {
@@ -367,7 +368,7 @@
 
             for (int keyIndex = 0; keyIndex < keysLength; keyIndex++)
             {
-                BehaviourInfo key = _behavioursPool.GetOrAdd(_genericBehaviourKeys[keyIndex]);
+                GenericTypeInfo key = _behavioursPool.GetOrAdd(_genericBehaviourKeys[keyIndex]);
 
                 List<ConcreteClass> value = _genericArgumentValues[keyIndex];
 
@@ -417,7 +418,7 @@
 
             int dictLength = _behaviourArgumentsDict.Count;
 
-            _genericBehaviourKeys = new BehaviourInfo[dictLength];
+            _genericBehaviourKeys = new GenericTypeInfo[dictLength];
             _genericArgumentValues = new ConcreteClassCollection[dictLength];
 
             int keysIndex = 0;
@@ -441,18 +442,18 @@
         [Serializable]
         private class BehaviourCollection
         {
-            [SerializeField] private BehaviourInfo[] _array;
+            [SerializeField] private GenericTypeInfo[] _array;
 
-            public BehaviourCollection(List<BehaviourInfo> collection) => _array = collection.ToArray();
+            public BehaviourCollection(List<GenericTypeInfo> collection) => _array = collection.ToArray();
 
-            public BehaviourCollection(BehaviourInfo[] collection) => _array = collection;
+            public BehaviourCollection(GenericTypeInfo[] collection) => _array = collection;
 
-            public BehaviourCollection() : this((BehaviourInfo[]) null) { }
+            public BehaviourCollection() : this((GenericTypeInfo[]) null) { }
 
-            public static implicit operator BehaviourCollection(List<BehaviourInfo> typeInfoArray) =>
+            public static implicit operator BehaviourCollection(List<GenericTypeInfo> typeInfoArray) =>
                 new BehaviourCollection(typeInfoArray);
 
-            public static implicit operator BehaviourInfo[] (BehaviourCollection typeCollection) =>
+            public static implicit operator GenericTypeInfo[] (BehaviourCollection typeCollection) =>
                 typeCollection._array;
         }
 

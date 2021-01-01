@@ -18,7 +18,7 @@
     {
         private static bool _needsAssetDatabaseRefresh;
 
-        [DidReloadScripts(Config.AssemblyGenerationOrder)]
+        // [DidReloadScripts(Config.AssemblyGenerationOrder)] // TODO: re-enable after debugging
         private static void OnScriptsReload()
         {
             _needsAssetDatabaseRefresh = false;
@@ -41,7 +41,7 @@
             var behaviours = BehavioursGenerationDatabase.Behaviours;
             var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
 
-            foreach (BehaviourInfo behaviourInfo in behaviours)
+            foreach (GenericTypeInfo behaviourInfo in behaviours)
             {
                 BehavioursGenerationDatabase.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
 
@@ -101,7 +101,7 @@
             var oldBehaviours = BehavioursGenerationDatabase.Behaviours;
             var newBehaviours = TypeCache.GetTypesDerivedFrom<MonoBehaviour>()
                 .Where(type => type.IsGenericType && ! type.IsAbstract)
-                .Select(type => new BehaviourInfo(type))
+                .Select(type => new GenericTypeInfo(type))
                 .ToArray();
 
             int oldBehavioursLength = oldBehaviours.Length;
@@ -125,19 +125,19 @@
                 return;
             }
 
-            var oldTypesSet = new HashSet<BehaviourInfo>(oldBehaviours);
-            var newTypesSet = new HashSet<BehaviourInfo>(newBehaviours);
+            var oldTypesSet = new HashSet<GenericTypeInfo>(oldBehaviours);
+            var newTypesSet = new HashSet<GenericTypeInfo>(newBehaviours);
 
             var oldBehavioursOnly = oldTypesSet.ExceptWithAndCreateNew(newTypesSet).ToList();
             var newBehavioursOnly = newTypesSet.ExceptWithAndCreateNew(oldTypesSet).ToArray();
 
-            foreach (BehaviourInfo newBehaviour in newBehavioursOnly)
+            foreach (GenericTypeInfo newBehaviour in newBehavioursOnly)
             {
                 bool foundMatching = false;
 
                 for (int i = 0; i < oldBehavioursOnly.Count; i++)
                 {
-                    BehaviourInfo oldBehaviour = oldBehavioursOnly[i];
+                    GenericTypeInfo oldBehaviour = oldBehavioursOnly[i];
 
                     // Full names are equal but GUIDs are not
                     if (newBehaviour.TypeNameAndAssembly == oldBehaviour.TypeNameAndAssembly)
@@ -176,13 +176,13 @@
             oldBehavioursOnly.ForEach(RemoveBehaviour);
         }
 
-        private static void UpdateBehaviourGUID(BehaviourInfo behaviour, string newGUID)
+        private static void UpdateBehaviourGUID(GenericTypeInfo behaviour, string newGUID)
         {
             DebugUtil.Log($"Behaviour GUID updated: {behaviour.GUID} => {newGUID}");
             BehavioursGenerationDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
         }
 
-        private static void RemoveBehaviour(BehaviourInfo behaviour)
+        private static void RemoveBehaviour(GenericTypeInfo behaviour)
         {
             DebugUtil.Log($"Behaviour removed: {behaviour.TypeFullName}");
             BehavioursGenerationDatabase.RemoveGenericBehaviour(behaviour, RemoveAssembly);
@@ -191,14 +191,14 @@
         private static void UpdateArgumentTypeName(ArgumentInfo argument, Type newType)
         {
             // Retrieve the array of generic arguments where the old argument was listed
-            bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedBehaviours(argument, out BehaviourInfo[] referencedBehaviours);
+            bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedBehaviours(argument, out GenericTypeInfo[] referencedBehaviours);
 
             // update argument typename in database before updating assemblies and trying to find behaviour because behaviour might also need to be updated, and the argument should already be new
             BehavioursGenerationDatabase.UpdateArgumentNameAndAssembly(ref argument, newType);
 
             Assert.IsTrue(behavioursSuccess);
 
-            foreach (BehaviourInfo behaviour in referencedBehaviours)
+            foreach (GenericTypeInfo behaviour in referencedBehaviours)
             {
                 // Retrieve type of the behaviour
                 // If type cannot be retrieved, try finding by GUID
@@ -227,7 +227,7 @@
             }
         }
 
-        private static void UpdateBehaviourTypeName(BehaviourInfo behaviour, Type newType)
+        private static void UpdateBehaviourTypeName(GenericTypeInfo behaviour, Type newType)
         {
             DebugUtil.Log($"Behaviour typename updated: {behaviour.TypeFullName} => {newType.FullName}");
 
@@ -267,7 +267,7 @@
             AssemblyCreator.CreateSelectorAssembly(assemblyName, genericTypeWithoutArgs, componentName);
         }
 
-        private static void AddNewBehaviour(BehaviourInfo behaviour)
+        private static void AddNewBehaviour(GenericTypeInfo behaviour)
         {
             DebugUtil.Log($"Behaviour added: {behaviour.TypeFullName}");
 
