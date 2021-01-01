@@ -5,7 +5,7 @@
     using System.Linq;
     using UnityEngine;
 
-    internal class BehavioursDatabase : SingletonScriptableObject<BehavioursDatabase>, ISerializationCallbackReceiver
+    internal class BehavioursDatabase : SingletonScriptableObject<BehavioursDatabase>, ISerializationCallbackReceiver, ICanBeInitialized
     {
         private Dictionary<Type, Dictionary<Type[], Type>> _dict;
 
@@ -109,6 +109,8 @@
                 _dict.Add(genericTypeWithoutArgs, new Dictionary<Type[], Type>(default(TypeArrayComparer)) { { genericArgs, concreteType } });
             }
         }
+
+        public void Initialize() { }
     }
 
     internal readonly struct TypeArrayComparer : IEqualityComparer<Type[]>

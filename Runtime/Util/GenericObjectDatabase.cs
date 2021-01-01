@@ -4,7 +4,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using Database;
     using TypeReferences;
     using UnityEditor;
@@ -27,7 +26,8 @@
     /// </summary>
     internal class GenericObjectDatabase :
         SingletonScriptableObject<GenericObjectDatabase>,
-        ISerializationCallbackReceiver
+        ISerializationCallbackReceiver,
+        ICanBeInitialized
     {
         private readonly Dictionary<TypeReference, TypeDictionary> _dict =
             new Dictionary<TypeReference, TypeDictionary>();
@@ -190,5 +190,7 @@
             EditorUtility.SetDirty(Instance);
 #endif
         }
+
+        public void Initialize() { }
     }
 }

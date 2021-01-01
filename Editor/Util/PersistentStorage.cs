@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
+    using GenericUnityObjects.Util;
     using ScriptableObject;
     using TypeReferences;
     using UnityEditor;
