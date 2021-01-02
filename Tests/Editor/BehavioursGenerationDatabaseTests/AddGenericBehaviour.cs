@@ -4,9 +4,9 @@
     using System.Linq;
     using NUnit.Framework;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class AddGenericBehaviour : GenericBehavioursDatabaseTests
+        public class AddGenericBehaviour : BehavioursGenerationDatabaseTests
         {
             [Test]
             public void Adds_behaviour_to_dict()

@@ -34,6 +34,8 @@
             _argNames = type.GetGenericArguments().Select(argType => argType.Name).ToArray();
         }
 
+        public void UpdateArgNames(string[] newNames) => _argNames = newNames;
+
         public bool Equals(GenericTypeInfo p)
         {
             // If parameter is null, return false.

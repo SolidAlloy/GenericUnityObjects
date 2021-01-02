@@ -3,9 +3,9 @@
     using Editor.MonoBehaviour;
     using NUnit.Framework;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class TryGetReferencedBehaviours : GenericBehavioursDatabaseTests
+        public class TryGetReferencedBehaviours : BehavioursGenerationDatabaseTests
         {
             private static bool CallMethodBool() =>
                 _database.InstanceTryGetReferencedBehaviours(_firstArg, out _);

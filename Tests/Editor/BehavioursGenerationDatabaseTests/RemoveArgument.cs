@@ -5,9 +5,9 @@
     using Editor.MonoBehaviour;
     using NUnit.Framework;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class RemoveArgument : GenericBehavioursDatabaseTests
+        public class RemoveArgument : BehavioursGenerationDatabaseTests
         {
             [SetUp]
             public override void BeforeEachTest()

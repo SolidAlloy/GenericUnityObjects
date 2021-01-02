@@ -3,9 +3,9 @@
     using Editor.MonoBehaviour;
     using NUnit.Framework;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class TryGetConcreteClassesByArgument : GenericBehavioursDatabaseTests
+        public class TryGetConcreteClassesByArgument : BehavioursGenerationDatabaseTests
         {
             private static void AssertFalse()
             {

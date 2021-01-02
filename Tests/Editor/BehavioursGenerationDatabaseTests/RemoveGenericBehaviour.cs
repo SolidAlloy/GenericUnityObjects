@@ -5,9 +5,9 @@
     using Editor.MonoBehaviour;
     using NUnit.Framework;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class RemoveGenericBehaviour : GenericBehavioursDatabaseTests
+        public class RemoveGenericBehaviour : BehavioursGenerationDatabaseTests
         {
             private static GenericTypeInfo _secondBehaviour;
 

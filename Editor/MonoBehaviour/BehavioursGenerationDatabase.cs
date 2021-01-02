@@ -273,6 +273,27 @@
             EditorUtility.SetDirty(this);
         }
 
+        public static void UpdateBehaviourArgs(ref GenericTypeInfo behaviour, string[] newArgNames)
+        {
+            Instance.InstanceUpdateBehaviourArgs(ref behaviour, newArgNames);
+        }
+
+        public void InstanceUpdateBehaviourArgs(ref GenericTypeInfo behaviour, string[] newArgNames)
+        {
+            if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
+
+            _behaviourArgumentsDict.Remove(behaviour);
+
+            _behavioursPool.ChangeItem(ref behaviour, behaviourToChange =>
+            {
+                behaviourToChange.UpdateArgNames(newArgNames);
+            });
+
+            _behaviourArgumentsDict.Add(behaviour, concreteClasses);
+            EditorUtility.SetDirty(this);
+        }
+
         public static void UpdateBehaviourNameAndAssembly(ref GenericTypeInfo behaviour, Type newType)
         {
             Instance.InstanceUpdateBehaviourNameAndAssembly(ref behaviour, newType);

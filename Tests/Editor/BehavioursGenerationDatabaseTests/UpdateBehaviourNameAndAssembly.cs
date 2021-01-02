@@ -5,9 +5,9 @@
     using NUnit.Framework;
     using Util;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class UpdateBehaviourNameAndAssembly : GenericBehavioursDatabaseTests
+        public class UpdateBehaviourNameAndAssembly : BehavioursGenerationDatabaseTests
         {
             private const string NewName = "newName";
             private const string NewAssembly = "newAssembly";

@@ -6,18 +6,28 @@
     using Editor.Util;
     using NUnit.Framework;
     using UnityEngine;
+    using Util;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class OnAfterDeserialize : GenericBehavioursDatabaseTests
+        public class OnAfterDeserialize : BehavioursGenerationDatabaseTests
         {
             private static FieldInfo _instanceField;
+            private static object _getterInstance;
 
             [OneTimeSetUp]
             public void BeforeAllTests()
             {
-                _instanceField = typeof(EditorOnlySingletonSO<BehavioursGenerationDatabase>)
-                    .GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                FieldInfo getterField = typeof(EditorOnlySingletonSO<BehavioursGenerationDatabase>)
+                    .GetField("Getter", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+
+                Assert.IsNotNull(getterField);
+
+                _getterInstance = getterField.GetValue(null);
+                Assert.IsNotNull(_getterInstance);
+
+                _instanceField = typeof(InstanceGetter<BehavioursGenerationDatabase>)
+                    .GetField("_instance", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(_instanceField);
             }
@@ -28,7 +38,7 @@
                 base.BeforeEachTest();
 
                 var cleanInstance = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
-                _instanceField.SetValue(null, cleanInstance);
+                _instanceField.SetValue(_getterInstance, cleanInstance);
                 BehavioursGenerationDatabase.Instance.Initialize();
                 BehavioursGenerationDatabase.AddGenericBehaviour(_behaviour);
                 BehavioursGenerationDatabase.Instance.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);

@@ -6,9 +6,9 @@
 
     internal partial class BehavioursGenerationDatabaseTests
     {
-        public class UpdateBehaviourGUID : BehavioursGenerationDatabaseTests
+        public class UpdateBehaviourArgs : BehavioursGenerationDatabaseTests
         {
-            private const string NewGUID = "newGUID";
+            private static readonly string[] NewArgs = { "newArgs" };
             private static GenericTypeInfo _expectedBehaviour;
 
             [SetUp]
@@ -16,33 +16,33 @@
             {
                 base.BeforeEachTest();
                 AddEntries();
-                _expectedBehaviour = new GenericTypeInfo(_behaviour.TypeNameAndAssembly, NewGUID, _behaviour.ArgNames);
+                _expectedBehaviour = new GenericTypeInfo(_behaviour.TypeNameAndAssembly, _behaviour.GUID, NewArgs);
             }
 
             [Test]
-            public void Updates_behaviour_GUID_in_behaviours_list()
+            public void Updates_behaviour_arguments_in_behaviours_list()
             {
-                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
+                _database.InstanceUpdateBehaviourArgs(ref _behaviour, NewArgs);
 
                 Assert.IsTrue(_database.InstanceBehaviours.Length == 1);
                 Assert.Contains(_expectedBehaviour, _database.InstanceBehaviours);
             }
 
             [Test]
-            public void Updates_behaviour_GUID_in_referenced_behaviours()
+            public void Updates_behaviour_arguments_in_referenced_behaviours()
             {
-                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
+                _database.InstanceUpdateBehaviourArgs(ref _behaviour, NewArgs);
 
                 bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
-                Assert.IsTrue(behaviours.Any(behaviour => behaviour.GUID == NewGUID));
+                Assert.IsTrue(behaviours.Any(behaviour => behaviour.ArgNames.SequenceEqual(NewArgs)));
             }
 
             [Test]
             public void Concrete_classes_can_be_found_by_new_behaviour()
             {
-                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
+                _database.InstanceUpdateBehaviourArgs(ref _behaviour, NewArgs);
 
                 bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
 
@@ -51,10 +51,10 @@
             }
 
             [Test]
-            public void Updates_passed_argument_GUID()
+            public void Updates_passed_argument_argNames()
             {
-                _database.InstanceUpdateBehaviourGUID(ref _behaviour, NewGUID);
-                Assert.IsTrue(_behaviour.GUID == NewGUID);
+                _database.InstanceUpdateBehaviourArgs(ref _behaviour, NewArgs);
+                Assert.IsTrue(_behaviour.ArgNames == NewArgs);
             }
         }
     }

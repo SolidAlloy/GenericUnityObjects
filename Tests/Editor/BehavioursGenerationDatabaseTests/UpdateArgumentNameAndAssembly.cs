@@ -6,9 +6,9 @@
     using Util;
     using TypeInfo = Editor.MonoBehaviour.TypeInfo;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class UpdateArgumentNameAndAssembly : GenericBehavioursDatabaseTests
+        public class UpdateArgumentNameAndAssembly : BehavioursGenerationDatabaseTests
         {
             private const string NewName = "newName";
             private const string NewAssembly = "newAssembly";

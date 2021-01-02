@@ -18,7 +18,7 @@
     {
         private static bool _needsAssetDatabaseRefresh;
 
-        // [DidReloadScripts(Config.AssemblyGenerationOrder)] // TODO: re-enable after debugging
+        [DidReloadScripts(Config.AssemblyGenerationOrder)]
         private static void OnScriptsReload()
         {
             _needsAssetDatabaseRefresh = false;
@@ -34,48 +34,6 @@
 
             if (_needsAssetDatabaseRefresh)
                 AssetDatabase.Refresh();
-        }
-
-        private static void InitializeBehavioursDatabase()
-        {
-            var behaviours = BehavioursGenerationDatabase.Behaviours;
-            var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
-
-            foreach (GenericTypeInfo behaviourInfo in behaviours)
-            {
-                BehavioursGenerationDatabase.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
-
-                Type behaviourType = behaviourInfo.RetrieveType();
-
-                var concreteClassesDict = new Dictionary<Type[], Type>(concreteClasses.Length, default(TypeArrayComparer));
-
-                foreach (ConcreteClass concreteClass in concreteClasses)
-                {
-                    int argsLength = concreteClass.Arguments.Length;
-
-                    Type[] key = new Type[argsLength];
-
-                    for (int i = 0; i < argsLength; i++)
-                    {
-                        var type = concreteClass.Arguments[i].RetrieveType();
-                        Assert.IsNotNull(type);
-                        key[i] = type;
-                    }
-
-                    string assemblyPath = AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID);
-                    var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
-
-                    // There was once NullReferenceReference here because Unity lost a MonoScript asset connected to
-                    // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
-                    Type value = script.GetClass();
-
-                    concreteClassesDict.Add(key, value);
-                }
-
-                dict.Add(behaviourType, concreteClassesDict);
-            }
-
-            BehavioursDatabase.Initialize(dict);
         }
 
         private static void CheckArguments()
@@ -139,11 +97,24 @@
                 {
                     GenericTypeInfo oldBehaviour = oldBehavioursOnly[i];
 
-                    // Full names are equal but GUIDs are not
+                    if (newBehaviour.GUID == oldBehaviour.GUID)
+                    {
+                        if (newBehaviour.TypeNameAndAssembly == oldBehaviour.TypeNameAndAssembly)
+                        {
+                            UpdateBehaviourArgNames(oldBehaviour, newBehaviour.ArgNames, newBehaviour.Type);
+                        }
+                        else
+                        {
+                            UpdateBehaviourTypeName(oldBehaviour, newBehaviour.Type);
+                        }
+
+                        oldBehavioursOnly.Remove(oldBehaviour);
+                        foundMatching = true;
+                        break;
+                    }
+
                     if (newBehaviour.TypeNameAndAssembly == oldBehaviour.TypeNameAndAssembly)
                     {
-                        oldBehavioursOnly.Remove(oldBehaviour);
-
                         // new type GUID is empty -> leave the old GUID
                         if (!string.IsNullOrEmpty(newBehaviour.GUID))
                         {
@@ -151,18 +122,14 @@
                             UpdateBehaviourGUID(oldBehaviour, newBehaviour.GUID);
                         }
 
+                        if (newBehaviour.ArgNames.SequenceEqual(oldBehaviour.ArgNames))
+                        {
+                            UpdateBehaviourArgNames(oldBehaviour, newBehaviour.ArgNames, newBehaviour.Type);
+                        }
+
+                        oldBehavioursOnly.Remove(oldBehaviour);
                         foundMatching = true;
                         break;
-                    }
-
-                    // GUIDS are equal but full names are not
-                    if (newBehaviour.GUID == oldBehaviour.GUID)
-                    {
-                        oldBehavioursOnly.Remove(oldBehaviour); // Remove old type from collection to optimize the next searches.
-                        UpdateBehaviourTypeName(oldBehaviour, newBehaviour.Type);
-
-                        foundMatching = true;
-                        break; // Go to new newTypeInfo
                     }
                 }
 
@@ -174,6 +141,48 @@
             }
 
             oldBehavioursOnly.ForEach(RemoveBehaviour);
+        }
+
+        private static void InitializeBehavioursDatabase()
+        {
+            var behaviours = BehavioursGenerationDatabase.Behaviours;
+            var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
+
+            foreach (GenericTypeInfo behaviourInfo in behaviours)
+            {
+                BehavioursGenerationDatabase.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
+
+                Type behaviourType = behaviourInfo.RetrieveType();
+
+                var concreteClassesDict = new Dictionary<Type[], Type>(concreteClasses.Length, default(TypeArrayComparer));
+
+                foreach (ConcreteClass concreteClass in concreteClasses)
+                {
+                    int argsLength = concreteClass.Arguments.Length;
+
+                    Type[] key = new Type[argsLength];
+
+                    for (int i = 0; i < argsLength; i++)
+                    {
+                        var type = concreteClass.Arguments[i].RetrieveType();
+                        Assert.IsNotNull(type);
+                        key[i] = type;
+                    }
+
+                    string assemblyPath = AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID);
+                    var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
+
+                    // There was once NullReferenceReference here because Unity lost a MonoScript asset connected to
+                    // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
+                    Type value = script.GetClass();
+
+                    concreteClassesDict.Add(key, value);
+                }
+
+                dict.Add(behaviourType, concreteClassesDict);
+            }
+
+            BehavioursDatabase.Initialize(dict);
         }
 
         private static void UpdateBehaviourGUID(GenericTypeInfo behaviour, string newGUID)
@@ -225,6 +234,15 @@
                     UpdateConcreteClassAssembly(behaviourType, concreteClass);
                 }
             }
+        }
+
+        private static void UpdateBehaviourArgNames(GenericTypeInfo behaviour, string[] newArgNames, Type newType)
+        {
+            DebugUtil.Log($"Behaviour args updated: '{string.Join(", ", behaviour.ArgNames)}' => '{string.Join(", ", behaviour.ArgNames)}'");
+
+            BehavioursGenerationDatabase.UpdateBehaviourArgs(ref behaviour, newArgNames);
+
+            UpdateSelectorAssembly(behaviour.AssemblyGUID, newType);
         }
 
         private static void UpdateBehaviourTypeName(GenericTypeInfo behaviour, Type newType)

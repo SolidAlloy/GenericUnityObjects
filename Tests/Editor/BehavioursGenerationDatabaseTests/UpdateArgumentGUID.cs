@@ -4,9 +4,9 @@
     using Editor.MonoBehaviour;
     using NUnit.Framework;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
-        public class UpdateArgumentGUID : GenericBehavioursDatabaseTests
+        public class UpdateArgumentGUID : BehavioursGenerationDatabaseTests
         {
             private const string NewGUID = "newGUID";
             private static ArgumentInfo _expectedArg;

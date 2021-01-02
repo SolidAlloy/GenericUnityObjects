@@ -4,7 +4,7 @@
     using NUnit.Framework;
     using UnityEngine;
 
-    internal partial class GenericBehavioursDatabaseTests
+    internal partial class BehavioursGenerationDatabaseTests
     {
         private const string AssemblyGUID = "testAssemblyGUID";
 
