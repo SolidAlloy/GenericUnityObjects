@@ -16,7 +16,7 @@
     /// </summary>
     internal static class GenericSOChecker
     {
-        [DidReloadScripts]
+        // [DidReloadScripts]
         private static void OnScriptsReload()
         {
             var types = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>()
@@ -37,12 +37,14 @@
                 if (assetMenuAttribute == null)
                     continue;
 
+                /*
                 menuItemMethods.Add(new MenuItemMethod(
                     type.FullName.MakeClassFriendly(),
                     assetMenuAttribute.FileName,
                     assetMenuAttribute.MenuName,
                     assetMenuAttribute.Order,
                     type));
+                    */
             }
 
             MenuItemsGenerator.GenerateClass(menuItemMethods.ToArray());

@@ -6,13 +6,13 @@
     using System.Reflection;
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
+    using ScriptableObject;
+    using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
 
-    public static class AssemblyCreator
+    internal static class AssemblyCreator
     {
-        public const string ConcreteClassName = "ConcreteClass";
-
         public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs, string componentName)
         {
             const string className = "ClassSelector";
@@ -32,10 +32,12 @@
 
         public static Type CreateConcreteClass(string assemblyName, Type genericBehaviourWithArgs, string componentName)
         {
+            const string concreteClassName = "ConcreteClass";
+
             AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
             ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
 
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(ConcreteClassName, TypeAttributes.NotPublic, genericBehaviourWithArgs);
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericBehaviourWithArgs);
 
             AddComponentMenuAttribute(typeBuilder, componentName);
 
@@ -44,6 +46,85 @@
             assemblyBuilder.Save($"{assemblyName}.dll");
 
             return type;
+        }
+
+        public static void CreateMenuItems(string assemblyName, MenuItemMethod[] menuItemMethods)
+        {
+            const string menuItemsTypeName = "MenuItems";
+
+            AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
+            ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
+
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(menuItemsTypeName, TypeAttributes.NotPublic, typeof(GenericSOCreator));
+
+            int menuItemsLength = menuItemMethods.Length;
+
+            for (int i = 0; i < menuItemsLength; i++)
+            {
+                ref MenuItemMethod menuItemMethod = ref menuItemMethods[i];
+                AddMenuItemMethod(typeBuilder, menuItemMethod, i);
+            }
+
+            typeBuilder.CreateType();
+
+            assemblyBuilder.Save($"{assemblyName}.dll");
+        }
+
+        private static void AddMenuItemMethod(TypeBuilder typeBuilder, MenuItemMethod menuItemMethod, int index)
+        {
+            MethodBuilder menuItemMethodBuilder = typeBuilder.DefineMethod(
+                $"Method_{index}",
+                MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Static,
+                typeof(void),
+                Type.EmptyTypes);
+
+            ILGenerator ilGenerator = menuItemMethodBuilder.GetILGenerator();
+
+            ilGenerator.Emit(OpCodes.Ldtoken, menuItemMethod.Type);
+
+            MethodInfo getTypeFromHandle = typeof(Type).GetMethod(
+                nameof(Type.GetTypeFromHandle),
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly,
+                null,
+                new[] { typeof(RuntimeTypeHandle) },
+                null);
+
+            Assert.IsNotNull(getTypeFromHandle);
+
+            ilGenerator.EmitCall(OpCodes.Call, getTypeFromHandle, null);
+
+            ilGenerator.Emit(OpCodes.Ldstr, menuItemMethod.FileName);
+
+            MethodInfo createAsset = typeof(GenericSOCreator).GetMethod(
+                "CreateAsset",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+                null,
+                Type.EmptyTypes,
+                null);
+
+            Assert.IsNotNull(createAsset);
+
+            ilGenerator.EmitCall(OpCodes.Call, createAsset, new Type[] { typeof(Type), typeof(string) });
+
+            ilGenerator.Emit(OpCodes.Nop);
+            ilGenerator.Emit(OpCodes.Ret);
+
+            SetMenuItemAttribute(menuItemMethodBuilder, menuItemMethod);
+        }
+
+        private static void SetMenuItemAttribute(MethodBuilder menuItemMethodBuilder, MenuItemMethod menuItemMethod)
+        {
+            ConstructorInfo classCtorInfo = typeof(MenuItem).GetConstructor(
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                new[] { typeof(string) },
+                null);
+
+            Assert.IsNotNull(classCtorInfo);
+
+            var attributeBuilder = new CustomAttributeBuilder(classCtorInfo, new object[] { $"Assets/Create/{menuItemMethod.MenuName}", menuItemMethod.Order });
+
+            menuItemMethodBuilder.SetCustomAttribute(attributeBuilder);
         }
 
         private static AssemblyBuilder GetAssemblyBuilder(string assemblyName)

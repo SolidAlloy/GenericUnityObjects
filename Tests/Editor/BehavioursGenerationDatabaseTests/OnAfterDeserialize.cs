@@ -61,7 +61,7 @@
             public void Restores_behaviours()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(BehavioursGenerationDatabase.Behaviours.SequenceEqual(_expectedBehaviours));
+                Assert.IsTrue(BehavioursGenerationDatabase.GenericUnityObjects.SequenceEqual(_expectedBehaviours));
             }
 
             [Test]

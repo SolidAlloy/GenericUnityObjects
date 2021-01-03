@@ -1,6 +1,11 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObject
 {
     using System;
+    using System.Linq;
+    using SolidUtilities.Helpers;
+    using UnityEngine;
+    using Util;
+    using TypeHelper = GenericUnityObjects.Util.TypeHelper;
 
     /// <summary>
     /// A struct that holds all variables needed to create a MenuItem method.
@@ -8,20 +13,31 @@
     [Serializable]
     internal struct MenuItemMethod : IEquatable<MenuItemMethod>
     {
+        private static readonly ArrayEqualityComparer<string> StringArrayComparer = new ArrayEqualityComparer<string>();
+
         public readonly Type Type;
 
-        public string TypeName;
-        public string FileName;
-        public string MenuName;
-        public int Order;
+        [SerializeField] private string _typeName;
+        [SerializeField] private string _fileName;
+        [SerializeField] private string _menuName;
+        [SerializeField] private int _order;
 
-        public MenuItemMethod(string typeName, string fileName, string menuName, int order, Type type)
+        public string TypeName => _typeName;
+
+        public string FileName => _fileName;
+
+        public string MenuName => _menuName;
+
+        public int Order => _order;
+
+        public MenuItemMethod(string fileName, string menuName, int order, Type genericTypeWithoutArgs)
         {
-            TypeName = typeName;
-            FileName = fileName;
-            MenuName = menuName;
-            Order = order;
-            Type = type;
+            Type = genericTypeWithoutArgs;
+
+            _typeName = TypeHelper.GetTypeNameAndAssembly(Type);
+            _fileName = fileName ?? $"New {Type.Name}";
+            _menuName = menuName ?? CreatorUtil.GetShortNameWithBrackets(Type);
+            _order = order;
         }
 
         public override bool Equals(object obj)
@@ -31,7 +47,10 @@
 
         public bool Equals(MenuItemMethod p)
         {
-            return TypeName == p.TypeName && FileName == p.FileName && MenuName == p.MenuName && Order == p.Order;
+            return TypeName == p.TypeName
+                   && _fileName == p._fileName
+                   && _menuName == p._menuName
+                   && _order == p._order;
         }
 
         public override int GetHashCode()
@@ -39,10 +58,10 @@
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + TypeName.GetHashCode();
-                hash = hash * 23 + FileName.GetHashCode();
-                hash = hash * 23 + MenuName.GetHashCode();
-                hash = hash * 23 + Order.GetHashCode();
+                hash = hash * 23 + _typeName.GetHashCode();
+                hash = hash * 23 + _fileName.GetHashCode();
+                hash = hash * 23 + _menuName.GetHashCode();
+                hash = hash * 23 + _order.GetHashCode();
                 return hash;
             }
         }

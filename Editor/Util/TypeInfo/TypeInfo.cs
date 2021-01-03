@@ -46,7 +46,8 @@
             }
         }
 
-        public bool RetrieveType(out Type type, out bool retrievedFromGUID)
+        public bool RetrieveType<TDatabase>(out Type type, out bool retrievedFromGUID)
+            where TDatabase : GenerationDatabase<TDatabase>
         {
             retrievedFromGUID = false;
 
@@ -61,7 +62,7 @@
             if (Type != null)
             {
                 type = Type;
-                UpdateGUIDIfNeeded();
+                UpdateGUIDIfNeeded<TDatabase>();
                 return true;
             }
 
@@ -78,10 +79,33 @@
             return Type != null;
         }
 
-        public Type RetrieveType()
+        public Type RetrieveType<TDatabase>()
+            where TDatabase : GenerationDatabase<TDatabase>
         {
-            RetrieveType(out Type type, out bool _);
+            RetrieveType<TDatabase>(out Type type, out bool _);
             return type;
+        }
+
+        private void UpdateGUIDIfNeeded<TDatabase>()
+            where TDatabase : GenerationDatabase<TDatabase>
+        {
+            string currentGUID = AssetSearcher.GetClassGUID(Type);
+
+            if (GUID == currentGUID || string.IsNullOrEmpty(currentGUID))
+                return;
+
+            if (this is ArgumentInfo argument)
+            {
+                GenerationDatabase<TDatabase>.UpdateArgumentGUID(ref argument, currentGUID);
+            }
+            else if (this is GenericTypeInfo genericTypeInfo)
+            {
+                GenerationDatabase<TDatabase>.UpdateBehaviourGUID(ref genericTypeInfo, currentGUID);
+            }
+            else
+            {
+                throw new TypeLoadException($"{nameof(UpdateGUIDIfNeeded)} method doesn't know of this inheritor of {nameof(TypeInfo)} yet: {GetType()}.");
+            }
         }
 
         public void UpdateGUID(string newGUID) => _guid = newGUID;
@@ -91,33 +115,6 @@
 
         public void UpdateNameAndAssembly(Type newType) =>
             _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(newType);
-
-        private void UpdateGUIDIfNeeded()
-        {
-            string currentGUID = AssetSearcher.GetClassGUID(Type);
-
-            if (GUID == currentGUID || string.IsNullOrEmpty(currentGUID))
-                return;
-
-            if (this is ArgumentInfo)
-            {
-                UpdateArgumentInDatabase((ArgumentInfo) this, currentGUID);
-            }
-            else if (this is GenericTypeInfo)
-            {
-                UpdateBehaviourInDatabase((GenericTypeInfo) this, currentGUID);
-            }
-            else
-            {
-                throw new TypeLoadException($"{nameof(UpdateGUIDIfNeeded)} method doesn't know of this inheritor of {nameof(TypeInfo)} yet: {GetType()}.");
-            }
-        }
-
-        private static void UpdateArgumentInDatabase(ArgumentInfo argument, string newGUID) =>
-            BehavioursGenerationDatabase.UpdateArgumentGUID(ref argument, newGUID);
-
-        private static void UpdateBehaviourInDatabase(GenericTypeInfo behaviour, string newGUID) =>
-            BehavioursGenerationDatabase.UpdateBehaviourGUID(ref behaviour, newGUID);
 
         public bool Equals(TypeInfo p)
         {

@@ -8,7 +8,7 @@
     {
         private const string AssemblyGUID = "testAssemblyGUID";
 
-        private static BehavioursGenerationDatabase _database;
+        private static GenerationDatabase<BehavioursGenerationDatabase> _database;
         private static GenericTypeInfo _behaviour;
         private static ArgumentInfo _firstArg;
         private static ArgumentInfo _secondArg;

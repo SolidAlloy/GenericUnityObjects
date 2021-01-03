@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using GenericUnityObjects.Util;
+    using ScriptableObject;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
     using UnityEditor;
@@ -12,21 +13,32 @@
 
     internal static class ConcreteClassCreator
     {
-        public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        public static void CreateConcreteClassAssemblyForSO(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        {
+            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
+            SOGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+        }
+
+        public static void CreateConcreteClassAssemblyForBehaviour(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        {
+            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
+            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+        }
+
+        private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
 
-            Type generatedType = null;
             string assemblyGUID = null;
 
             CreatorUtil.WithDisabledAssetDatabase(() =>
             {
-                generatedType = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
+                CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
                 assemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
             });
 
-            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID, generatedType);
+            return assemblyGUID;
         }
 
         public static Type CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
