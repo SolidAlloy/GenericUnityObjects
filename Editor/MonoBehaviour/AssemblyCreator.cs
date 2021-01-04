@@ -7,125 +7,61 @@
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
     using ScriptableObject;
-    using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
 
-    internal static class AssemblyCreator
+    internal static partial class AssemblyCreator
     {
-        public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs, string componentName)
+        private static ConstructorInfo _addComponentMenuConstructor;
+        private static MethodInfo _getTypeFromHandle;
+
+        private static ConstructorInfo AddComponentMenuConstructor
         {
-            const string className = "ClassSelector";
-
-            AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
-            ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
-
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, typeof(BehaviourSelector));
-
-            CreateBehaviourTypeProperty(typeBuilder, genericBehaviourWithoutArgs);
-            AddComponentMenuAttribute(typeBuilder, componentName);
-
-            typeBuilder.CreateType();
-
-            assemblyBuilder.Save($"{assemblyName}.dll");
-        }
-
-        public static Type CreateConcreteClass(string assemblyName, Type genericBehaviourWithArgs, string componentName)
-        {
-            const string concreteClassName = "ConcreteClass";
-
-            AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
-            ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
-
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericBehaviourWithArgs);
-
-            AddComponentMenuAttribute(typeBuilder, componentName);
-
-            Type type = typeBuilder.CreateType();
-
-            assemblyBuilder.Save($"{assemblyName}.dll");
-
-            return type;
-        }
-
-        public static void CreateMenuItems(string assemblyName, MenuItemMethod[] menuItemMethods)
-        {
-            const string menuItemsTypeName = "MenuItems";
-
-            AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
-            ModuleBuilder moduleBuilder = GetModuleBuilder(assemblyBuilder, assemblyName);
-
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(menuItemsTypeName, TypeAttributes.NotPublic, typeof(GenericSOCreator));
-
-            int menuItemsLength = menuItemMethods.Length;
-
-            for (int i = 0; i < menuItemsLength; i++)
+            get
             {
-                ref MenuItemMethod menuItemMethod = ref menuItemMethods[i];
-                AddMenuItemMethod(typeBuilder, menuItemMethod, i);
+                if (_addComponentMenuConstructor == null)
+                {
+                    _addComponentMenuConstructor = typeof(AddComponentMenu).GetConstructor(
+                        BindingFlags.Public | BindingFlags.Instance,
+                        null,
+                        new[] { typeof(string) },
+                        null);
+
+                    Assert.IsNotNull(_addComponentMenuConstructor);
+                }
+
+                return _addComponentMenuConstructor;
             }
-
-            typeBuilder.CreateType();
-
-            assemblyBuilder.Save($"{assemblyName}.dll");
         }
 
-        private static void AddMenuItemMethod(TypeBuilder typeBuilder, MenuItemMethod menuItemMethod, int index)
+        private static MethodInfo GetTypeFromHandle
         {
-            MethodBuilder menuItemMethodBuilder = typeBuilder.DefineMethod(
-                $"Method_{index}",
-                MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.Static,
-                typeof(void),
-                Type.EmptyTypes);
+            get
+            {
+                if (_getTypeFromHandle == null)
+                {
+                    _getTypeFromHandle = typeof(Type).GetMethod(
+                        nameof(Type.GetTypeFromHandle),
+                        BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly,
+                        null,
+                        new[] { typeof(RuntimeTypeHandle) },
+                        null);
 
-            ILGenerator ilGenerator = menuItemMethodBuilder.GetILGenerator();
+                    Assert.IsNotNull(_getTypeFromHandle);
+                }
 
-            ilGenerator.Emit(OpCodes.Ldtoken, menuItemMethod.Type);
-
-            MethodInfo getTypeFromHandle = typeof(Type).GetMethod(
-                nameof(Type.GetTypeFromHandle),
-                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly,
-                null,
-                new[] { typeof(RuntimeTypeHandle) },
-                null);
-
-            Assert.IsNotNull(getTypeFromHandle);
-
-            ilGenerator.EmitCall(OpCodes.Call, getTypeFromHandle, null);
-
-            ilGenerator.Emit(OpCodes.Ldstr, menuItemMethod.FileName);
-
-            MethodInfo createAsset = typeof(GenericSOCreator).GetMethod(
-                "CreateAsset",
-                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly,
-                null,
-                Type.EmptyTypes,
-                null);
-
-            Assert.IsNotNull(createAsset);
-
-            ilGenerator.EmitCall(OpCodes.Call, createAsset, new Type[] { typeof(Type), typeof(string) });
-
-            ilGenerator.Emit(OpCodes.Nop);
-            ilGenerator.Emit(OpCodes.Ret);
-
-            SetMenuItemAttribute(menuItemMethodBuilder, menuItemMethod);
+                return _getTypeFromHandle;
+            }
         }
 
-        private static void SetMenuItemAttribute(MethodBuilder menuItemMethodBuilder, MenuItemMethod menuItemMethod)
-        {
-            ConstructorInfo classCtorInfo = typeof(MenuItem).GetConstructor(
-                BindingFlags.Public | BindingFlags.Instance,
-                null,
-                new[] { typeof(string) },
-                null);
+        public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs, string componentName) =>
+            BehaviourCreator.CreateSelectorAssemblyImpl(assemblyName, genericBehaviourWithoutArgs, componentName);
 
-            Assert.IsNotNull(classCtorInfo);
+        public static Type CreateConcreteClass(string assemblyName, Type genericBehaviourWithoutArgs, string componentName) =>
+            ConcreteClassCreator.CreateConcreteClassImpl(assemblyName, genericBehaviourWithoutArgs, componentName);
 
-            var attributeBuilder = new CustomAttributeBuilder(classCtorInfo, new object[] { $"Assets/Create/{menuItemMethod.MenuName}", menuItemMethod.Order });
-
-            menuItemMethodBuilder.SetCustomAttribute(attributeBuilder);
-        }
+        public static void CreateMenuItems(MenuItemMethod[] menuItemMethods) =>
+            MenuItemsCreator.CreateMenuItemsImpl(menuItemMethods);
 
         private static AssemblyBuilder GetAssemblyBuilder(string assemblyName)
         {
@@ -145,50 +81,8 @@
 
         private static void AddComponentMenuAttribute(TypeBuilder typeBuilder, string componentName)
         {
-            ConstructorInfo classCtorInfo = typeof(AddComponentMenu).GetConstructor(
-                BindingFlags.Public | BindingFlags.Instance,
-                null,
-                new[] { typeof(string) },
-                null);
-
-            Assert.IsNotNull(classCtorInfo);
-
-            var attributeBuilder = new CustomAttributeBuilder(classCtorInfo, new object[] { componentName });
-
+            var attributeBuilder = new CustomAttributeBuilder(AddComponentMenuConstructor, new object[] { componentName });
             typeBuilder.SetCustomAttribute(attributeBuilder);
-        }
-
-        private static void CreateBehaviourTypeProperty(TypeBuilder typeBuilder, Type propertyValue)
-        {
-            PropertyBuilder property = typeBuilder.DefineProperty(
-                "GenericBehaviourType",
-                PropertyAttributes.None,
-                typeof(Type),
-                null);
-
-            MethodBuilder pGet = typeBuilder.DefineMethod(
-                "get_GenericBehaviourType",
-                MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                typeof(Type),
-                Type.EmptyTypes);
-
-            ILGenerator pILGet = pGet.GetILGenerator();
-
-            pILGet.Emit(OpCodes.Ldtoken, propertyValue);
-
-            MethodInfo getTypeFromHandle = typeof(Type).GetMethod(
-                nameof(Type.GetTypeFromHandle),
-                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly,
-                null,
-                new[] { typeof(RuntimeTypeHandle) },
-                null);
-
-            Assert.IsNotNull(getTypeFromHandle);
-
-            pILGet.EmitCall(OpCodes.Call, getTypeFromHandle, null);
-            pILGet.Emit(OpCodes.Ret);
-
-            property.SetGetMethod(pGet);
         }
     }
 }

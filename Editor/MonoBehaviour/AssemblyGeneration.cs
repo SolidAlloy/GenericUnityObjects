@@ -6,10 +6,10 @@
 
     internal static class AssemblyGeneration
     {
-        public static string ImportAssemblyAsset(string assemblyPath)
+        public static string ImportAssemblyAsset(string assemblyPath, bool editorOnly = false)
         {
             string assemblyGUID = GetUniqueGUID();
-            string metaContent = GetMetaFileContent(assemblyGUID);
+            string metaContent = editorOnly ? GetEditorMetaContent(assemblyGUID) : GetMetaFileContent(assemblyGUID);
 
             // Starting from Unity 2019, .meta files are hidden and their direct editing via File.WriteAllText can
             // raise exceptions. Operating on a file through FileStream is safer and allows to be sure the file will be
@@ -45,6 +45,7 @@
 
         private static string GetMetaFileContent(string guid)
         {
+            // Auto Reference is disabled, all platforms are enabled, and Any CPU/OS is chosen for all platforms.
             return $@"fileFormatVersion: 2
 guid: {guid}
 PluginImporter:
@@ -105,6 +106,81 @@ PluginImporter:
       enabled: 1
       settings:
         CPU: x86_64
+  - first:
+      Windows Store Apps: WindowsStoreApps
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  userData:
+  assetBundleName:
+  assetBundleVariant:
+";
+        }
+
+        private static string GetEditorMetaContent(string guid)
+        {
+            // Auto Reference is disabled, only Editor platform is enabled.
+            return $@"fileFormatVersion: 2
+guid: {guid}
+PluginImporter:
+  externalObjects: {{}}
+  serializedVersion: 2
+  iconMap: {{}}
+  executionOrder: {{}}
+  defineConstraints: []
+  isPreloaded: 0
+  isOverridable: 0
+  isExplicitlyReferenced: 1
+  validateReferences: 1
+  platformData:
+  - first:
+      : Any
+    second:
+      enabled: 0
+      settings:
+        Exclude Editor: 0
+        Exclude Linux64: 1
+        Exclude OSXUniversal: 1
+        Exclude Win: 1
+        Exclude Win64: 1
+  - first:
+      Any: 
+    second:
+      enabled: 0
+      settings: {{}}
+  - first:
+      Editor: Editor
+    second:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+        DefaultValueInitialized: true
+        OS: AnyOS
+  - first:
+      Standalone: Linux64
+    second:
+      enabled: 0
+      settings:
+        CPU: None
+  - first:
+      Standalone: OSXUniversal
+    second:
+      enabled: 0
+      settings:
+        CPU: None
+  - first:
+      Standalone: Win
+    second:
+      enabled: 0
+      settings:
+        CPU: None
+  - first:
+      Standalone: Win64
+    second:
+      enabled: 0
+      settings:
+        CPU: None
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
