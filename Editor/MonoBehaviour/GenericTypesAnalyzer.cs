@@ -1,8 +1,10 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
+    using System;
     using System.IO;
     using GenericUnityObjects.Util;
     using ScriptableObject;
+    using UnityEditor;
     using UnityEditor.Callbacks;
     using Util;
 
@@ -11,37 +13,47 @@
         [DidReloadScripts(Config.AssemblyGenerationOrder)]
         private static void AnalyzeBehaviours()
         {
-            var analyzer = new GenericTypesAnalyzer<BehavioursGenerationDatabase>();
-
-            analyzer.RefreshDatabaseIfNeeded(() =>
+            RefreshDatabaseIfNeeded(() =>
             {
+                bool needsAssetDatabaseRefresh = false;
+
                 CreatorUtil.WithDisabledAssetDatabase(() =>
                 {
                     Directory.CreateDirectory(Config.AssembliesDirPath);
-                    analyzer.CheckArguments();
-                    analyzer.CheckBehaviours();
+                    needsAssetDatabaseRefresh = GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckArguments();
+                    needsAssetDatabaseRefresh = GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckBehaviours();
                 });
 
-                BehavioursDatabase.Initialize(analyzer.GetDictForInitialization());
+                return needsAssetDatabaseRefresh;
             });
+
+            BehavioursDatabase.Initialize(GenericTypesAnalyzer<BehavioursGenerationDatabase>.GetDictForInitialization());
         }
 
-        // [DidReloadScripts(Config.AssemblyGenerationOrder)]
+        [DidReloadScripts(Config.AssemblyGenerationOrder)]
         private static void AnalyzeScriptableObjects()
         {
-            var analyzer = new GenericTypesAnalyzer<SOGenerationDatabase>();
-
-            analyzer.RefreshDatabaseIfNeeded(() =>
+            RefreshDatabaseIfNeeded(() =>
             {
+                bool needsAssetDatabaseRefresh = false;
+
                 CreatorUtil.WithDisabledAssetDatabase(() =>
                 {
                     Directory.CreateDirectory(Config.AssembliesDirPath);
-                    analyzer.CheckArguments();
-                    analyzer.CheckBehaviours();
+                    needsAssetDatabaseRefresh = GenericTypesAnalyzer<SOGenerationDatabase>.CheckArguments();
+                    needsAssetDatabaseRefresh = GenericTypesAnalyzer<SOGenerationDatabase>.CheckScriptableObjects();
                 });
 
-                ScriptableObjectsDatabase.Initialize(analyzer.GetDictForInitialization());
+                return needsAssetDatabaseRefresh;
             });
+
+            ScriptableObjectsDatabase.Initialize(GenericTypesAnalyzer<BehavioursGenerationDatabase>.GetDictForInitialization());
+        }
+
+        private static void RefreshDatabaseIfNeeded(Func<bool> doStuff)
+        {
+            if (doStuff())
+                AssetDatabase.Refresh();
         }
     }
 }

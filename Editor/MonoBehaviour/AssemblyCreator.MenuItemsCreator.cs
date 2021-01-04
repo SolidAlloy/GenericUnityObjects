@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
     using System.Reflection.Emit;
     using ScriptableObject;
@@ -14,7 +15,7 @@
             private static MethodInfo _createAsset;
             private static FieldInfo _priorityField;
             private static ConstructorInfo _menuItemConstructor;
-            
+
             private static MethodInfo CreateAsset
             {
                 get
@@ -34,7 +35,7 @@
                     return _createAsset;
                 }
             }
-            
+
             private static FieldInfo PriorityField
             {
                 get
@@ -51,7 +52,7 @@
                     return _priorityField;
                 }
             }
-            
+
             private static ConstructorInfo MenuItemConstructor
             {
                 get
@@ -70,10 +71,9 @@
                     return _menuItemConstructor;
                 }
             }
-            
-            public static void CreateMenuItemsImpl(MenuItemMethod[] menuItemMethods)
+
+            public static void CreateMenuItemsImpl(string assemblyName, MenuItemMethod[] menuItemMethods)
             {
-                const string assemblyName = "GeneratedMenuItems";
                 const string menuItemsTypeName = "MenuItems";
 
                 AssemblyBuilder assemblyBuilder = GetAssemblyBuilder(assemblyName);
@@ -85,8 +85,7 @@
 
                 for (int i = 0; i < menuItemsLength; i++)
                 {
-                    ref MenuItemMethod menuItemMethod = ref menuItemMethods[i];
-                    AddMenuItemMethod(typeBuilder, menuItemMethod, i);
+                    AddMenuItemMethod(typeBuilder, menuItemMethods[i], i);
                 }
 
                 typeBuilder.CreateType();

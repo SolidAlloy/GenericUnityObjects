@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System;
+    using System.Collections.Generic;
     using System.Configuration.Assemblies;
     using System.Globalization;
     using System.Reflection;
@@ -60,8 +61,8 @@
         public static Type CreateConcreteClass(string assemblyName, Type genericBehaviourWithoutArgs, string componentName) =>
             ConcreteClassCreator.CreateConcreteClassImpl(assemblyName, genericBehaviourWithoutArgs, componentName);
 
-        public static void CreateMenuItems(MenuItemMethod[] menuItemMethods) =>
-            MenuItemsCreator.CreateMenuItemsImpl(menuItemMethods);
+        public static void CreateMenuItems(string assemblyName, MenuItemMethod[] menuItemMethods) =>
+            MenuItemsCreator.CreateMenuItemsImpl(assemblyName, menuItemMethods);
 
         private static AssemblyBuilder GetAssemblyBuilder(string assemblyName)
         {
