@@ -12,10 +12,10 @@
     public class CreateGenericAssetMenuAttribute : Attribute
     {
         /// <summary>The default file name used by newly created instances of this type.</summary>
-        [PublicAPI, NotNull] public string FileName = string.Empty;
+        [PublicAPI] public string FileName;
 
         /// <summary>The display name for this type shown in the Assets/Create menu.</summary>
-        [PublicAPI, NotNull] public string MenuName = string.Empty;
+        [PublicAPI] public string MenuName;
 
         /// <summary>The position of the menu item within the Assets/Create menu.</summary>
         [PublicAPI] public int Order = 0;
