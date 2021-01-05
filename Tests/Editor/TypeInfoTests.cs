@@ -1,7 +1,7 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
     using System.Collections.Generic;
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
     using SolidUtilities.Extensions;
 

@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
-    using Editor.MonoBehaviour;
+    using System.Collections.Generic;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
     using UnityEngine;
 
@@ -32,8 +33,8 @@
 
         private static void AddEntries()
         {
-            _database.InstanceAddGenericBehaviour(_behaviour);
-            _database.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
+            _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+            _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
         }
     }
 }

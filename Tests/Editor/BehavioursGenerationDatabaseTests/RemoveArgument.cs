@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class BehavioursGenerationDatabaseTests
@@ -18,7 +18,7 @@
 
             private static void CallRemoveArgument()
             {
-                _database.InstanceRemoveArgument(_firstArg, assemblyName => { });
+                _database.RemoveArgumentImpl(_firstArg, assemblyName => { });
             }
 
             [Test]
@@ -33,7 +33,7 @@
             {
                 CallRemoveArgument();
 
-                bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] actualClasses);
+                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] actualClasses);
 
                 Assert.IsTrue(success);
                 Assert.IsFalse(actualClasses.Contains(_expectedConcreteClass));
@@ -44,7 +44,7 @@
             {
                 bool acceptedAssemblyName = false;
 
-                _database.InstanceRemoveArgument(_firstArg, assemblyName =>
+                _database.RemoveArgumentImpl(_firstArg, assemblyName =>
                 {
                     if (assemblyName == AssemblyGUID)
                         acceptedAssemblyName = true;
@@ -60,7 +60,7 @@
 
                 Assert.Throws<KeyNotFoundException>(() =>
                 {
-                    _database.InstanceRemoveArgument(_firstArg, assemblyName => { });
+                    _database.RemoveArgumentImpl(_firstArg, assemblyName => { });
                 });
             }
         }

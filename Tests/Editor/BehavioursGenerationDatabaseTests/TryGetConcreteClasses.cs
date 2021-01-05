@@ -1,17 +1,17 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class BehavioursGenerationDatabaseTests
     {
         public class TryGetConcreteClasses : BehavioursGenerationDatabaseTests
         {
-            private static bool CallMethodBool() => _database.InstanceTryGetConcreteClasses(_behaviour, out _);
+            private static bool CallMethodBool() => _database.TryGetConcreteClassesImpl(_behaviour, out _);
 
             private static ConcreteClass[] CallMethodArray()
             {
-                _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
+                _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
                 return concreteClasses;
             }
 

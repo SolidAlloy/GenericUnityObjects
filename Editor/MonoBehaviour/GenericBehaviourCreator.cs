@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.MonoBehaviour
 {
     using System;
+    using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -9,12 +10,24 @@
     using Util;
     using Object = UnityEngine.Object;
 
-    internal class GenericBehaviourCreator
+    internal static class GenericBehaviourCreator
     {
         public static void AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
         {
-            var creator = new GenericBehaviourCreator(selectorComponentType, gameObject, genericTypeWithoutArgs, genericArgs);
-            creator.AddComponent();
+            Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
+
+            if (BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteComponent))
+            {
+                DestroySelectorComponent(gameObject, selectorComponentType);
+                gameObject.AddComponent(concreteComponent);
+                return;
+            }
+
+            PersistentStorage.SaveForAssemblyReload(gameObject, genericType);
+            DestroySelectorComponent(gameObject, selectorComponentType);
+
+            ConcreteClassCreator.CreateConcreteClassAssembly<BehavioursGenerationDatabase>(genericTypeWithoutArgs, genericArgs);
+            AssetDatabase.Refresh();
         }
 
         [DidReloadScripts(Config.UnityObjectCreationOrder)]
@@ -38,43 +51,9 @@
             }
         }
 
-        private readonly Type _selectorComponentType;
-        private readonly Type _genericTypeWithoutArgs;
-        private readonly Type[] _genericArgs;
-        private readonly GameObject _gameObject;
-
-        private GenericBehaviourCreator(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
+        private static void DestroySelectorComponent(GameObject gameObject, Type selectorComponentType)
         {
-            _selectorComponentType = selectorComponentType;
-            _gameObject = gameObject;
-            _genericTypeWithoutArgs = genericTypeWithoutArgs;
-            _genericArgs = genericArgs;
-        }
-
-        private void AddComponent()
-        {
-            if (GenericObjectDatabase.TryGetValue(_genericTypeWithoutArgs, _genericArgs, out Type concreteComponent))
-            {
-                AddConcreteComponent(concreteComponent);
-                return;
-            }
-
-            PersistentStorage.SaveForAssemblyReload(_gameObject, _genericTypeWithoutArgs.MakeGenericType(_genericArgs));
-            DestroySelectorComponent();
-
-            ConcreteClassCreator.CreateConcreteClassAssemblyForBehaviour(_genericTypeWithoutArgs, _genericArgs);
-            AssetDatabase.Refresh();
-        }
-
-        private void AddConcreteComponent(Type concreteType)
-        {
-            DestroySelectorComponent();
-            _gameObject.AddComponent(concreteType);
-        }
-
-        private void DestroySelectorComponent()
-        {
-            if (_gameObject.TryGetComponent(_selectorComponentType, out Component selectorComponent))
+            if (gameObject.TryGetComponent(selectorComponentType, out Component selectorComponent))
             {
                 Object.DestroyImmediate(selectorComponent);
             }

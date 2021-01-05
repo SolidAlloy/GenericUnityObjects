@@ -1,7 +1,7 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
     using System.Linq;
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
     using Util;
 
@@ -15,7 +15,7 @@
             private static TypeStub _typeStub;
 
             private static void CallUpdateArgumentNameAndAssembly() =>
-                _database.InstanceUpdateBehaviourNameAndAssembly(ref _behaviour, _typeStub);
+                _database.UpdateBehaviourNameAndAssemblyImpl(ref _behaviour, _typeStub);
 
             [OneTimeSetUp]
             public void BeforeAllTests()
@@ -45,10 +45,10 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] behaviours);
+                bool success = _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
-                Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly)));
+                Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeUtility.GetTypeNameAndAssembly(NewName, NewAssembly)));
             }
 
             [Test]
@@ -56,7 +56,7 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
+                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Length != 0);
@@ -66,7 +66,7 @@
             public void Updates_passed_behaviour_TypeNameAndAssembly()
             {
                 CallUpdateArgumentNameAndAssembly();
-                Assert.IsTrue(_behaviour.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly));
+                Assert.IsTrue(_behaviour.TypeNameAndAssembly == TypeUtility.GetTypeNameAndAssembly(NewName, NewAssembly));
             }
         }
     }

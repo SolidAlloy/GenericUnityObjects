@@ -2,7 +2,6 @@
 {
     using System;
     using GenericUnityObjects.Util;
-    using ScriptableObject;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;

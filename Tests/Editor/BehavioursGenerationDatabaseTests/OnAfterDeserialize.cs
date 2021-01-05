@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using System.Reflection;
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using Editor.Util;
     using NUnit.Framework;
     using UnityEngine;
@@ -40,8 +40,8 @@
                 var cleanInstance = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
                 _instanceField.SetValue(_getterInstance, cleanInstance);
                 BehavioursGenerationDatabase.Instance.Initialize();
-                BehavioursGenerationDatabase.AddGenericBehaviour(_behaviour);
-                BehavioursGenerationDatabase.Instance.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
+                BehavioursGenerationDatabase.AddGenericType(_behaviour);
+                BehavioursGenerationDatabase.Instance.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
             }
 
             private static void ReserializeDatabase()

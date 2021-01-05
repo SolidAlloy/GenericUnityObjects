@@ -1,6 +1,6 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     public class BehaviourInfoTests

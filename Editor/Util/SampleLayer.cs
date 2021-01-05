@@ -1,6 +1,5 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
-    using System;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -22,11 +21,14 @@
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         public static class GenericObjectDatabase
         {
+            // TODO: check how samples will be created
+            /*
             public static bool ContainsKey(Type genericType, Type[] key) =>
                 GenericUnityObjects.Util.GenericObjectDatabase.ContainsKey(genericType, key);
 
             public static void Add(Type genericTypeWithoutArgs, Type[] key, Type value) =>
                 GenericUnityObjects.Util.GenericObjectDatabase.Add(genericTypeWithoutArgs, key, value);
+                */
         }
     }
 }

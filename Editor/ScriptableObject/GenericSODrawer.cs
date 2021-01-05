@@ -1,13 +1,11 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObject
 {
     using System;
-    using GenericUnityObjects;
     using GenericUnityObjects.Util;
     using SolidUtilities.Editor.Extensions;
     using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
-    using Util;
 
     /// <summary>
     /// The default object field drawn for types derived from <see cref="GenericScriptableObject"/> does not list
@@ -35,7 +33,7 @@
             if ( ! objectType.IsGenericType)
                 return objectType;
 
-            GenericObjectDatabase.TryGetValue(objectType, out Type concreteType);
+            ScriptableObjectsDatabase.TryGetConcreteType(objectType, out Type concreteType);
 
             return concreteType ?? objectType;
         }

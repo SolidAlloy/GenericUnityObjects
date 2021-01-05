@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
-    using Editor.MonoBehaviour;
+    using System.Collections.Generic;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class BehavioursGenerationDatabaseTests
@@ -9,7 +10,7 @@
         {
             private static void AssertFalse()
             {
-                bool success = _database.InstanceTryGetConcreteClassesByArgument(_behaviour, _firstArg, out ConcreteClass[] concreteClasses);
+                bool success = _database.TryGetConcreteClassesByArgumentImpl(_behaviour, _firstArg, out ConcreteClass[] concreteClasses);
 
                 Assert.IsFalse(success);
                 Assert.IsNull(concreteClasses);
@@ -20,7 +21,7 @@
             {
                 AddEntries();
 
-                bool success = _database.InstanceTryGetConcreteClassesByArgument(_behaviour, _firstArg, out ConcreteClass[] concreteClasses);
+                bool success = _database.TryGetConcreteClassesByArgumentImpl(_behaviour, _firstArg, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(success);
                 Assert.IsNotNull(concreteClasses);
@@ -32,7 +33,7 @@
             {
                 AddEntries();
 
-                _database.InstanceRemoveArgument(_firstArg, (assemblyGUID) => { });
+                _database.RemoveArgumentImpl(_firstArg, (assemblyGUID) => { });
 
                 AssertFalse();
             }
@@ -44,11 +45,11 @@
                 AddEntries();
 
                 var secondBehaviour = new GenericTypeInfo("secondName", "secondGUID", new[] { "secondArgs" });
-                _database.InstanceAddGenericBehaviour(secondBehaviour);
-                _database.InstanceAddConcreteClass(secondBehaviour, _firstSecondArgs, AssemblyGUID);
+                _database.AddGenericBehaviourImpl(secondBehaviour, out List<ConcreteClass> _);
+                _database.AddConcreteClassImpl(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 
                 // Action
-                _database.InstanceRemoveGenericBehaviour(_behaviour, _ => { });
+                _database.RemoveGenericBehaviourImpl(_behaviour, _ => { });
 
                 // Check
                 AssertFalse();

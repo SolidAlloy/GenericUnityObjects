@@ -70,7 +70,7 @@
         {
             var instance = ScriptableObject.CreateInstance<T>();
 #if UNITY_EDITOR
-            DebugUtil.Log($"The asset of type {typeof(T)} was created.");
+            DebugUtility.Log($"The asset of type {typeof(T)} was created.");
             Directory.CreateDirectory(_folderPath);
             AssetDatabase.CreateAsset(instance, _assetPath);
             instance.Initialize();

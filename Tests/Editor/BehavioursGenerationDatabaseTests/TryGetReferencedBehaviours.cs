@@ -1,6 +1,6 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class BehavioursGenerationDatabaseTests
@@ -8,11 +8,11 @@
         public class TryGetReferencedBehaviours : BehavioursGenerationDatabaseTests
         {
             private static bool CallMethodBool() =>
-                _database.InstanceTryGetReferencedBehaviours(_firstArg, out _);
+                _database.TryGetReferencedBehavioursImpl(_firstArg, out _);
 
             private static GenericTypeInfo[] CallMethodArray()
             {
-                _database.InstanceTryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] behaviours);
+                _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] behaviours);
                 return behaviours;
             }
 

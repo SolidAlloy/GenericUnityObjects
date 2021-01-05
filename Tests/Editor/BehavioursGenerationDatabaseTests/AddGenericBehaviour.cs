@@ -1,7 +1,9 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class BehavioursGenerationDatabaseTests
@@ -13,7 +15,7 @@
             {
                 var expectedBehaviours = new[] { _behaviour };
 
-                _database.InstanceAddGenericBehaviour(_behaviour);
+                _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
 
                 Assert.IsTrue(_database.InstanceBehaviours.SequenceEqual(expectedBehaviours));
                 Assert.IsEmpty(_database.InstanceArguments);
@@ -22,11 +24,11 @@
             [Test]
             public void Throws_ArgumentException_if_key_exists()
             {
-                _database.InstanceAddGenericBehaviour(_behaviour);
+                _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                    _database.InstanceAddGenericBehaviour(_behaviour);
+                    _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
                 });
             }
         }

@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class BehavioursGenerationDatabaseTests
@@ -18,14 +18,14 @@
 
                 _secondBehaviour = new GenericTypeInfo("secondBehaviourName", "secondBehaviourGUID", new[] { "secondArgs" });
 
-                _database.InstanceAddGenericBehaviour(_behaviour);
-                _database.InstanceAddGenericBehaviour(_secondBehaviour);
+                _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericBehaviourImpl(_secondBehaviour, out List<ConcreteClass> _);
 
-                _database.InstanceAddConcreteClass(_behaviour, _firstSecondArgs, AssemblyGUID);
-                _database.InstanceAddConcreteClass(_secondBehaviour, _firstSecondArgs, AssemblyGUID);
+                _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
+                _database.AddConcreteClassImpl(_secondBehaviour, _firstSecondArgs, AssemblyGUID);
             }
 
-            private void CallRemoveGenericBehaviour(GenericTypeInfo behaviour) => _database.InstanceRemoveGenericBehaviour(behaviour, _ => { });
+            private void CallRemoveGenericBehaviour(GenericTypeInfo behaviour) => _database.RemoveGenericBehaviourImpl(behaviour, _ => { });
 
             [Test]
             public void Removes_behaviour_from_behaviours_list()
@@ -40,11 +40,11 @@
             {
                 CallRemoveGenericBehaviour(_behaviour);
 
-                bool firstSuccess = _database.InstanceTryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] firstBehaviours);
+                bool firstSuccess = _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] firstBehaviours);
                 Assert.IsTrue(firstSuccess);
                 Assert.IsFalse(firstBehaviours.Contains(_behaviour));
 
-                bool secondSuccess = _database.InstanceTryGetReferencedBehaviours(_secondArg, out GenericTypeInfo[] secondBehaviours);
+                bool secondSuccess = _database.TryGetReferencedBehavioursImpl(_secondArg, out GenericTypeInfo[] secondBehaviours);
                 Assert.IsTrue(secondSuccess);
                 Assert.IsFalse(secondBehaviours.Contains(_behaviour));
             }
@@ -66,7 +66,7 @@
 
                 Assert.Throws<KeyNotFoundException>(() =>
                 {
-                    _database.InstanceRemoveGenericBehaviour(_behaviour, _ => { });
+                    _database.RemoveGenericBehaviourImpl(_behaviour, _ => { });
                 });
             }
         }

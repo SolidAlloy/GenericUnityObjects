@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObject
 {
     using System;
-    using GenericUnityObjects;
     using SelectionWindow;
     using UnityEditor;
 

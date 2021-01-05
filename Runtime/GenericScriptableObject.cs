@@ -22,7 +22,7 @@
             if ( ! type.IsGenericType)
                 return ScriptableObject.CreateInstance(type);
 
-            if (GenericObjectDatabase.TryGetValue(type, out Type concreteType))
+            if (ScriptableObjectsDatabase.TryGetConcreteType(type, out Type concreteType))
                 return ScriptableObject.CreateInstance(concreteType);
 
             Debug.LogWarning($"There is no {type.GetGenericTypeDefinition()} derivative with type parameters " +

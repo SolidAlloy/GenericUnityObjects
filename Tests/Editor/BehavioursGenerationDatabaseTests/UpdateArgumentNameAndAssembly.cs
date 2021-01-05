@@ -1,10 +1,9 @@
 ﻿namespace GenericUnityObjects.EditorTests
 {
     using System.Linq;
-    using Editor.MonoBehaviour;
+    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
     using Util;
-    using TypeInfo = Editor.MonoBehaviour.TypeInfo;
 
     internal partial class BehavioursGenerationDatabaseTests
     {
@@ -16,7 +15,7 @@
             private static TypeStub _typeStub;
 
             private static void CallUpdateArgumentNameAndAssembly() =>
-                _database.InstanceUpdateArgumentNameAndAssembly(ref _firstArg, _typeStub);
+                _database.UpdateArgumentNameAndAssemblyImpl(ref _firstArg, _typeStub);
 
             [OneTimeSetUp]
             public void BeforeAllTests()
@@ -47,7 +46,7 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.InstanceTryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
+                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Any(concreteClass => concreteClass.Arguments.Contains(_expectedArg)));
@@ -58,7 +57,7 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.InstanceTryGetReferencedBehaviours(_expectedArg, out GenericTypeInfo[] behaviours);
+                bool success = _database.TryGetReferencedBehavioursImpl(_expectedArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Length != 0);
@@ -68,7 +67,7 @@
             public void Updates_passed_argument_TypeNameAndAssembly()
             {
                 CallUpdateArgumentNameAndAssembly();
-                Assert.IsTrue(_firstArg.TypeNameAndAssembly == TypeHelper.GetTypeNameAndAssembly(NewName, NewAssembly));
+                Assert.IsTrue(_firstArg.TypeNameAndAssembly == TypeUtility.GetTypeNameAndAssembly(NewName, NewAssembly));
             }
         }
     }

@@ -87,7 +87,7 @@
 
         public bool TryGetEmptyDerivedType(Type genericType, out Type derivedType)
         {
-            derivedType = TypeHelper.GetEmptyTypeDerivedFrom(genericType);
+            derivedType = TypeUtility.GetEmptyTypeDerivedFrom(genericType);
 
             if (derivedType == null)
                 return false;
@@ -236,7 +236,7 @@
         public SerializableType(Type type)
         {
             _value = type;
-            _typeNameAndAssembly = TypeHelper.GetTypeNameAndAssembly(type);
+            _typeNameAndAssembly = TypeUtility.GetTypeNameAndAssembly(type);
             _triedSettingTypeOnce = false;
         }
 
