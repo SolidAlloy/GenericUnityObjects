@@ -16,7 +16,7 @@
             if (BehavioursDatabase.TryGetConcreteType(genericTypeWithArgs, out concreteType))
                 return true;
 
-            concreteType = BehaviourCache.GetClass(genericTypeWithArgs);
+            concreteType = GeneratedUnityObjectCache.GetBehaviourClass(genericTypeWithArgs);
             return concreteType != null;
         }
 

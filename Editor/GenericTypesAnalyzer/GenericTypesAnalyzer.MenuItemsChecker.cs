@@ -13,7 +13,7 @@
     {
         private static class MenuItemsChecker
         {
-            private const string MenuItemsAssemblyName = "GeneratedMenuItems";
+            private const string AssemblyName = Config.MenuItemsAssemblyName;
 
             public static bool CheckMenuItemsImpl()
             {
@@ -87,24 +87,24 @@
 
             private static void CreateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
             {
-                AssemblyCreator.CreateMenuItems(MenuItemsAssemblyName, menuItemMethods);
-                string assemblyPath = $"{Config.AssembliesDirPath}/{MenuItemsAssemblyName}.dll";
+                AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
+                string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
                 AssemblyGeneration.ImportAssemblyAsset(assemblyPath, true);
             }
 
             private static void RemoveMenuItemsAssembly()
             {
-                string assemblyPath = $"{Config.AssembliesDirPath}/{MenuItemsAssemblyName}.dll";
+                string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
                 AssemblyAssetOperations.RemoveAssemblyByPath(assemblyPath);
             }
 
             private static void UpdateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
             {
-                string assemblyPath = $"{Config.AssembliesDirPath}/{MenuItemsAssemblyName}.dll";
+                string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
 
-                AssemblyAssetOperations.ReplaceAssemblyByPath(assemblyPath, MenuItemsAssemblyName, () =>
+                AssemblyAssetOperations.ReplaceAssemblyByPath(assemblyPath, AssemblyName, () =>
                 {
-                    AssemblyCreator.CreateMenuItems(MenuItemsAssemblyName, menuItemMethods);
+                    AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
                 });
             }
         }

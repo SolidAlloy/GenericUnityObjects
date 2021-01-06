@@ -7,7 +7,7 @@
 
     internal static partial class AssemblyCreator
     {
-        private static class BehaviourCreator
+        private static class BehaviourSelectorCreator
         {
             public static void CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs, string componentName)
             {

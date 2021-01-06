@@ -25,8 +25,13 @@
             if (ScriptableObjectsDatabase.TryGetConcreteType(type, out Type concreteType))
                 return ScriptableObject.CreateInstance(concreteType);
 
+            concreteType = GeneratedUnityObjectCache.GetBehaviourClass(type);
+            if (concreteType != null)
+                return ScriptableObject.CreateInstance(concreteType);
+
             Debug.LogWarning($"There is no {type.GetGenericTypeDefinition()} derivative with type parameters " +
-                             $"{string.Join(", ", type.GetGenericArguments().Select(typeParam => typeParam.Name))}. " +
+                             $"{string.Join(", ", type.GetGenericArguments().Select(typeParam => typeParam.Name))} " +
+                             "and a type cannot be created dynamically in an IL2CPP build. " +
                              "Please create an asset with such type parameters once to be able to create it from code.");
 
             return null;

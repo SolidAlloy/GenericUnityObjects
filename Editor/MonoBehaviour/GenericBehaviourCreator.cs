@@ -26,7 +26,7 @@
             PersistentStorage.SaveForAssemblyReload(gameObject, genericType);
             DestroySelectorComponent(gameObject, selectorComponentType);
 
-            ConcreteClassCreator.CreateConcreteClassAssembly<BehavioursGenerationDatabase>(genericTypeWithoutArgs, genericArgs);
+            BehaviourCreator.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();
         }
 

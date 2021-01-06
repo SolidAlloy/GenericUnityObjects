@@ -13,7 +13,6 @@
     internal static partial class AssemblyCreator
     {
         private static ConstructorInfo _addComponentMenuConstructor;
-        private static MethodInfo _getTypeFromHandle;
 
         private static ConstructorInfo AddComponentMenuConstructor
         {
@@ -33,6 +32,8 @@
                 return _addComponentMenuConstructor;
             }
         }
+
+        private static MethodInfo _getTypeFromHandle;
 
         private static MethodInfo GetTypeFromHandle
         {
@@ -55,18 +56,21 @@
         }
 
         public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs, string componentName) =>
-            BehaviourCreator.CreateSelectorAssemblyImpl(assemblyName, genericBehaviourWithoutArgs, componentName);
+            BehaviourSelectorCreator.CreateSelectorAssemblyImpl(assemblyName, genericBehaviourWithoutArgs, componentName);
 
-        public static Type CreateConcreteClass(string assemblyName, Type genericBehaviourWithoutArgs, string componentName) =>
-            ConcreteClassCreator.CreateConcreteClassImpl(assemblyName, genericBehaviourWithoutArgs, componentName);
+        public static Type CreateConcreteClassForBehaviour(string assemblyName, Type genericBehaviourWithArgs, string componentName) =>
+            ConcreteClassCreator.CreateConcreteClassImpl(assemblyName, genericBehaviourWithArgs, componentName);
+
+        public static Type CreateConcreteClassForSO(string assemblyName, Type genericBehaviourWithArgs) =>
+            ConcreteClassCreator.CreateConcreteClassImpl(assemblyName, genericBehaviourWithArgs);
 
         public static void CreateMenuItems(string assemblyName, MenuItemMethod[] menuItemMethods) =>
             MenuItemsCreator.CreateMenuItemsImpl(assemblyName, menuItemMethods);
 
-        private static AssemblyBuilder GetAssemblyBuilder(string assemblyName)
+        private static AssemblyBuilder GetAssemblyBuilder(string generatedAssemblyName)
         {
-            return AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName(assemblyName)
+            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
+                new AssemblyName(generatedAssemblyName)
                 {
                     CultureInfo = CultureInfo.InvariantCulture,
                     Flags = AssemblyNameFlags.None,
@@ -74,10 +78,14 @@
                     VersionCompatibility = AssemblyVersionCompatibility.SameDomain
                 },
                 AssemblyBuilderAccess.RunAndSave, Config.AssembliesDirPath);
+
+            return assemblyBuilder;
         }
 
-        private static ModuleBuilder GetModuleBuilder(AssemblyBuilder assemblyBuilder, string assemblyName) =>
-            assemblyBuilder.DefineDynamicModule($"{assemblyName}.dll", true);
+        private static ModuleBuilder GetModuleBuilder(AssemblyBuilder assemblyBuilder, string generatedAssemblyName)
+        {
+            return assemblyBuilder.DefineDynamicModule($"{generatedAssemblyName}.dll", true);
+        }
 
         private static void AddComponentMenuAttribute(TypeBuilder typeBuilder, string componentName)
         {

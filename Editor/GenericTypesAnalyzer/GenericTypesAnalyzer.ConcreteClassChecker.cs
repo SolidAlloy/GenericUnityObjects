@@ -16,24 +16,24 @@
                     UpdateConcreteClassAssembly(behaviourType, concreteClass);
                 }
             }
-            
-            private static void UpdateConcreteClassAssembly(Type behaviourType, ConcreteClass concreteClass)
+
+            private static void UpdateConcreteClassAssembly(Type genericType, ConcreteClass concreteClass)
             {
                 if ( ! GetArgumentTypes(concreteClass, out Type[] argumentTypes))
                     return;
 
-                UpdateConcreteClassAssembly(behaviourType, argumentTypes, concreteClass);
+                UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass);
                 LogHelper.RemoveLogEntriesByMode(LogModes.EditorErrors);
                 LogHelper.RemoveLogEntriesByMode(LogModes.UserAndEditorWarnings);
             }
 
-            private static void UpdateConcreteClassAssembly(Type behaviourType, Type[] argumentTypes, ConcreteClass concreteClass)
+            private static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
             {
                 string newAssemblyName;
 
                 try
                 {
-                    newAssemblyName = ConcreteClassCreator.GetConcreteClassAssemblyName(behaviourType, argumentTypes);
+                    newAssemblyName = ConcreteClassCreator.GetConcreteClassAssemblyName(genericType, argumentTypes);
                 }
                 catch (TypeLoadException)
                 {
@@ -42,7 +42,14 @@
 
                 AssemblyAssetOperations.ReplaceAssemblyByGUID(concreteClass.AssemblyGUID, newAssemblyName, () =>
                 {
-                    ConcreteClassCreator.CreateConcreteClassAssembly(behaviourType, argumentTypes, newAssemblyName);
+                    if (typeof(UnityEngine.MonoBehaviour).IsAssignableFrom(genericType))
+                    {
+                        BehaviourCreator.CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName);
+                    }
+                    else if (typeof(GenericScriptableObject).IsAssignableFrom(genericType))
+                    {
+                        ScriptableObjectCreator.CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName);
+                    }
                 });
             }
 

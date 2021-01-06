@@ -13,7 +13,7 @@
     using UnityEngine.Assertions;
     using Util;
 
-    public class GenericSOCreator
+    internal class GenericSOCreator
     {
         /// <summary>
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the
@@ -69,7 +69,7 @@
 
             PersistentStorage.SaveForAssemblyReload(genericType, fileName);
 
-            ConcreteClassCreator.CreateConcreteClassAssembly<SOGenerationDatabase>(genericTypeWithoutArgs, genericArgs);
+            ScriptableObjectCreator.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();
         }
 

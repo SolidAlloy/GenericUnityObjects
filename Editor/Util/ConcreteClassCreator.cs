@@ -10,21 +10,52 @@
     using UnityEditor;
     using UnityEngine.Assertions;
 
-    internal static class ConcreteClassCreator
+    internal class BehaviourCreator : ConcreteClassCreator
     {
-        public static void CreateConcreteClassAssembly<TDatabase>(Type genericTypeWithoutArgs, Type[] argumentTypes)
-            where TDatabase : GenerationDatabase<TDatabase>
+        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
-            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
-            GenerationDatabase<TDatabase>.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, CreateConcreteClassAssembly);
+            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
         public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
         {
             string componentName = "Scripts/" + GetComponentName(genericTypeWithoutArgs, argumentTypes);
-            AssemblyCreator.CreateConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), componentName);
+            AssemblyCreator.CreateConcreteClassForBehaviour(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), componentName);
         }
 
+        private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)
+        {
+            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+
+            string shortName = genericTypeWithoutArgs.Name;
+            string typeNameWithoutSuffix = shortName.StripGenericSuffix();
+
+            var argumentNames = genericArgs
+                .Select(argument => argument.FullName)
+                .Select(fullName => fullName.ReplaceWithBuiltInName())
+                .Select(fullName => fullName.GetSubstringAfterLast('.'));
+
+            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
+        }
+    }
+
+    internal class ScriptableObjectCreator : ConcreteClassCreator
+    {
+        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        {
+            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, CreateConcreteClassAssembly);
+            SOGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+        }
+
+        public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
+        {
+            AssemblyCreator.CreateConcreteClassForSO(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
+        }
+    }
+
+    internal class ConcreteClassCreator
+    {
         public static string GetConcreteClassAssemblyName(Type genericTypeWithoutArgs, Type[] genericArgs)
         {
             var argumentsNames = genericArgs.Select(argument => GetShortNameForNaming(argument.FullName));
@@ -45,7 +76,7 @@
             return newAssemblyName;
         }
 
-        private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        protected static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, Action<Type, Type[], string> createAssemblyImpl)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
@@ -54,26 +85,11 @@
 
             AssetDatabaseHelper.WithDisabledAssetDatabase(() =>
             {
-                CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
+                createAssemblyImpl(genericTypeWithoutArgs, argumentTypes, assemblyName);
                 assemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
             });
 
             return assemblyGUID;
-        }
-
-        private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)
-        {
-            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
-
-            string shortName = genericTypeWithoutArgs.Name;
-            string typeNameWithoutSuffix = shortName.StripGenericSuffix();
-
-            var argumentNames = genericArgs
-                .Select(argument => argument.FullName)
-                .Select(fullName => fullName.ReplaceWithBuiltInName())
-                .Select(fullName => fullName.GetSubstringAfterLast('.'));
-
-            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
 
         private static string GetShortNameForNaming(string fullName)
