@@ -11,9 +11,9 @@
 
     internal static partial class GenericTypesAnalyzer<TDatabase>
     {
-        private static class ScriptableObjectsChecker
+        public static class ScriptableObjectsChecker
         {
-            public static bool CheckScriptableObjectsImpl()
+            public static bool Check()
             {
                 var oldScriptableObjects = GenerationDatabase<TDatabase>.GenericUnityObjects;
                 var newScriptableObjects = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>()

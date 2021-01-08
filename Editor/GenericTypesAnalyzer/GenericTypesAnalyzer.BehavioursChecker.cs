@@ -13,9 +13,9 @@
 
     internal static partial class GenericTypesAnalyzer<TDatabase>
     {
-        private static class BehavioursChecker
+        public static class BehavioursChecker
         {
-            public static bool CheckBehavioursImpl()
+            public static bool Check()
             {
                 var oldBehaviours = GenerationDatabase<TDatabase>.GenericUnityObjects;
                 var newBehaviours = TypeCache.GetTypesDerivedFrom<UnityEngine.MonoBehaviour>()
@@ -183,7 +183,7 @@
                 BehaviourConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
             }
 
-            public static void UpdateReferencedBehaviours(ArgumentInfo argument, GenericTypeInfo[] referencedBehaviours)
+            public static void UpdateReferencedGenericTypes(ArgumentInfo argument, GenericTypeInfo[] referencedBehaviours)
             {
                 foreach (GenericTypeInfo behaviour in referencedBehaviours)
                 {

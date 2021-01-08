@@ -68,7 +68,7 @@
             public void Restores_referenced_behaviours()
             {
                 ReserializeDatabase();
-                bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedBehaviours(_firstArg, out GenericTypeInfo[] referencedBehaviours);
+                bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedGenericTypes(_firstArg, out GenericTypeInfo[] referencedBehaviours);
                 Assert.IsTrue(behavioursSuccess);
                 Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedBehaviours));
             }

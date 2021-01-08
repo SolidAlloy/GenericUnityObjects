@@ -51,13 +51,5 @@
 
             return dict;
         }
-
-        public static bool CheckBehaviours() => BehavioursChecker.CheckBehavioursImpl();
-
-        public static bool CheckArguments() => ArgumentsChecker.CheckArgumentsImpl();
-
-        public static bool CheckScriptableObjects() => ScriptableObjectsChecker.CheckScriptableObjectsImpl();
-
-        public static bool CheckMenuItems() => MenuItemsChecker.CheckMenuItemsImpl();
     }
 }

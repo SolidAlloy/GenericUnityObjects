@@ -6,7 +6,6 @@
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using Util;
 
     internal abstract partial class GenerationDatabase<TDatabase> :
@@ -168,7 +167,7 @@
             return concreteClasses.Count != 0;
         }
 
-        public static bool TryGetReferencedBehaviours(ArgumentInfo argument, out GenericTypeInfo[] referencedBehaviours)
+        public static bool TryGetReferencedGenericTypes(ArgumentInfo argument, out GenericTypeInfo[] referencedBehaviours)
         {
             return Instance.TryGetReferencedBehavioursImpl(argument, out referencedBehaviours);
         }

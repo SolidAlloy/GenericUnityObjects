@@ -11,11 +11,11 @@
 
     internal static partial class GenericTypesAnalyzer<TDatabase>
     {
-        private static class MenuItemsChecker
+        public static class MenuItemsChecker
         {
             private const string AssemblyName = Config.MenuItemsAssemblyName;
 
-            public static bool CheckMenuItemsImpl()
+            public static bool Check()
             {
                 var newScriptableObjects = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>()
                     .Where(type => type.IsGenericType && ! type.IsAbstract)

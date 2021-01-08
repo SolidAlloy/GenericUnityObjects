@@ -19,8 +19,8 @@
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
                 needsAssetDatabaseRefresh =
-                    GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckArguments()
-                    || GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckBehaviours();
+                    GenericTypesAnalyzer<BehavioursGenerationDatabase>.ArgumentsChecker.Check()
+                    || GenericTypesAnalyzer<BehavioursGenerationDatabase>.BehavioursChecker.Check();
             }
 
             if (needsAssetDatabaseRefresh)
@@ -39,9 +39,9 @@
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
                 needsAssetDatabaseRefresh =
-                    GenericTypesAnalyzer<SOGenerationDatabase>.CheckArguments()
-                    || GenericTypesAnalyzer<SOGenerationDatabase>.CheckScriptableObjects()
-                    || GenericTypesAnalyzer<SOGenerationDatabase>.CheckMenuItems();
+                    GenericTypesAnalyzer<SOGenerationDatabase>.ArgumentsChecker.Check()
+                    || GenericTypesAnalyzer<SOGenerationDatabase>.ScriptableObjectsChecker.Check()
+                    || GenericTypesAnalyzer<SOGenerationDatabase>.MenuItemsChecker.Check();
             }
 
             if (needsAssetDatabaseRefresh)
