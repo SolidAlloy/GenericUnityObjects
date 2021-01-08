@@ -1,12 +1,9 @@
 ﻿namespace GenericUnityObjects.Editor
 {
-    using System;
     using GenericUnityObjects;
-    using SolidUtilities.Editor.Helpers;
     using UnityEditor;
-    using UnityEngine;
-    using UnityEngine.Assertions;
 
+#if !DISABLE_GENERIC_OBJECT_EDITOR
     [CanEditMultipleObjects]
     [CustomEditor(typeof(UnityEngine.MonoBehaviour), true)]
     internal class MonoBehaviourEditor : GenericUnityObjectEditor { }
@@ -14,23 +11,15 @@
     [CanEditMultipleObjects]
     [CustomEditor(typeof(GenericScriptableObject), true)]
     internal class GenericScriptableObjectEditor : GenericUnityObjectEditor { }
+#endif
 
     internal class GenericUnityObjectEditor : Editor
     {
-        private bool _drawForGeneric;
-        private MonoScript _monoScript;
-        private Type _genericType;
+        private GenericUnityObjectHelper _helper;
 
         private void OnEnable()
         {
-            _genericType = target.GetType().BaseType;
-
-            if (_genericType?.IsGenericType != true)
-                return;
-
-            _drawForGeneric = true;
-            _monoScript = AssetSearcher.GetMonoScriptFromType(_genericType);
-            Assert.IsNotNull(_monoScript);
+            _helper = new GenericUnityObjectHelper(target);
         }
 
         public override void OnInspectorGUI()
@@ -43,17 +32,7 @@
             {
                 if (iterator.propertyPath == "m_Script")
                 {
-                    using (new EditorGUI.DisabledScope(true))
-                    {
-                        if (_drawForGeneric)
-                        {
-                            EditorGUILayout.ObjectField("Script", _monoScript, _genericType, false, null);
-                        }
-                        else
-                        {
-                            EditorGUILayout.ObjectField(iterator, (GUILayoutOption[]) null);
-                        }
-                    }
+                    _helper.DrawMonoScript(iterator);
                 }
                 else
                 {
