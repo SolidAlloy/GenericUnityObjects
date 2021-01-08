@@ -11,8 +11,5 @@
 
         public const int AssemblyGenerationOrder = 1;
         public const int UnityObjectCreationOrder = 2;
-
-        // Not const so that analyzers don't complain that the expression is always true/false.
-        public static readonly bool Debug = true;
     }
 }

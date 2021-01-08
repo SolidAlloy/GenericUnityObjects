@@ -39,11 +39,9 @@
         /// <summary>
         /// Gets the type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>.
         /// </summary>
-        public static string GetShortNameWithBrackets(Type genericTypeWithoutArgs, Type[] genericArgs = null)
+        public static string GetShortNameWithBrackets(Type genericTypeWithoutArgs)
         {
-            if (genericArgs == null)
-                genericArgs = genericTypeWithoutArgs.GetGenericArguments();
-
+            Type[] genericArgs = genericTypeWithoutArgs.GetGenericArguments();
             string typeNameWithoutBrackets = genericTypeWithoutArgs.Name.StripGenericSuffix();
             var argumentNames = genericArgs.Select(argument => argument.Name);
             return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";

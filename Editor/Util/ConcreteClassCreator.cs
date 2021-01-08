@@ -6,88 +6,50 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
     using UnityEditor;
-    using UnityEngine.Assertions;
 
-    internal class BehaviourCreator : ConcreteClassCreator
+    internal abstract class ConcreteClassCreator
     {
-        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        protected void CreateConcreteClassImpl(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
-            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, CreateConcreteClassAssembly);
-            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
+            AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
-        public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
+        protected void UpdateConcreteClassAssemblyImpl(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
         {
-            string componentName = "Scripts/" + GetComponentName(genericTypeWithoutArgs, argumentTypes);
-            AssemblyCreator.CreateConcreteClassForBehaviour(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), componentName);
+            string newAssemblyName;
+
+            try
+            {
+                newAssemblyName = GetConcreteClassAssemblyName(genericType, argumentTypes);
+            }
+            catch (TypeLoadException)
+            {
+                return;
+            }
+
+            AssemblyAssetOperations.ReplaceAssemblyByGUID(concreteClass.AssemblyGUID, newAssemblyName,
+                () => CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName));
         }
 
-        private static string GetComponentName(Type genericTypeWithoutArgs, Type[] genericArgs)
-        {
-            Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
+        protected abstract void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
+            string newAssemblyName);
 
-            string shortName = genericTypeWithoutArgs.Name;
-            string typeNameWithoutSuffix = shortName.StripGenericSuffix();
+        protected abstract void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID);
 
-            var argumentNames = genericArgs
-                .Select(argument => argument.FullName)
-                .Select(fullName => fullName.ReplaceWithBuiltInName())
-                .Select(fullName => fullName.GetSubstringAfterLast('.'));
-
-            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
-        }
-    }
-
-    internal class ScriptableObjectCreator : ConcreteClassCreator
-    {
-        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
-        {
-            string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, CreateConcreteClassAssembly);
-            SOGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
-        }
-
-        public static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName)
-        {
-            AssemblyCreator.CreateConcreteClassForSO(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
-        }
-    }
-
-    internal class ConcreteClassCreator
-    {
-        public static string GetConcreteClassAssemblyName(Type genericTypeWithoutArgs, Type[] genericArgs)
-        {
-            var argumentsNames = genericArgs.Select(argument => GetShortNameForNaming(argument.FullName));
-            string newAssemblyName = $"{GetShortNameForNaming(genericTypeWithoutArgs.FullName)}_{string.Join("_", argumentsNames)}";
-            var dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
-            int identicalFilesCount = dirInfo.GetFiles($"{newAssemblyName}*.dll").Length;
-
-            if (identicalFilesCount == 0)
-                return newAssemblyName;
-
-            Type genericTypeWithArgs = genericTypeWithoutArgs.MakeGenericType(genericArgs);
-            bool typeExists = TypeCache.GetTypesDerivedFrom(genericTypeWithArgs).Any(type => type.IsEmpty());
-
-            if (typeExists)
-                throw new TypeLoadException($"The type {genericTypeWithArgs} already exists. No need to create one more.");
-
-            newAssemblyName += $"_{identicalFilesCount}";
-            return newAssemblyName;
-        }
-
-        protected static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, Action<Type, Type[], string> createAssemblyImpl)
+        private string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
 
-            string assemblyGUID = null;
+            string assemblyGUID;
 
-            AssetDatabaseHelper.WithDisabledAssetDatabase(() =>
+            using (new DisabledAssetDatabase(null))
             {
-                createAssemblyImpl(genericTypeWithoutArgs, argumentTypes, assemblyName);
+                CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
                 assemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
-            });
+            }
 
             return assemblyGUID;
         }
@@ -110,5 +72,59 @@
 
             return fullName;
         }
+
+        private static string GetConcreteClassAssemblyName(Type genericTypeWithoutArgs, Type[] genericArgs)
+        {
+            var argumentsNames = genericArgs.Select(argument => GetShortNameForNaming(argument.FullName));
+            string newAssemblyName = $"{GetShortNameForNaming(genericTypeWithoutArgs.FullName)}_{string.Join("_", argumentsNames)}";
+            var dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
+            int identicalFilesCount = dirInfo.GetFiles($"{newAssemblyName}*.dll").Length;
+
+            if (identicalFilesCount == 0)
+                return newAssemblyName;
+
+            Type genericTypeWithArgs = genericTypeWithoutArgs.MakeGenericType(genericArgs);
+            bool typeExists = TypeCache.GetTypesDerivedFrom(genericTypeWithArgs).Any(type => type.IsEmpty());
+
+            if (typeExists)
+                throw new TypeLoadException($"The type {genericTypeWithArgs} already exists. No need to create one more.");
+
+            newAssemblyName += $"_{identicalFilesCount}";
+            return newAssemblyName;
+        }
+    }
+
+    internal class ConcreteBehaviourCreator : ConcreteClassCreator
+    {
+        private static readonly ConcreteBehaviourCreator _creatorInstance = new ConcreteBehaviourCreator();
+
+        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes) =>
+            _creatorInstance.CreateConcreteClassImpl(genericTypeWithoutArgs, argumentTypes);
+
+        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass) =>
+            _creatorInstance.UpdateConcreteClassAssemblyImpl(genericType, argumentTypes, concreteClass);
+
+        protected override void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID) =>
+            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+
+        protected override void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName) =>
+            AssemblyCreator.CreateBehaviourConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
+    }
+
+    internal class ConcreteSOCreator : ConcreteClassCreator
+    {
+        private static readonly ConcreteSOCreator _creatorInstance = new ConcreteSOCreator();
+
+        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes) =>
+            _creatorInstance.CreateConcreteClassImpl(genericTypeWithoutArgs, argumentTypes);
+
+        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass) =>
+            _creatorInstance.UpdateConcreteClassAssemblyImpl(genericType, argumentTypes, concreteClass);
+
+        protected override void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID) =>
+            SOGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+
+        protected override void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName) =>
+            AssemblyCreator.CreateSOConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
     }
 }

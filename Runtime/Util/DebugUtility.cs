@@ -1,13 +1,11 @@
 ﻿namespace GenericUnityObjects.Util
 {
-    using UnityEngine;
+    using System.Diagnostics;
+    using Debug = UnityEngine.Debug;
 
     public static class DebugUtility
     {
-        public static void Log(string message)
-        {
-            if (Config.Debug)
-                Debug.Log(message);
-        }
+        [Conditional("GENERIC_UNITY_OBJECTS_DEBUG")]
+        public static void Log(string message) => Debug.Log(message);
     }
 }

@@ -164,9 +164,7 @@
 
             private static void CreateSelectorAssembly(Type genericTypeWithoutArgs, string assemblyName)
             {
-                Type[] genericArgs = genericTypeWithoutArgs.GetGenericArguments();
-                string componentName = "Scripts/" + TypeUtility.GetShortNameWithBrackets(genericTypeWithoutArgs, genericArgs);
-                AssemblyCreator.CreateSelectorAssembly(assemblyName, genericTypeWithoutArgs, componentName);
+                AssemblyCreator.CreateSelectorAssembly(assemblyName, genericTypeWithoutArgs);
             }
 
             private static void UpdateBehaviourTypeName(GenericTypeInfo behaviour, Type newType)
@@ -182,7 +180,7 @@
 
                 UpdateSelectorAssembly(behaviour.AssemblyGUID, newType);
 
-                ConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
+                BehaviourConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
             }
 
             public static void UpdateReferencedBehaviours(ArgumentInfo argument, GenericTypeInfo[] referencedBehaviours)
@@ -209,7 +207,7 @@
 
                     Assert.IsTrue(concreteClassesSuccess);
 
-                    ConcreteClassChecker.UpdateConcreteClassesAssemblies(behaviourType, concreteClasses);
+                    BehaviourConcreteClassChecker.UpdateConcreteClassesAssemblies(behaviourType, concreteClasses);
                 }
             }
         }

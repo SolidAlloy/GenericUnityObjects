@@ -3,6 +3,7 @@
     using System.IO;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
+    using UnityEditor;
     using UnityEditor.Callbacks;
     using Util;
 
@@ -11,21 +12,19 @@
         [DidReloadScripts(Config.AssemblyGenerationOrder)]
         private static void AnalyzeBehaviours()
         {
-            AssetDatabaseHelper.RefreshDatabaseIfNeeded(() =>
+            bool needsAssetDatabaseRefresh;
+
+            using (new DisabledAssetDatabase(null))
             {
-                bool needsAssetDatabaseRefresh = false;
+                Directory.CreateDirectory(Config.AssembliesDirPath);
 
-                AssetDatabaseHelper.WithDisabledAssetDatabase(() =>
-                {
-                    Directory.CreateDirectory(Config.AssembliesDirPath);
+                needsAssetDatabaseRefresh =
+                    GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckArguments()
+                    || GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckBehaviours();
+            }
 
-                    needsAssetDatabaseRefresh =
-                        GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckArguments()
-                        || GenericTypesAnalyzer<BehavioursGenerationDatabase>.CheckBehaviours();
-                });
-
-                return needsAssetDatabaseRefresh;
-            });
+            if (needsAssetDatabaseRefresh)
+                AssetDatabase.Refresh();
 
             BehavioursDatabase.Initialize(GenericTypesAnalyzer<BehavioursGenerationDatabase>.GetDictForInitialization());
         }
@@ -33,22 +32,20 @@
         [DidReloadScripts(Config.AssemblyGenerationOrder)]
         private static void AnalyzeScriptableObjects()
         {
-            AssetDatabaseHelper.RefreshDatabaseIfNeeded(() =>
+            bool needsAssetDatabaseRefresh;
+
+            using (new DisabledAssetDatabase(null))
             {
-                bool needsAssetDatabaseRefresh = false;
+                Directory.CreateDirectory(Config.AssembliesDirPath);
 
-                AssetDatabaseHelper.WithDisabledAssetDatabase(() =>
-                {
-                    Directory.CreateDirectory(Config.AssembliesDirPath);
+                needsAssetDatabaseRefresh =
+                    GenericTypesAnalyzer<SOGenerationDatabase>.CheckArguments()
+                    || GenericTypesAnalyzer<SOGenerationDatabase>.CheckScriptableObjects()
+                    || GenericTypesAnalyzer<SOGenerationDatabase>.CheckMenuItems();
+            }
 
-                    needsAssetDatabaseRefresh =
-                        GenericTypesAnalyzer<SOGenerationDatabase>.CheckArguments()
-                        || GenericTypesAnalyzer<SOGenerationDatabase>.CheckScriptableObjects()
-                        || GenericTypesAnalyzer<SOGenerationDatabase>.CheckMenuItems();
-                });
-
-                return needsAssetDatabaseRefresh;
-            });
+            if (needsAssetDatabaseRefresh)
+                AssetDatabase.Refresh();
 
             ScriptableObjectsDatabase.Initialize(GenericTypesAnalyzer<SOGenerationDatabase>.GetDictForInitialization());
         }

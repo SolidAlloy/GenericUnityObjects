@@ -7,9 +7,37 @@
 
     internal static partial class GenericTypesAnalyzer<TDatabase>
     {
-        private static class ConcreteClassChecker
+        private class ScriptableObjectConcreteClassChecker : ConcreteClassChecker
         {
-            public static void UpdateConcreteClassesAssemblies(Type behaviourType, ConcreteClass[] concreteClasses)
+            private static readonly ScriptableObjectConcreteClassChecker _checker =
+                new ScriptableObjectConcreteClassChecker();
+
+            public static void UpdateConcreteClassesAssemblies(Type behaviourType, ConcreteClass[] concreteClasses) =>
+                _checker.UpdateConcreteClassesAssembliesImpl(behaviourType, concreteClasses);
+
+            protected override void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
+            {
+                ConcreteSOCreator.UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass);
+            }
+        }
+
+        private class BehaviourConcreteClassChecker : ConcreteClassChecker
+        {
+            private static readonly BehaviourConcreteClassChecker _checker =
+                new BehaviourConcreteClassChecker();
+
+            public static void UpdateConcreteClassesAssemblies(Type behaviourType, ConcreteClass[] concreteClasses) =>
+                _checker.UpdateConcreteClassesAssembliesImpl(behaviourType, concreteClasses);
+
+            protected override void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
+            {
+                ConcreteBehaviourCreator.UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass);
+            }
+        }
+
+        private abstract class ConcreteClassChecker
+        {
+            protected void UpdateConcreteClassesAssembliesImpl(Type behaviourType, ConcreteClass[] concreteClasses)
             {
                 foreach (ConcreteClass concreteClass in concreteClasses)
                 {
@@ -17,7 +45,7 @@
                 }
             }
 
-            private static void UpdateConcreteClassAssembly(Type genericType, ConcreteClass concreteClass)
+            private void UpdateConcreteClassAssembly(Type genericType, ConcreteClass concreteClass)
             {
                 if ( ! GetArgumentTypes(concreteClass, out Type[] argumentTypes))
                     return;
@@ -25,32 +53,6 @@
                 UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass);
                 LogHelper.RemoveLogEntriesByMode(LogModes.EditorErrors);
                 LogHelper.RemoveLogEntriesByMode(LogModes.UserAndEditorWarnings);
-            }
-
-            private static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
-            {
-                string newAssemblyName;
-
-                try
-                {
-                    newAssemblyName = ConcreteClassCreator.GetConcreteClassAssemblyName(genericType, argumentTypes);
-                }
-                catch (TypeLoadException)
-                {
-                    return;
-                }
-
-                AssemblyAssetOperations.ReplaceAssemblyByGUID(concreteClass.AssemblyGUID, newAssemblyName, () =>
-                {
-                    if (typeof(UnityEngine.MonoBehaviour).IsAssignableFrom(genericType))
-                    {
-                        BehaviourCreator.CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName);
-                    }
-                    else if (typeof(GenericScriptableObject).IsAssignableFrom(genericType))
-                    {
-                        ScriptableObjectCreator.CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName);
-                    }
-                });
             }
 
             private static bool GetArgumentTypes(ConcreteClass concreteClass, out Type[] argumentTypes)
@@ -85,6 +87,9 @@
 
                 return true;
             }
+
+            protected abstract void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes,
+                ConcreteClass concreteClass);
         }
     }
 }

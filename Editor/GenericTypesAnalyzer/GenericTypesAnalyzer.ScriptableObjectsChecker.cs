@@ -148,7 +148,7 @@
 
                 // Update database before operating on assemblies
                 GenerationDatabase<TDatabase>.UpdateBehaviourNameAndAssembly(ref scriptableObject, newType);
-                ConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
+                ScriptableObjectConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
             }
 
             private static void UpdateScriptableObjectGUID(GenericTypeInfo scriptableObject, string newGUID)
