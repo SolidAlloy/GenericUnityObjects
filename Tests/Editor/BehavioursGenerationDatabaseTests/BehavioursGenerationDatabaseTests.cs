@@ -9,7 +9,7 @@
     {
         private const string AssemblyGUID = "testAssemblyGUID";
 
-        private static GenerationDatabase<BehavioursGenerationDatabase> _database;
+        private static GenerationDatabase<MonoBehaviour> _database;
         private static GenericTypeInfo _behaviour;
         private static ArgumentInfo _firstArg;
         private static ArgumentInfo _secondArg;
@@ -33,7 +33,7 @@
 
         private static void AddEntries()
         {
-            _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+            _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
             _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
         }
     }

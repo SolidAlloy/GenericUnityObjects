@@ -14,7 +14,7 @@
             public override void BeforeEachTest()
             {
                 base.BeforeEachTest();
-                _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
             }
 
             [Test]
@@ -41,7 +41,7 @@
             public void Adds_behaviour_to_each_argument_in_arguments_dict()
             {
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
-                bool success = _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] firstBehaviours);
+                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] firstBehaviours);
                 Assert.IsTrue(success);
                 Assert.IsTrue(firstBehaviours.SequenceEqual(_expectedBehaviours));
             }
@@ -52,11 +52,11 @@
                 var secondBehaviour = new GenericTypeInfo("secondBehaviourName", "secondBehaviourGUID", new[] { "secondArgs" });
                 var expectedBehaviours = new[] { _behaviour, secondBehaviour };
 
-                _database.AddGenericBehaviourImpl(secondBehaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(secondBehaviour, out List<ConcreteClass> _);
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
                 _database.AddConcreteClassImpl(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 
-                bool success = _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] actualBehaviours);
+                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] actualBehaviours);
                 Assert.IsTrue(success);
                 Assert.IsTrue(actualBehaviours.SequenceEqual(expectedBehaviours));
             }
@@ -64,7 +64,7 @@
             [Test]
             public void When_behaviour_does_not_exist_throws_KeyNotFound_exception()
             {
-                _database.RemoveGenericBehaviourImpl(_behaviour, _ => { });
+                _database.RemoveGenericTypeImpl(_behaviour, _ => { });
 
                 Assert.Throws<KeyNotFoundException>(() =>
                 {

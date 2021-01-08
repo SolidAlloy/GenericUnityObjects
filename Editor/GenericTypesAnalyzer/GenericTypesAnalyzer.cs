@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System.IO;
-    using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -19,14 +18,14 @@
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
                 needsAssetDatabaseRefresh =
-                    GenericTypesAnalyzer<BehavioursGenerationDatabase>.ArgumentsChecker.Check()
-                    || GenericTypesAnalyzer<BehavioursGenerationDatabase>.BehavioursChecker.Check();
+                    GenericTypesAnalyzer<UnityEngine.MonoBehaviour>.ArgumentsChecker.Check()
+                    || GenericTypesAnalyzer<UnityEngine.MonoBehaviour>.BehavioursChecker.Check();
             }
 
             if (needsAssetDatabaseRefresh)
                 AssetDatabase.Refresh();
 
-            BehavioursDatabase.Initialize(GenericTypesAnalyzer<BehavioursGenerationDatabase>.GetDictForInitialization());
+            BehavioursDatabase.Initialize(GenericTypesAnalyzer<UnityEngine.MonoBehaviour>.GetDictForInitialization());
         }
 
         [DidReloadScripts(Config.AssemblyGenerationOrder)]
@@ -39,15 +38,15 @@
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
                 needsAssetDatabaseRefresh =
-                    GenericTypesAnalyzer<SOGenerationDatabase>.ArgumentsChecker.Check()
-                    || GenericTypesAnalyzer<SOGenerationDatabase>.ScriptableObjectsChecker.Check()
-                    || GenericTypesAnalyzer<SOGenerationDatabase>.MenuItemsChecker.Check();
+                    GenericTypesAnalyzer<UnityEngine.ScriptableObject>.ArgumentsChecker.Check()
+                    || GenericTypesAnalyzer<UnityEngine.ScriptableObject>.ScriptableObjectsChecker.Check()
+                    || GenericTypesAnalyzer<UnityEngine.ScriptableObject>.MenuItemsChecker.Check();
             }
 
             if (needsAssetDatabaseRefresh)
                 AssetDatabase.Refresh();
 
-            ScriptableObjectsDatabase.Initialize(GenericTypesAnalyzer<SOGenerationDatabase>.GetDictForInitialization());
+            ScriptableObjectsDatabase.Initialize(GenericTypesAnalyzer<UnityEngine.ScriptableObject>.GetDictForInitialization());
         }
     }
 }

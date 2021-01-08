@@ -6,20 +6,28 @@
     using System.Reflection.Emit;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
+    using Object = UnityEngine.Object;
 
     internal static class ConcreteClassCreator
     {
-        public static void CreateBehaviourConcreteClass(string assemblyName, Type genericTypeWithArgs)
+        public static void CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs)
+            where TObject : Object
         {
-            using var emptyType = new EmptyConcreteClassType(assemblyName, genericTypeWithArgs);
-            string componentName = "Scripts/" + GetComponentName(genericTypeWithArgs);
-            AssemblyCreatorHelper.AddComponentMenuAttribute(emptyType.TypeBuilder, componentName);
-        }
+            const string concreteClassName = "ConcreteClass";
 
-        public static void CreateSOConcreteClass(string assemblyName, Type genericTypeWithArgs)
-        {
-            // do nothing additional, just create the empty type
-            using var emptyType = new EmptyConcreteClassType(assemblyName, genericTypeWithArgs);
+            AssemblyBuilder assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
+            ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(assemblyBuilder, assemblyName);
+
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericTypeWithArgs);
+
+            if (typeof(TObject) == typeof(UnityEngine.MonoBehaviour))
+            {
+                string componentName = "Scripts/" + GetComponentName(genericTypeWithArgs);
+                AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
+            }
+
+            typeBuilder.CreateType();
+            assemblyBuilder.Save($"{assemblyName}.dll");
         }
 
         private static string GetComponentName(Type genericTypeWithArgs)
@@ -32,38 +40,6 @@
                 .Select(fullName => fullName.GetSubstringAfterLast('.'));
 
             return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
-        }
-
-        private struct EmptyConcreteClassType : IDisposable
-        {
-            public readonly TypeBuilder TypeBuilder;
-
-            private readonly AssemblyBuilder _assemblyBuilder;
-            private readonly string _assemblyName;
-
-            private bool _disposed;
-
-            public EmptyConcreteClassType(string assemblyName, Type genericTypeWithArgs)
-            {
-                const string concreteClassName = "ConcreteClass";
-
-                _assemblyName = assemblyName;
-                _assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
-                ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(_assemblyBuilder, assemblyName);
-
-                TypeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericTypeWithArgs);
-                _disposed = false;
-            }
-
-            public void Dispose()
-            {
-                if (_disposed)
-                    return;
-
-                TypeBuilder.CreateType();
-                _assemblyBuilder.Save($"{_assemblyName}.dll");
-                _disposed = true;
-            }
         }
     }
 }

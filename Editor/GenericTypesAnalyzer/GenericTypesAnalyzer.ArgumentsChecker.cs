@@ -4,7 +4,7 @@
     using GeneratedTypesDatabase;
     using UnityEngine.Assertions;
 
-    internal static partial class GenericTypesAnalyzer<TDatabase>
+    internal static partial class GenericTypesAnalyzer<TObject>
     {
         public static class ArgumentsChecker
         {
@@ -12,9 +12,9 @@
             {
                 bool needsAssetDatabaseRefresh = false;
 
-                foreach (ArgumentInfo argument in GenerationDatabase<TDatabase>.Arguments)
+                foreach (ArgumentInfo argument in GenerationDatabase<TObject>.Arguments)
                 {
-                    if (argument.RetrieveType<TDatabase>(out Type type, out bool retrievedFromGUID))
+                    if (argument.RetrieveType<TObject>(out Type type, out bool retrievedFromGUID))
                     {
                         if (retrievedFromGUID)
                         {
@@ -25,7 +25,7 @@
                     else
                     {
                         needsAssetDatabaseRefresh = true;
-                        GenerationDatabase<TDatabase>.RemoveArgument(argument, AssemblyAssetOperations.RemoveAssemblyByGUID);
+                        GenerationDatabase<TObject>.RemoveArgument(argument, AssemblyAssetOperations.RemoveAssemblyByGUID);
                     }
                 }
 
@@ -35,14 +35,14 @@
             public static void UpdateArgumentTypeName(ArgumentInfo argument, Type newType)
             {
                 // Retrieve the array of generic arguments where the old argument was listed
-                bool behavioursSuccess = GenerationDatabase<TDatabase>.TryGetReferencedGenericTypes(argument, out GenericTypeInfo[] referencedBehaviours);
+                bool behavioursSuccess = GenerationDatabase<TObject>.TryGetReferencedGenericTypes(argument, out GenericTypeInfo[] referencedBehaviours);
 
                 // update argument typename in database before updating assemblies and trying to find behaviour because behaviour might also need to be updated, and the argument should already be new
-                GenerationDatabase<TDatabase>.UpdateArgumentNameAndAssembly(ref argument, newType);
+                GenerationDatabase<TObject>.UpdateArgumentNameAndAssembly(ref argument, newType);
 
                 Assert.IsTrue(behavioursSuccess);
 
-                // need to split the method into two types
+                // TODO: need to split the method into two types
                 BehavioursChecker.UpdateReferencedGenericTypes(argument, referencedBehaviours);
             }
         }

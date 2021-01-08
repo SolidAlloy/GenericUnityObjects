@@ -1,4 +1,6 @@
 ﻿namespace GenericUnityObjects.Util
 {
-    internal class BehavioursDatabase : GenericTypesDatabase<BehavioursDatabase> { }
+    using UnityEngine;
+
+    internal class BehavioursDatabase : GenericTypesDatabase<MonoBehaviour> { }
 }

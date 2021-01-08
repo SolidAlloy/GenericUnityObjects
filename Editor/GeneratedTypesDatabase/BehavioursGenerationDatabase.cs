@@ -1,4 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.GeneratedTypesDatabase
 {
-    internal class BehavioursGenerationDatabase : GenerationDatabase<BehavioursGenerationDatabase> { }
+    using UnityEngine;
+
+    internal class BehavioursGenerationDatabase : GenerationDatabase<MonoBehaviour> { }
 }

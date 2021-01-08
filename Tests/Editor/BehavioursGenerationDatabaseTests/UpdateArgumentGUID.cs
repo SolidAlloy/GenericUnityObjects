@@ -44,7 +44,7 @@
             {
                 _database.UpdateArgumentGUIDImpl(ref _firstArg, NewGUID);
 
-                bool success = _database.TryGetReferencedBehavioursImpl(_expectedArg, out GenericTypeInfo[] behaviours);
+                bool success = _database.TryGetReferencedGenericTypesImpl(_expectedArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Length != 0);

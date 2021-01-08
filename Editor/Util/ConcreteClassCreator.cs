@@ -7,16 +7,18 @@
     using GenericUnityObjects.Util;
     using SolidUtilities.Extensions;
     using UnityEditor;
+    using Object = UnityEngine.Object;
 
-    internal abstract class ConcreteClassCreator
+    internal static class ConcreteClassCreator<TObject>
+        where TObject : Object
     {
-        protected void CreateConcreteClassImpl(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
             AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
-        protected void UpdateConcreteClassAssemblyImpl(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
+        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
         {
             string newAssemblyName;
 
@@ -33,12 +35,18 @@
                 () => CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName));
         }
 
-        protected abstract void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
-            string newAssemblyName);
+        private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
+            string newAssemblyName)
+        {
+            AssemblyCreator.CreateConcreteClass<TObject>(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
+        }
 
-        protected abstract void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID);
+        private static void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID)
+        {
+            GenerationDatabase<TObject>.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+        }
 
-        private string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
+        private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
@@ -92,39 +100,5 @@
             newAssemblyName += $"_{identicalFilesCount}";
             return newAssemblyName;
         }
-    }
-
-    internal class ConcreteBehaviourCreator : ConcreteClassCreator
-    {
-        private static readonly ConcreteBehaviourCreator _creatorInstance = new ConcreteBehaviourCreator();
-
-        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes) =>
-            _creatorInstance.CreateConcreteClassImpl(genericTypeWithoutArgs, argumentTypes);
-
-        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass) =>
-            _creatorInstance.UpdateConcreteClassAssemblyImpl(genericType, argumentTypes, concreteClass);
-
-        protected override void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID) =>
-            BehavioursGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
-
-        protected override void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName) =>
-            AssemblyCreator.CreateBehaviourConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
-    }
-
-    internal class ConcreteSOCreator : ConcreteClassCreator
-    {
-        private static readonly ConcreteSOCreator _creatorInstance = new ConcreteSOCreator();
-
-        public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes) =>
-            _creatorInstance.CreateConcreteClassImpl(genericTypeWithoutArgs, argumentTypes);
-
-        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass) =>
-            _creatorInstance.UpdateConcreteClassAssemblyImpl(genericType, argumentTypes, concreteClass);
-
-        protected override void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID) =>
-            SOGenerationDatabase.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
-
-        protected override void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes, string newAssemblyName) =>
-            AssemblyCreator.CreateSOConcreteClass(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
     }
 }

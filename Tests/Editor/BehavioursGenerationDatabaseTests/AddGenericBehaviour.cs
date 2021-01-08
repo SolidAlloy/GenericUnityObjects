@@ -15,20 +15,20 @@
             {
                 var expectedBehaviours = new[] { _behaviour };
 
-                _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
 
-                Assert.IsTrue(_database.InstanceBehaviours.SequenceEqual(expectedBehaviours));
+                Assert.IsTrue(_database.InstanceGenericTypes.SequenceEqual(expectedBehaviours));
                 Assert.IsEmpty(_database.InstanceArguments);
             }
 
             [Test]
             public void Throws_ArgumentException_if_key_exists()
             {
-                _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                    _database.AddGenericBehaviourImpl(_behaviour, out List<ConcreteClass> _);
+                    _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
                 });
             }
         }

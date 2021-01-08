@@ -18,7 +18,9 @@
             return TypeCache.GetTypesDerivedFrom(parentType)
                 .FirstOrDefault(type => type.IsEmpty());
 #else
-            return null;
+            return parentType.Assembly.GetTypes()
+                .Where(parentType.IsAssignableFrom)
+                .FirstOrDefault(type => type.IsEmpty());
 #endif
         }
 

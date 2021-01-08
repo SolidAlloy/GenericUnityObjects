@@ -7,49 +7,50 @@
     using UnityEditor;
     using UnityEngine;
     using Util;
+    using Object = UnityEngine.Object;
 
-    internal abstract partial class GenerationDatabase<TDatabase> :
-        EditorOnlySingletonSO<TDatabase>,
+    internal abstract partial class GenerationDatabase<TUnityObject> :
+        EditorOnlySingletonSO<GenerationDatabase<TUnityObject>>,
         ISerializationCallbackReceiver,
         ICanBeInitialized
-        where TDatabase : GenerationDatabase<TDatabase>
+        where TUnityObject : Object
     {
-        private Dictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentBehavioursDict;
-        private Dictionary<GenericTypeInfo, List<ConcreteClass>> _behaviourArgumentsDict;
+        private Dictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
+        private Dictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
         private Pool<ArgumentInfo> _argumentsPool;
-        private Pool<GenericTypeInfo> _behavioursPool;
+        private Pool<GenericTypeInfo> _genericTypesPool;
 
         [HideInInspector] [SerializeField] private ArgumentInfo[] _genericArgumentKeys;
-        [HideInInspector] [SerializeField] private BehaviourCollection[] _genericBehaviourValues;
-        [HideInInspector] [SerializeField] private GenericTypeInfo[] _genericBehaviourKeys;
+        [HideInInspector] [SerializeField] private GenericTypeCollection[] _genericTypeValues;
+        [HideInInspector] [SerializeField] private GenericTypeInfo[] _genericTypeKeys;
         [HideInInspector] [SerializeField] private ConcreteClassCollection[] _genericArgumentValues;
 
         private bool _shouldSetDirty;
 
         public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
 
-        public ArgumentInfo[] InstanceArguments => _argumentBehavioursDict.Keys.ToArray();
+        public ArgumentInfo[] InstanceArguments => _argumentGenericTypesDict.Keys.ToArray();
 
-        public static GenericTypeInfo[] GenericUnityObjects => Instance.InstanceBehaviours;
+        public static GenericTypeInfo[] GenericTypes => Instance.InstanceGenericTypes;
 
-        public GenericTypeInfo[] InstanceBehaviours => _behaviourArgumentsDict.Keys.ToArray();
+        public GenericTypeInfo[] InstanceGenericTypes => _genericTypeArgumentsDict.Keys.ToArray();
 
-        public static void AddGenericType(GenericTypeInfo genericBehaviour)
+        public static void AddGenericType(GenericTypeInfo genericTypeInfo)
         {
-            Instance.AddGenericBehaviourImpl(genericBehaviour, out List<ConcreteClass> _);
+            Instance.AddGenericTypeImpl(genericTypeInfo, out List<ConcreteClass> _);
         }
 
-        public void AddGenericBehaviourImpl(GenericTypeInfo genericBehaviour, out List<ConcreteClass> concreteClasses)
+        public void AddGenericTypeImpl(GenericTypeInfo genericTypeInfo, out List<ConcreteClass> concreteClasses)
         {
             concreteClasses = new List<ConcreteClass>();
-            genericBehaviour = _behavioursPool.GetOrAdd(genericBehaviour);
-            _behaviourArgumentsDict.Add(genericBehaviour, concreteClasses);
+            genericTypeInfo = _genericTypesPool.GetOrAdd(genericTypeInfo);
+            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
             EditorUtility.SetDirty(this);
         }
 
         public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID)
         {
-            var behaviour = new GenericTypeInfo(genericTypeWithoutArgs);
+            var genericTypeInfo = new GenericTypeInfo(genericTypeWithoutArgs);
 
             int genericArgsLength = genericArgs.Length;
             var arguments = new ArgumentInfo[genericArgsLength];
@@ -59,17 +60,17 @@
                 arguments[i] = new ArgumentInfo(genericArgs[i]);
             }
 
-            Instance.AddConcreteClassImpl(behaviour, arguments, assemblyGUID);
+            Instance.AddConcreteClassImpl(genericTypeInfo, arguments, assemblyGUID);
         }
 
         public void AddConcreteClassImpl(GenericTypeInfo genericTypeInfo, ArgumentInfo[] arguments, string assemblyGUID)
         {
-            if (!_behaviourArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+            if (!_genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
             {
                 throw new KeyNotFoundException($"Cannot add a concrete class to a generic Unity.Object '{genericTypeInfo}' because it is not present in the database.");
             }
 
-            genericTypeInfo = _behavioursPool.GetOrAdd(genericTypeInfo);
+            genericTypeInfo = _genericTypesPool.GetOrAdd(genericTypeInfo);
 
             int argumentsLength = arguments.Length;
 
@@ -78,13 +79,13 @@
                 ArgumentInfo argument = arguments[i];
                 argument = _argumentsPool.GetOrAdd(argument);
 
-                if (_argumentBehavioursDict.ContainsKey(argument))
+                if (_argumentGenericTypesDict.ContainsKey(argument))
                 {
-                    _argumentBehavioursDict[argument].Add(genericTypeInfo);
+                    _argumentGenericTypesDict[argument].Add(genericTypeInfo);
                 }
                 else
                 {
-                    _argumentBehavioursDict[argument] = new List<GenericTypeInfo> { genericTypeInfo };
+                    _argumentGenericTypesDict[argument] = new List<GenericTypeInfo> { genericTypeInfo };
                 }
             }
 
@@ -92,7 +93,7 @@
 
             if (concreteClasses.Contains(classToAdd))
             {
-                throw new ArgumentException($"The generic behaviour '{genericTypeInfo}' already " +
+                throw new ArgumentException($"The generic Unity.Object '{genericTypeInfo}' already " +
                                             "has the following concrete class in the database: " +
                                             $"{string.Join(", ", arguments.Select(arg => arg.TypeNameAndAssembly))}");
             }
@@ -109,14 +110,14 @@
 
         public void RemoveArgumentImpl(ArgumentInfo argument, Action<string> assemblyAction)
         {
-            if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> genericBehaviours))
+            if ( ! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
-            _argumentBehavioursDict.Remove(argument);
+            _argumentGenericTypesDict.Remove(argument);
 
-            foreach (GenericTypeInfo genericBehaviour in genericBehaviours)
+            foreach (GenericTypeInfo genericTypeInfo in genericTypeInfos)
             {
-                if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
+                if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
                     continue;
 
                 for (int i = concreteClasses.Count - 1; i >= 0; i--)
@@ -134,30 +135,30 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static bool RemoveGenericType(GenericTypeInfo genericBehaviour, Action<string> removeAssembly)
+        public static bool RemoveGenericType(GenericTypeInfo genericTypeInfo, Action<string> removeAssembly)
         {
-            return Instance.RemoveGenericBehaviourImpl(genericBehaviour, removeAssembly);
+            return Instance.RemoveGenericTypeImpl(genericTypeInfo, removeAssembly);
         }
 
-        public bool RemoveGenericBehaviourImpl(GenericTypeInfo genericBehaviour, Action<string> removeAssembly)
+        public bool RemoveGenericTypeImpl(GenericTypeInfo genericTypeInfo, Action<string> removeAssembly)
         {
-            if ( ! _behaviourArgumentsDict.TryGetValue(genericBehaviour, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Behaviour '{genericBehaviour}' was not found in the database.");
+            if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
 
-            removeAssembly(genericBehaviour.AssemblyGUID);
-            _behaviourArgumentsDict.Remove(genericBehaviour);
+            removeAssembly(genericTypeInfo.AssemblyGUID);
+            _genericTypeArgumentsDict.Remove(genericTypeInfo);
 
             foreach (ConcreteClass concreteClass in concreteClasses)
             {
                 foreach (ArgumentInfo argument in concreteClass.Arguments)
                 {
-                    if ( ! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
+                    if ( ! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos))
                         continue;
 
-                    behaviours.Remove(genericBehaviour);
+                    genericTypeInfos.Remove(genericTypeInfo);
 
-                    if (behaviours.Count == 0)
-                        _argumentBehavioursDict.Remove(argument);
+                    if (genericTypeInfos.Count == 0)
+                        _argumentGenericTypesDict.Remove(argument);
                 }
 
                 removeAssembly(concreteClass.AssemblyGUID);
@@ -167,38 +168,38 @@
             return concreteClasses.Count != 0;
         }
 
-        public static bool TryGetReferencedGenericTypes(ArgumentInfo argument, out GenericTypeInfo[] referencedBehaviours)
+        public static bool TryGetReferencedGenericTypes(ArgumentInfo argument, out GenericTypeInfo[] referencedGenericTypeInfos)
         {
-            return Instance.TryGetReferencedBehavioursImpl(argument, out referencedBehaviours);
+            return Instance.TryGetReferencedGenericTypesImpl(argument, out referencedGenericTypeInfos);
         }
 
-        public bool TryGetReferencedBehavioursImpl(ArgumentInfo argument, out GenericTypeInfo[] referencedBehaviours)
+        public bool TryGetReferencedGenericTypesImpl(ArgumentInfo argument, out GenericTypeInfo[] referencedGenericTypeInfos)
         {
-            bool success = _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behavioursList);
-            referencedBehaviours = success ? behavioursList.ToArray() : null;
+            bool success = _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos);
+            referencedGenericTypeInfos = success ? genericTypeInfos.ToArray() : null;
             return success;
         }
 
-        public static bool TryGetConcreteClasses(GenericTypeInfo behaviour, out ConcreteClass[] concreteClasses)
+        public static bool TryGetConcreteClasses(GenericTypeInfo genericTypeInfo, out ConcreteClass[] concreteClasses)
         {
-            return Instance.TryGetConcreteClassesImpl(behaviour, out concreteClasses);
+            return Instance.TryGetConcreteClassesImpl(genericTypeInfo, out concreteClasses);
         }
 
-        public bool TryGetConcreteClassesImpl(GenericTypeInfo behaviour, out ConcreteClass[] concreteClasses)
+        public bool TryGetConcreteClassesImpl(GenericTypeInfo genericTypeInfo, out ConcreteClass[] concreteClasses)
         {
-            bool success = _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClassesList);
+            bool success = _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClassesList);
             concreteClasses = success ? concreteClassesList.ToArray() : null;
             return success;
         }
 
-        public static bool TryGetConcreteClassesByArgument(GenericTypeInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
+        public static bool TryGetConcreteClassesByArgument(GenericTypeInfo genericTypeInfo, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
-            return Instance.TryGetConcreteClassesByArgumentImpl(behaviour, argument, out concreteClasses);
+            return Instance.TryGetConcreteClassesByArgumentImpl(genericTypeInfo, argument, out concreteClasses);
         }
 
-        public bool TryGetConcreteClassesByArgumentImpl(GenericTypeInfo behaviour, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
+        public bool TryGetConcreteClassesByArgumentImpl(GenericTypeInfo genericTypeInfo, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
-            if ( ! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClassesList))
+            if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClassesList))
             {
                 concreteClasses = null;
                 return false;
@@ -222,17 +223,17 @@
 
         public void UpdateArgumentGUIDImpl(ref ArgumentInfo argument, string newGUID)
         {
-            if (! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
+            if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
-            _argumentBehavioursDict.Remove(argument);
+            _argumentGenericTypesDict.Remove(argument);
 
             _argumentsPool.ChangeItem(ref argument, argumentToChange =>
             {
                 argumentToChange.UpdateGUID(newGUID);
             });
 
-            _argumentBehavioursDict.Add(argument, behaviours);
+            _argumentGenericTypesDict.Add(argument, genericTypeInfos);
             EditorUtility.SetDirty(this);
         }
 
@@ -243,80 +244,80 @@
 
         public void UpdateArgumentNameAndAssemblyImpl(ref ArgumentInfo argument, Type newType)
         {
-            if (! _argumentBehavioursDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
+            if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
 
-            _argumentBehavioursDict.Remove(argument);
+            _argumentGenericTypesDict.Remove(argument);
 
             _argumentsPool.ChangeItem(ref argument, argumentToChange =>
             {
                 argumentToChange.UpdateNameAndAssembly(newType);
             });
 
-            _argumentBehavioursDict.Add(argument, behaviours);
+            _argumentGenericTypesDict.Add(argument, behaviours);
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateGenericTypeGUID(ref GenericTypeInfo behaviour, string newGUID)
+        public static void UpdateGenericTypeGUID(ref GenericTypeInfo genericTypeInfo, string newGUID)
         {
-            Instance.UpdateBehaviourGUIDImpl(ref behaviour, newGUID);
+            Instance.UpdateGenericTypeGUIDImpl(ref genericTypeInfo, newGUID);
         }
 
-        public void UpdateBehaviourGUIDImpl(ref GenericTypeInfo behaviour, string newGUID)
+        public void UpdateGenericTypeGUIDImpl(ref GenericTypeInfo genericTypeInfo, string newGUID)
         {
-            if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
+            if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
 
-            _behaviourArgumentsDict.Remove(behaviour);
+            _genericTypeArgumentsDict.Remove(genericTypeInfo);
 
-            _behavioursPool.ChangeItem(ref behaviour, behaviourToChange =>
+            _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
             {
-                behaviourToChange.UpdateGUID(newGUID);
+                genericTypeToChange.UpdateGUID(newGUID);
             });
 
-            _behaviourArgumentsDict.Add(behaviour, concreteClasses);
+            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateGenericTypeArgs(ref GenericTypeInfo behaviour, string[] newArgNames)
+        public static void UpdateGenericTypeArgs(ref GenericTypeInfo genericTypeInfo, string[] newArgNames)
         {
-            Instance.UpdateBehaviourArgsImpl(ref behaviour, newArgNames);
+            Instance.UpdateGenericTypeArgsImpl(ref genericTypeInfo, newArgNames);
         }
 
-        public void UpdateBehaviourArgsImpl(ref GenericTypeInfo behaviour, string[] newArgNames)
+        public void UpdateGenericTypeArgsImpl(ref GenericTypeInfo genericTypeInfo, string[] newArgNames)
         {
-            if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Behaviour '{behaviour}' was not found in the database.");
+            if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
 
-            _behaviourArgumentsDict.Remove(behaviour);
+            _genericTypeArgumentsDict.Remove(genericTypeInfo);
 
-            _behavioursPool.ChangeItem(ref behaviour, behaviourToChange =>
+            _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
             {
-                behaviourToChange.UpdateArgNames(newArgNames);
+                genericTypeToChange.UpdateArgNames(newArgNames);
             });
 
-            _behaviourArgumentsDict.Add(behaviour, concreteClasses);
+            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateBehaviourNameAndAssembly(ref GenericTypeInfo behaviour, Type newType)
+        public static void UpdateGenericTypeNameAndAssembly(ref GenericTypeInfo genericTypeInfo, Type newType)
         {
-            Instance.UpdateBehaviourNameAndAssemblyImpl(ref behaviour, newType);
+            Instance.UpdateGenericTypeNameAndAssemblyImpl(ref genericTypeInfo, newType);
         }
 
-        public void UpdateBehaviourNameAndAssemblyImpl(ref GenericTypeInfo behaviour, Type newType)
+        public void UpdateGenericTypeNameAndAssemblyImpl(ref GenericTypeInfo genericTypeInfo, Type newType)
         {
-            if (! _behaviourArgumentsDict.TryGetValue(behaviour, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Argument '{behaviour}' was not found in the database.");
+            if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
 
-            _behaviourArgumentsDict.Remove(behaviour);
+            _genericTypeArgumentsDict.Remove(genericTypeInfo);
 
-            _behavioursPool.ChangeItem(ref behaviour, behaviourToChange =>
+            _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
             {
-                behaviourToChange.UpdateNameAndAssembly(newType);
+                genericTypeToChange.UpdateNameAndAssembly(newType);
             });
 
-            _behaviourArgumentsDict.Add(behaviour, concreteClasses);
+            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
             EditorUtility.SetDirty(this);
         }
     }

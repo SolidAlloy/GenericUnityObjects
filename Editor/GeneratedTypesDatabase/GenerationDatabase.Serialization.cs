@@ -5,14 +5,15 @@
     using System.Runtime.Serialization;
     using UnityEditor;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
-    internal abstract partial class GenerationDatabase<TDatabase>
-        where TDatabase : GenerationDatabase<TDatabase>
+    internal abstract partial class GenerationDatabase<TUnityObject>
+        where TUnityObject : Object
     {
         public void OnAfterDeserialize()
         {
-            InitializeArgumentBehavioursDict();
-            InitializeBehaviourArgumentsDict();
+            InitializeArgumentGenericTypesDict();
+            InitializeGenericTypeArgumentsDict();
         }
 
         public void Initialize()
@@ -23,30 +24,30 @@
             if (! typeof(GenericTypeInfo).IsSerializable)
                 throw new SerializationException($"Cannot initialize a database with {typeof(GenericTypeInfo)} because the type is not serializable.");
 
-            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
+            _argumentGenericTypesDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
             _argumentsPool = new Pool<ArgumentInfo>();
-            _behaviourArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>();
-            _behavioursPool = new Pool<GenericTypeInfo>();
+            _genericTypeArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>();
+            _genericTypesPool = new Pool<GenericTypeInfo>();
         }
 
-        private void InitializeArgumentBehavioursDict()
+        private void InitializeArgumentGenericTypesDict()
         {
             if (_genericArgumentKeys == null)
             {
-                _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
+                _argumentGenericTypesDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
                 _argumentsPool = new Pool<ArgumentInfo>();
                 return;
             }
 
             int keysLength = _genericArgumentKeys.Length;
-            int valuesLength = _genericBehaviourValues.Length;
+            int valuesLength = _genericTypeValues.Length;
 
-            _argumentBehavioursDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>(keysLength);
+            _argumentGenericTypesDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>(keysLength);
 
             _argumentsPool = new Pool<ArgumentInfo>(keysLength);
             _argumentsPool.AddRange(_genericArgumentKeys);
 
-            _behavioursPool = new Pool<GenericTypeInfo>(valuesLength);
+            _genericTypesPool = new Pool<GenericTypeInfo>(valuesLength);
 
             if (keysLength != valuesLength)
             {
@@ -58,23 +59,23 @@
 
             for (int keyIndex = 0; keyIndex < keysLength; ++keyIndex)
             {
-                GenericTypeInfo[] valuesArray = _genericBehaviourValues[keyIndex];
+                GenericTypeInfo[] valuesArray = _genericTypeValues[keyIndex];
                 int valuesArrayLength = valuesArray.Length;
                 var valuesToAdd = new List<GenericTypeInfo>(valuesArrayLength);
 
                 for (int valueIndex = 0; valueIndex < valuesArrayLength; valueIndex++)
-                    valuesToAdd.Add(_behavioursPool.GetOrAdd(valuesArray[valueIndex]));
+                    valuesToAdd.Add(_genericTypesPool.GetOrAdd(valuesArray[valueIndex]));
 
-                _argumentBehavioursDict[_genericArgumentKeys[keyIndex]] = valuesToAdd;
+                _argumentGenericTypesDict[_genericArgumentKeys[keyIndex]] = valuesToAdd;
             }
         }
 
-        private void InitializeBehaviourArgumentsDict()
+        private void InitializeGenericTypeArgumentsDict()
         {
-            int keysLength = _genericBehaviourKeys.Length;
+            int keysLength = _genericTypeKeys.Length;
             int valuesLength = _genericArgumentValues.Length;
 
-            _behaviourArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>(keysLength);
+            _genericTypeArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>(keysLength);
 
             if (keysLength != valuesLength)
             {
@@ -86,7 +87,7 @@
 
             for (int keyIndex = 0; keyIndex < keysLength; keyIndex++)
             {
-                GenericTypeInfo key = _behavioursPool.GetOrAdd(_genericBehaviourKeys[keyIndex]);
+                GenericTypeInfo key = _genericTypesPool.GetOrAdd(_genericTypeKeys[keyIndex]);
 
                 List<ConcreteClass> value = _genericArgumentValues[keyIndex];
 
@@ -98,51 +99,49 @@
                     }
                 }
 
-                _behaviourArgumentsDict[key] = value;
+                _genericTypeArgumentsDict[key] = value;
             }
         }
 
         public void OnBeforeSerialize()
         {
-            SerializeArgumentBehavioursDict();
-            SerializeBehaviourArgumentsDict();
+            SerializeArgumentGenericTypesDict();
+            SerializeGenericTypeArgumentsDict();
         }
 
-        private void SerializeArgumentBehavioursDict()
+        private void SerializeArgumentGenericTypesDict()
         {
-            // If OnAfterDeserialize() has never been called yet for this new asset.
-            if (_argumentBehavioursDict == null)
+            if (_argumentGenericTypesDict == null)
                 return;
 
-            int dictLength = _argumentBehavioursDict.Count;
+            int dictLength = _argumentGenericTypesDict.Count;
 
             _genericArgumentKeys = new ArgumentInfo[dictLength];
-            _genericBehaviourValues = new BehaviourCollection[dictLength];
+            _genericTypeValues = new GenericTypeCollection[dictLength];
 
             int keysIndex = 0;
-            foreach (var pair in _argumentBehavioursDict)
+            foreach (var pair in _argumentGenericTypesDict)
             {
                 _genericArgumentKeys[keysIndex] = pair.Key;
-                _genericBehaviourValues[keysIndex] = pair.Value;
+                _genericTypeValues[keysIndex] = pair.Value;
                 ++keysIndex;
             }
         }
 
-        private void SerializeBehaviourArgumentsDict()
+        private void SerializeGenericTypeArgumentsDict()
         {
-            // If OnAfterDeserialize() has never been called yet for this new asset.
-            if (_behaviourArgumentsDict == null)
+            if (_genericTypeArgumentsDict == null)
                 return;
 
-            int dictLength = _behaviourArgumentsDict.Count;
+            int dictLength = _genericTypeArgumentsDict.Count;
 
-            _genericBehaviourKeys = new GenericTypeInfo[dictLength];
+            _genericTypeKeys = new GenericTypeInfo[dictLength];
             _genericArgumentValues = new ConcreteClassCollection[dictLength];
 
             int keysIndex = 0;
-            foreach (var pair in _behaviourArgumentsDict)
+            foreach (var pair in _genericTypeArgumentsDict)
             {
-                _genericBehaviourKeys[keysIndex] = pair.Key;
+                _genericTypeKeys[keysIndex] = pair.Key;
                 _genericArgumentValues[keysIndex] = pair.Value;
                 ++keysIndex;
             }

@@ -4,9 +4,10 @@
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
-    internal class GenericTypesDatabase<TDatabase> : SingletonScriptableObject<TDatabase>, ISerializationCallbackReceiver, ICanBeInitialized
-    where TDatabase : GenericTypesDatabase<TDatabase>
+    internal class GenericTypesDatabase<TObject> : SingletonScriptableObject<GenericTypesDatabase<TObject>>, ISerializationCallbackReceiver, ICanBeInitialized
+    where TObject : Object
     {
         private Dictionary<Type, Dictionary<Type[], Type>> _dict;
 

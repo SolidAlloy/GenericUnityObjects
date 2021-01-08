@@ -9,13 +9,13 @@
     using UnityEditor;
     using UnityEngine.Assertions;
 
-    internal static partial class GenericTypesAnalyzer<TDatabase>
+    internal static partial class GenericTypesAnalyzer<TObject>
     {
         public static class ScriptableObjectsChecker
         {
             public static bool Check()
             {
-                var oldScriptableObjects = GenerationDatabase<TDatabase>.GenericUnityObjects;
+                var oldScriptableObjects = GenerationDatabase<TObject>.GenericTypes;
                 var newScriptableObjects = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>()
                     .Where(type => type.IsGenericType && ! type.IsAbstract)
                     .Select(type => new GenericTypeInfo(type))
@@ -65,7 +65,7 @@
                         {
                             if (newSO.TypeNameAndAssembly == oldSO.TypeNameAndAssembly)
                             {
-                                GenerationDatabase<TDatabase>.UpdateGenericTypeArgs(ref oldSO, newSO.ArgNames);
+                                GenerationDatabase<TObject>.UpdateGenericTypeArgs(ref oldSO, newSO.ArgNames);
                             }
                             else
                             {
@@ -91,7 +91,7 @@
                             if ( ! newSO.ArgNames.SequenceEqual(oldSO.ArgNames))
                             {
                                 needsAssetDatabaseRefresh = true;
-                                GenerationDatabase<TDatabase>.UpdateGenericTypeArgs(ref oldSO, newSO.ArgNames);
+                                GenerationDatabase<TObject>.UpdateGenericTypeArgs(ref oldSO, newSO.ArgNames);
                             }
 
                             oldScriptableObjectsOnly.Remove(oldSO);
@@ -117,7 +117,7 @@
             private static void AddNewScriptableObject(GenericTypeInfo scriptableObject)
             {
                 DebugUtility.Log($"Scriptable Object added: {scriptableObject.TypeFullName}");
-                GenerationDatabase<TDatabase>.AddGenericType(scriptableObject);
+                GenerationDatabase<TObject>.AddGenericType(scriptableObject);
             }
 
             private static bool RemoveScriptableObjects(IEnumerable<GenericTypeInfo> scriptableObjects)
@@ -135,26 +135,26 @@
             private static bool RemoveScriptableObject(GenericTypeInfo scriptableObject)
             {
                 DebugUtility.Log($"Scriptable Object removed: {scriptableObject.TypeFullName}");
-                return GenerationDatabase<TDatabase>.RemoveGenericType(scriptableObject, AssemblyAssetOperations.RemoveAssemblyByGUID);
+                return GenerationDatabase<TObject>.RemoveGenericType(scriptableObject, AssemblyAssetOperations.RemoveAssemblyByGUID);
             }
 
             private static void UpdateScriptableObjectTypeName(GenericTypeInfo scriptableObject, Type newType)
             {
                 DebugUtility.Log($"Scriptable Object typename updated: {scriptableObject.TypeFullName} => {newType.FullName}");
 
-                bool success = GenerationDatabase<TDatabase>.TryGetConcreteClasses(scriptableObject, out ConcreteClass[] concreteClasses);
+                bool success = GenerationDatabase<TObject>.TryGetConcreteClasses(scriptableObject, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(success);
 
                 // Update database before operating on assemblies
-                GenerationDatabase<TDatabase>.UpdateBehaviourNameAndAssembly(ref scriptableObject, newType);
-                ScriptableObjectConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
+                GenerationDatabase<TObject>.UpdateGenericTypeNameAndAssembly(ref scriptableObject, newType);
+                ConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
             }
 
             private static void UpdateScriptableObjectGUID(GenericTypeInfo scriptableObject, string newGUID)
             {
                 DebugUtility.Log($"Scriptable Object GUID updated: {scriptableObject.GUID} => {newGUID}");
-                GenerationDatabase<TDatabase>.UpdateGenericTypeGUID(ref scriptableObject, newGUID);
+                GenerationDatabase<TObject>.UpdateGenericTypeGUID(ref scriptableObject, newGUID);
             }
         }
     }

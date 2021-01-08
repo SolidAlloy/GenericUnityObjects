@@ -18,7 +18,7 @@
             [OneTimeSetUp]
             public void BeforeAllTests()
             {
-                FieldInfo getterField = typeof(EditorOnlySingletonSO<BehavioursGenerationDatabase>)
+                FieldInfo getterField = typeof(EditorOnlySingletonSO<GenerationDatabase<MonoBehaviour>>)
                     .GetField("Getter", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(getterField);
@@ -26,7 +26,7 @@
                 _getterInstance = getterField.GetValue(null);
                 Assert.IsNotNull(_getterInstance);
 
-                _instanceField = typeof(InstanceGetter<BehavioursGenerationDatabase>)
+                _instanceField = typeof(InstanceGetter<GenerationDatabase<MonoBehaviour>>)
                     .GetField("_instance", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(_instanceField);
@@ -39,36 +39,36 @@
 
                 var cleanInstance = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
                 _instanceField.SetValue(_getterInstance, cleanInstance);
-                BehavioursGenerationDatabase.Instance.Initialize();
-                BehavioursGenerationDatabase.AddGenericType(_behaviour);
-                BehavioursGenerationDatabase.Instance.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
+                GenerationDatabase<MonoBehaviour>.Instance.Initialize();
+                GenerationDatabase<MonoBehaviour>.AddGenericType(_behaviour);
+                GenerationDatabase<MonoBehaviour>.Instance.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
             }
 
             private static void ReserializeDatabase()
             {
-                BehavioursGenerationDatabase.Instance.OnBeforeSerialize();
-                BehavioursGenerationDatabase.Instance.OnAfterDeserialize();
+                GenerationDatabase<MonoBehaviour>.Instance.OnBeforeSerialize();
+                GenerationDatabase<MonoBehaviour>.Instance.OnAfterDeserialize();
             }
 
             [Test]
             public void Restores_arguments()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(BehavioursGenerationDatabase.Arguments.SequenceEqual(_firstSecondArgs));
+                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.Arguments.SequenceEqual(_firstSecondArgs));
             }
 
             [Test]
             public void Restores_behaviours()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(BehavioursGenerationDatabase.GenericUnityObjects.SequenceEqual(_expectedBehaviours));
+                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.GenericTypes.SequenceEqual(_expectedBehaviours));
             }
 
             [Test]
             public void Restores_referenced_behaviours()
             {
                 ReserializeDatabase();
-                bool behavioursSuccess = BehavioursGenerationDatabase.TryGetReferencedGenericTypes(_firstArg, out GenericTypeInfo[] referencedBehaviours);
+                bool behavioursSuccess = GenerationDatabase<MonoBehaviour>.TryGetReferencedGenericTypes(_firstArg, out GenericTypeInfo[] referencedBehaviours);
                 Assert.IsTrue(behavioursSuccess);
                 Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedBehaviours));
             }
@@ -77,7 +77,7 @@
             public void Restores_concrete_classes()
             {
                 ReserializeDatabase();
-                bool concreteClassesSuccess = BehavioursGenerationDatabase.TryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
+                bool concreteClassesSuccess = GenerationDatabase<MonoBehaviour>.TryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
                 Assert.IsTrue(concreteClassesSuccess);
                 Assert.IsTrue(concreteClasses.Length == 1);
                 Assert.IsTrue(concreteClasses[0] == _expectedConcreteClass);

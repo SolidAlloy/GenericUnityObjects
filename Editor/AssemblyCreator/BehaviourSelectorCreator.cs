@@ -5,7 +5,7 @@
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
 
-    internal class BehaviourSelectorCreator
+    internal static class BehaviourSelectorCreator
     {
         public static void CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs)
         {

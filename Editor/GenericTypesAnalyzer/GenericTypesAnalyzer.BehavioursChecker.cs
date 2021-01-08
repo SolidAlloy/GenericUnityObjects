@@ -11,13 +11,13 @@
     using UnityEngine.Assertions;
     using Util;
 
-    internal static partial class GenericTypesAnalyzer<TDatabase>
+    internal static partial class GenericTypesAnalyzer<TObject>
     {
         public static class BehavioursChecker
         {
             public static bool Check()
             {
-                var oldBehaviours = GenerationDatabase<TDatabase>.GenericUnityObjects;
+                var oldBehaviours = GenerationDatabase<TObject>.GenericTypes;
                 var newBehaviours = TypeCache.GetTypesDerivedFrom<UnityEngine.MonoBehaviour>()
                     .Where(type => type.IsGenericType && ! type.IsAbstract)
                     .Select(type => new GenericTypeInfo(type))
@@ -116,20 +116,20 @@
             private static void UpdateBehaviourGUID(GenericTypeInfo behaviour, string newGUID)
             {
                 DebugUtility.Log($"Behaviour GUID updated: {behaviour.GUID} => {newGUID}");
-                GenerationDatabase<TDatabase>.UpdateGenericTypeGUID(ref behaviour, newGUID);
+                GenerationDatabase<TObject>.UpdateGenericTypeGUID(ref behaviour, newGUID);
             }
 
             private static void RemoveBehaviour(GenericTypeInfo behaviour)
             {
                 DebugUtility.Log($"Behaviour removed: {behaviour.TypeFullName}");
-                GenerationDatabase<TDatabase>.RemoveGenericType(behaviour, AssemblyAssetOperations.RemoveAssemblyByGUID);
+                GenerationDatabase<TObject>.RemoveGenericType(behaviour, AssemblyAssetOperations.RemoveAssemblyByGUID);
             }
 
             private static void UpdateBehaviourArgNames(GenericTypeInfo behaviour, string[] newArgNames, Type newType)
             {
                 DebugUtility.Log($"Behaviour args updated: '{string.Join(", ", behaviour.ArgNames)}' => '{string.Join(", ", behaviour.ArgNames)}'");
 
-                GenerationDatabase<TDatabase>.UpdateGenericTypeArgs(ref behaviour, newArgNames);
+                GenerationDatabase<TObject>.UpdateGenericTypeArgs(ref behaviour, newArgNames);
 
                 UpdateSelectorAssembly(behaviour.AssemblyGUID, newType);
             }
@@ -149,7 +149,7 @@
                 string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
                 behaviour.AssemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
 
-                GenerationDatabase<TDatabase>.AddGenericType(behaviour);
+                GenerationDatabase<TObject>.AddGenericType(behaviour);
             }
 
             private static void UpdateSelectorAssembly(string selectorAssemblyGUID, Type newType)
@@ -171,16 +171,16 @@
             {
                 DebugUtility.Log($"Behaviour typename updated: {behaviour.TypeFullName} => {newType.FullName}");
 
-                bool success = GenerationDatabase<TDatabase>.TryGetConcreteClasses(behaviour, out ConcreteClass[] concreteClasses);
+                bool success = GenerationDatabase<TObject>.TryGetConcreteClasses(behaviour, out ConcreteClass[] concreteClasses);
 
                 Assert.IsTrue(success);
 
                 // Update database before operating on assemblies
-                GenerationDatabase<TDatabase>.UpdateBehaviourNameAndAssembly(ref behaviour, newType);
+                GenerationDatabase<TObject>.UpdateGenericTypeNameAndAssembly(ref behaviour, newType);
 
                 UpdateSelectorAssembly(behaviour.AssemblyGUID, newType);
 
-                BehaviourConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
+                ConcreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
             }
 
             public static void UpdateReferencedGenericTypes(ArgumentInfo argument, GenericTypeInfo[] referencedBehaviours)
@@ -190,7 +190,7 @@
                     // Retrieve type of the behaviour
                     // If type cannot be retrieved, try finding by GUID
                     // If GUID didn't help, remove the whole collection of assemblies
-                    if (behaviour.RetrieveType<TDatabase>(out Type behaviourType, out bool retrievedFromGUID))
+                    if (behaviour.RetrieveType<TObject>(out Type behaviourType, out bool retrievedFromGUID))
                     {
                         if (retrievedFromGUID)
                         {
@@ -199,15 +199,15 @@
                     }
                     else
                     {
-                        GenerationDatabase<TDatabase>.RemoveGenericType(behaviour, AssemblyAssetOperations.RemoveAssemblyByGUID);
+                        GenerationDatabase<TObject>.RemoveGenericType(behaviour, AssemblyAssetOperations.RemoveAssemblyByGUID);
                         continue; // concrete classes are already removed, no need to iterate through them.
                     }
 
-                    bool concreteClassesSuccess = GenerationDatabase<TDatabase>.TryGetConcreteClassesByArgument(behaviour, argument, out ConcreteClass[] concreteClasses);
+                    bool concreteClassesSuccess = GenerationDatabase<TObject>.TryGetConcreteClassesByArgument(behaviour, argument, out ConcreteClass[] concreteClasses);
 
                     Assert.IsTrue(concreteClassesSuccess);
 
-                    BehaviourConcreteClassChecker.UpdateConcreteClassesAssemblies(behaviourType, concreteClasses);
+                    ConcreteClassChecker.UpdateConcreteClassesAssemblies(behaviourType, concreteClasses);
                 }
             }
         }

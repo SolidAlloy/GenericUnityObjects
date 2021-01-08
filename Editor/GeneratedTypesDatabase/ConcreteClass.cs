@@ -7,7 +7,7 @@
     [Serializable]
     internal class ConcreteClass : IEquatable<ConcreteClass>
     {
-        private static readonly ArrayEqualityComparer<ArgumentInfo> ArrayComparer = new ArrayEqualityComparer<ArgumentInfo>();
+        private static readonly ArrayEqualityComparer<ArgumentInfo> _arrayComparer = new ArrayEqualityComparer<ArgumentInfo>();
 
         [SerializeField] private ArgumentInfo[] _arguments;
         [SerializeField] private string _assemblyGUID;
@@ -45,7 +45,7 @@
             // Return true if the fields match.
             // Note that the base class is not invoked because it is
             // System.Object, which defines Equals as reference equality.
-            return ArrayComparer.Equals(_arguments, p._arguments) && _assemblyGUID == p._assemblyGUID;
+            return _arrayComparer.Equals(_arguments, p._arguments) && _assemblyGUID == p._assemblyGUID;
         }
 
         public static bool operator ==(ConcreteClass lhs, ConcreteClass rhs)
@@ -69,7 +69,7 @@
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + ArrayComparer.GetHashCode(_arguments);
+                hash = hash * 23 + _arrayComparer.GetHashCode(_arguments);
                 hash = hash * 23 + _assemblyGUID.GetHashCode();
                 return hash;
             }

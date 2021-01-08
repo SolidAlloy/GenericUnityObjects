@@ -15,7 +15,7 @@
             private static TypeStub _typeStub;
 
             private static void CallUpdateArgumentNameAndAssembly() =>
-                _database.UpdateBehaviourNameAndAssemblyImpl(ref _behaviour, _typeStub);
+                _database.UpdateGenericTypeNameAndAssemblyImpl(ref _behaviour, _typeStub);
 
             [OneTimeSetUp]
             public void BeforeAllTests()
@@ -36,8 +36,8 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                Assert.IsTrue(_database.InstanceBehaviours.Length == 1);
-                Assert.Contains(_expectedBehaviour, _database.InstanceBehaviours);
+                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
+                Assert.Contains(_expectedBehaviour, _database.InstanceGenericTypes);
             }
 
             [Test]
@@ -45,7 +45,7 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] behaviours);
+                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] behaviours);
 
                 Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeUtility.GetTypeNameAndAssembly(NewName, NewAssembly)));

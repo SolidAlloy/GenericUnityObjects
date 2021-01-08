@@ -9,7 +9,7 @@
     [Serializable]
     internal class GenericTypeInfo : TypeInfo
     {
-        private static readonly ArrayEqualityComparer<string> StringArrayComparer = new ArrayEqualityComparer<string>();
+        private static readonly ArrayEqualityComparer<string> _stringArrayComparer = new ArrayEqualityComparer<string>();
 
         public string AssemblyGUID;
 
@@ -84,7 +84,7 @@
             unchecked
             {
                 int hash = base.GetHashCode();
-                hash = hash * 23 + StringArrayComparer.GetHashCode(_argNames);
+                hash = hash * 23 + _stringArrayComparer.GetHashCode(_argNames);
                 return hash;
             }
         }

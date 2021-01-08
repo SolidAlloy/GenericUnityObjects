@@ -4,6 +4,7 @@
     using GenericUnityObjects.Util;
     using SolidUtilities.Editor.Helpers;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     [Serializable]
     internal abstract class TypeInfo : IEquatable<TypeInfo>
@@ -45,8 +46,8 @@
             }
         }
 
-        public bool RetrieveType<TDatabase>(out Type type, out bool retrievedFromGUID)
-            where TDatabase : GenerationDatabase<TDatabase>
+        public bool RetrieveType<TObject>(out Type type, out bool retrievedFromGUID)
+            where TObject : Object
         {
             retrievedFromGUID = false;
 
@@ -61,7 +62,7 @@
             if (Type != null)
             {
                 type = Type;
-                UpdateGUIDIfNeeded<TDatabase>();
+                UpdateGUIDIfNeeded<TObject>();
                 return true;
             }
 
@@ -78,15 +79,15 @@
             return Type != null;
         }
 
-        public Type RetrieveType<TDatabase>()
-            where TDatabase : GenerationDatabase<TDatabase>
+        public Type RetrieveType<TObject>()
+            where TObject : Object
         {
-            RetrieveType<TDatabase>(out Type type, out bool _);
+            RetrieveType<TObject>(out Type type, out bool _);
             return type;
         }
 
-        private void UpdateGUIDIfNeeded<TDatabase>()
-            where TDatabase : GenerationDatabase<TDatabase>
+        private void UpdateGUIDIfNeeded<TObject>()
+            where TObject : Object
         {
             string currentGUID = AssetSearcher.GetClassGUID(Type);
 
@@ -95,11 +96,11 @@
 
             if (this is ArgumentInfo argument)
             {
-                GenerationDatabase<TDatabase>.UpdateArgumentGUID(ref argument, currentGUID);
+                GenerationDatabase<TObject>.UpdateArgumentGUID(ref argument, currentGUID);
             }
             else if (this is GenericTypeInfo genericTypeInfo)
             {
-                GenerationDatabase<TDatabase>.UpdateGenericTypeGUID(ref genericTypeInfo, currentGUID);
+                GenerationDatabase<TObject>.UpdateGenericTypeGUID(ref genericTypeInfo, currentGUID);
             }
             else
             {

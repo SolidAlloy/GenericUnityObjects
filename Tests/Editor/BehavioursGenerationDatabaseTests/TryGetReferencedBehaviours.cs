@@ -8,11 +8,11 @@
         public class TryGetReferencedBehaviours : BehavioursGenerationDatabaseTests
         {
             private static bool CallMethodBool() =>
-                _database.TryGetReferencedBehavioursImpl(_firstArg, out _);
+                _database.TryGetReferencedGenericTypesImpl(_firstArg, out _);
 
             private static GenericTypeInfo[] CallMethodArray()
             {
-                _database.TryGetReferencedBehavioursImpl(_firstArg, out GenericTypeInfo[] behaviours);
+                _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] behaviours);
                 return behaviours;
             }
 

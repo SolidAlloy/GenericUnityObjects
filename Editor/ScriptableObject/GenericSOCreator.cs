@@ -69,7 +69,7 @@
 
             PersistentStorage.SaveForAssemblyReload(genericType, fileName);
 
-            ConcreteSOCreator.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
+            ConcreteClassCreator<ScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();
         }
 

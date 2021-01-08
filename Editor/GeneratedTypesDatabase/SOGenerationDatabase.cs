@@ -1,4 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.GeneratedTypesDatabase
 {
-    internal class SOGenerationDatabase : GenerationDatabase<SOGenerationDatabase> { }
+    using UnityEngine;
+
+    internal class SOGenerationDatabase : GenerationDatabase<ScriptableObject> { }
 }

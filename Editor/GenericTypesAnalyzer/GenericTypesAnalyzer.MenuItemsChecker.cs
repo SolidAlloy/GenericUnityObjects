@@ -9,7 +9,7 @@
     using UnityEditor;
     using Util;
 
-    internal static partial class GenericTypesAnalyzer<TDatabase>
+    internal static partial class GenericTypesAnalyzer<TObject>
     {
         public static class MenuItemsChecker
         {

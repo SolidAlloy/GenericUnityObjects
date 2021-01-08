@@ -6,20 +6,21 @@
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEngine.Assertions;
+    using Object = UnityEngine.Object;
 
-    internal static partial class GenericTypesAnalyzer<TDatabase>
-        where TDatabase : GenerationDatabase<TDatabase>
+    internal static partial class GenericTypesAnalyzer<TObject>
+        where TObject : Object
     {
         public static Dictionary<Type, Dictionary<Type[], Type>> GetDictForInitialization()
         {
-            var behaviours = GenerationDatabase<TDatabase>.GenericUnityObjects;
+            var behaviours = GenerationDatabase<TObject>.GenericTypes;
             var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
 
             foreach (GenericTypeInfo behaviourInfo in behaviours)
             {
-                GenerationDatabase<TDatabase>.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
+                GenerationDatabase<TObject>.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
 
-                Type behaviourType = behaviourInfo.RetrieveType<TDatabase>();
+                Type behaviourType = behaviourInfo.RetrieveType<TObject>();
 
                 var concreteClassesDict = new Dictionary<Type[], Type>(concreteClasses.Length, default(TypeArrayComparer));
 
@@ -31,7 +32,7 @@
 
                     for (int i = 0; i < argsLength; i++)
                     {
-                        var type = concreteClass.Arguments[i].RetrieveType<TDatabase>();
+                        var type = concreteClass.Arguments[i].RetrieveType<TObject>();
                         Assert.IsNotNull(type);
                         key[i] = type;
                     }

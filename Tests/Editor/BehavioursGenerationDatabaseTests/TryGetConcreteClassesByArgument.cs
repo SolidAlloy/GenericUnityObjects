@@ -45,11 +45,11 @@
                 AddEntries();
 
                 var secondBehaviour = new GenericTypeInfo("secondName", "secondGUID", new[] { "secondArgs" });
-                _database.AddGenericBehaviourImpl(secondBehaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(secondBehaviour, out List<ConcreteClass> _);
                 _database.AddConcreteClassImpl(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 
                 // Action
-                _database.RemoveGenericBehaviourImpl(_behaviour, _ => { });
+                _database.RemoveGenericTypeImpl(_behaviour, _ => { });
 
                 // Check
                 AssertFalse();
