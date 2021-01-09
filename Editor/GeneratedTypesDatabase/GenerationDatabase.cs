@@ -20,10 +20,10 @@
         private Pool<ArgumentInfo> _argumentsPool;
         private Pool<GenericTypeInfo> _genericTypesPool;
 
-        [HideInInspector] [SerializeField] private ArgumentInfo[] _genericArgumentKeys;
-        [HideInInspector] [SerializeField] private GenericTypeCollection[] _genericTypeValues;
-        [HideInInspector] [SerializeField] private GenericTypeInfo[] _genericTypeKeys;
-        [HideInInspector] [SerializeField] private ConcreteClassCollection[] _genericArgumentValues;
+        [SerializeField] private ArgumentInfo[] _genericArgumentKeys;
+        [SerializeField] private GenericTypeCollection[] _genericTypeValues;
+        [SerializeField] private GenericTypeInfo[] _genericTypeKeys;
+        [SerializeField] private ConcreteClassCollection[] _genericArgumentValues;
 
         private bool _shouldSetDirty;
 

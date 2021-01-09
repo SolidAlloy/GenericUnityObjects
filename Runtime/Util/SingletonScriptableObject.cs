@@ -5,17 +5,12 @@
     using UnityEditor;
 #endif
 
-    internal interface ICanBeInitialized
-    {
-        void Initialize();
-    }
-
     /// <summary>
     /// Abstract class for making reload-proof singletons out of ScriptableObjects
     /// Returns the asset created in the Assets/Resources folder, or null if there is none.
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
-    internal abstract class SingletonScriptableObject<T> : ScriptableObject
+    internal abstract class SingletonScriptableObject<T> : SingletonScriptableObject
         where T : SingletonScriptableObject<T>, ICanBeInitialized
     {
         private static readonly InstanceGetter<T> _getter = new InstanceGetter<T>(Config.ResourcesPath);
@@ -29,5 +24,12 @@
             EditorUtility.SetDirty(this);
 #endif
         }
+    }
+
+    internal abstract class SingletonScriptableObject : ScriptableObject { }
+
+    internal interface ICanBeInitialized
+    {
+        void Initialize();
     }
 }

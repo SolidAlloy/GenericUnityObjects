@@ -3,7 +3,7 @@
     using GenericUnityObjects.Util;
     using UnityEngine;
 
-    internal abstract class EditorOnlySingletonSO<T> : ScriptableObject
+    internal abstract class EditorOnlySingletonSO<T> : SingletonScriptableObject
         where T : EditorOnlySingletonSO<T>, ICanBeInitialized
     {
         private static readonly InstanceGetter<T> Getter = new InstanceGetter<T>(Config.EditorResourcesPath);

@@ -12,14 +12,14 @@
     /// </summary>
     internal class PersistentStorage : EditorOnlySingletonSO<PersistentStorage>, ICanBeInitialized
     {
-        [HideInInspector] [SerializeField] private TypeReference _genericSOType;
-        [HideInInspector] [SerializeField] private string _fileName;
+        [SerializeField] private TypeReference _genericSOType;
+        [SerializeField] private string _fileName;
 
-        [HideInInspector] [SerializeField] private GameObject _gameObject;
-        [HideInInspector] [SerializeField] private TypeReference _genericBehaviourType;
+        [SerializeField] private GameObject _gameObject;
+        [SerializeField] private TypeReference _genericBehaviourType;
 
-        [HideInInspector] [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
-        [HideInInspector] [SerializeField] private bool _usageExampleTypesAreAdded;
+        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
+        [SerializeField] private bool _usageExampleTypesAreAdded;
 
         public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
 

@@ -8,10 +8,10 @@
     using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
-    internal static partial class GenericTypesAnalyzer<TObject>
+    internal static class DictInitializer<TObject>
         where TObject : Object
     {
-        public static Dictionary<Type, Dictionary<Type[], Type>> GetDictForInitialization()
+        public static void Initialize()
         {
             var behaviours = GenerationDatabase<TObject>.GenericTypes;
             var dict = new Dictionary<Type, Dictionary<Type[], Type>>(behaviours.Length);
@@ -50,7 +50,7 @@
                 dict.Add(behaviourType, concreteClassesDict);
             }
 
-            return dict;
+            GenericTypesDatabase<TObject>.Initialize(dict);
         }
     }
 }

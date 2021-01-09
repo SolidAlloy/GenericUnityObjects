@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using GeneratedTypesDatabase;
     using GenericUnityObjects;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
@@ -69,7 +68,7 @@
 
             PersistentStorage.SaveForAssemblyReload(genericType, fileName);
 
-            ConcreteClassCreator<ScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
+            ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();
         }
 

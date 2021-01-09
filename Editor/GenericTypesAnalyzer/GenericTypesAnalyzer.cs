@@ -13,19 +13,21 @@
         {
             bool needsAssetDatabaseRefresh;
 
+            var behavioursChecker = new BehavioursChecker();
+
             using (new DisabledAssetDatabase(null))
             {
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
                 needsAssetDatabaseRefresh =
-                    GenericTypesAnalyzer<UnityEngine.MonoBehaviour>.ArgumentsChecker.Check()
-                    || GenericTypesAnalyzer<UnityEngine.MonoBehaviour>.BehavioursChecker.Check();
+                    ArgumentsChecker<UnityEngine.MonoBehaviour>.Check(behavioursChecker)
+                    | behavioursChecker.Check();
             }
 
             if (needsAssetDatabaseRefresh)
                 AssetDatabase.Refresh();
 
-            BehavioursDatabase.Initialize(GenericTypesAnalyzer<UnityEngine.MonoBehaviour>.GetDictForInitialization());
+            DictInitializer<UnityEngine.MonoBehaviour>.Initialize();
         }
 
         [DidReloadScripts(Config.AssemblyGenerationOrder)]
@@ -33,20 +35,22 @@
         {
             bool needsAssetDatabaseRefresh;
 
+            var scriptableObjectsChecker = new ScriptableObjectsChecker();
+
             using (new DisabledAssetDatabase(null))
             {
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
                 needsAssetDatabaseRefresh =
-                    GenericTypesAnalyzer<UnityEngine.ScriptableObject>.ArgumentsChecker.Check()
-                    || GenericTypesAnalyzer<UnityEngine.ScriptableObject>.ScriptableObjectsChecker.Check()
-                    || GenericTypesAnalyzer<UnityEngine.ScriptableObject>.MenuItemsChecker.Check();
+                    ArgumentsChecker<GenericScriptableObject>.Check(scriptableObjectsChecker)
+                    | scriptableObjectsChecker.Check()
+                    | MenuItemsChecker.Check();
             }
 
             if (needsAssetDatabaseRefresh)
                 AssetDatabase.Refresh();
 
-            ScriptableObjectsDatabase.Initialize(GenericTypesAnalyzer<UnityEngine.ScriptableObject>.GetDictForInitialization());
+            DictInitializer<GenericScriptableObject>.Initialize();
         }
     }
 }

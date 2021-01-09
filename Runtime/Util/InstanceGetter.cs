@@ -2,9 +2,7 @@
 {
     using System;
     using System.IO;
-    using System.Linq;
     using JetBrains.Annotations;
-    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
 
@@ -21,7 +19,7 @@
         {
             _actualType = GetActualType();
             _folderPath = folderPath;
-            _assetPath = $"{_folderPath}/{GetAssetName()}.asset";
+            _assetPath = $"{_folderPath}/{_actualType.Name}.asset";
         }
 
         public T GetInstance()
@@ -81,7 +79,7 @@
 #if UNITY_EDITOR
                 instance = (T) AssetDatabase.LoadAssetAtPath(_assetPath, _actualType);
 #else
-                instance = (T) Resources.Load(GetAssetName(), _actualType);
+                instance = (T) Resources.Load(_actualType.Name, _actualType);
 #endif
             }
             catch (UnityException)
@@ -92,17 +90,6 @@
             }
 
             return instance;
-        }
-
-        private string GetAssetName()
-        {
-            if ( ! _actualType.IsGenericType)
-                return _actualType.Name;
-
-            Type[] genericArgs = _actualType.GetGenericArguments();
-            string typeNameWithoutBrackets = _actualType.Name.StripGenericSuffix();
-            var argumentNames = genericArgs.Select(argument => argument.Name);
-            return $"{typeNameWithoutBrackets}_{string.Join("_", argumentNames)}";
         }
     }
 }
