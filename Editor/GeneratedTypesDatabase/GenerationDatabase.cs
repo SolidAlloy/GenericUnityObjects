@@ -168,6 +168,7 @@
             return concreteClasses.Count != 0;
         }
 
+        // TODO: replace with GetReferencedGenericTypes in tests
         public static bool TryGetReferencedGenericTypes(ArgumentInfo argument, out GenericTypeInfo[] referencedGenericTypeInfos)
         {
             return Instance.TryGetReferencedGenericTypesImpl(argument, out referencedGenericTypeInfos);
@@ -180,6 +181,13 @@
             return success;
         }
 
+        public static GenericTypeInfo[] GetReferencedGenericTypes(ArgumentInfo argument) =>
+            Instance.GetReferencedGenericTypesImpl(argument);
+
+        public GenericTypeInfo[] GetReferencedGenericTypesImpl(ArgumentInfo argument) =>
+            _argumentGenericTypesDict[argument].ToArray();
+
+        // TODO: replace with GetConcreteClasses in tests
         public static bool TryGetConcreteClasses(GenericTypeInfo genericTypeInfo, out ConcreteClass[] concreteClasses)
         {
             return Instance.TryGetConcreteClassesImpl(genericTypeInfo, out concreteClasses);
@@ -192,11 +200,18 @@
             return success;
         }
 
+        public static ConcreteClass[] GetConcreteClasses(GenericTypeInfo genericTypeInfo) =>
+            Instance.GetConcreteClassesImpl(genericTypeInfo);
+
+        public ConcreteClass[] GetConcreteClassesImpl(GenericTypeInfo genericTypeInfo) =>
+            _genericTypeArgumentsDict[genericTypeInfo].ToArray();
+
         public static bool TryGetConcreteClassesByArgument(GenericTypeInfo genericTypeInfo, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
             return Instance.TryGetConcreteClassesByArgumentImpl(genericTypeInfo, argument, out concreteClasses);
         }
 
+        // TODO: replace with GetConcreteClassesByArgument in tests
         public bool TryGetConcreteClassesByArgumentImpl(GenericTypeInfo genericTypeInfo, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
         {
             if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClassesList))
@@ -214,6 +229,16 @@
 
             concreteClasses = null;
             return false;
+        }
+
+        public static ConcreteClass[] GetConcreteClassesByArgument(GenericTypeInfo genericTypeInfo, ArgumentInfo argument) =>
+            Instance.GetConcreteClassesByArgumentImpl(genericTypeInfo, argument);
+
+        public ConcreteClass[] GetConcreteClassesByArgumentImpl(GenericTypeInfo genericTypeInfo, ArgumentInfo argument)
+        {
+            return _genericTypeArgumentsDict[genericTypeInfo]
+                .Where(concreteClass => concreteClass.Arguments.Contains(argument))
+                .ToArray();
         }
 
         public static void UpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)

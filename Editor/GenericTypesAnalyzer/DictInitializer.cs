@@ -18,7 +18,7 @@
 
             foreach (GenericTypeInfo behaviourInfo in behaviours)
             {
-                GenerationDatabase<TObject>.TryGetConcreteClasses(behaviourInfo, out var concreteClasses);
+                var concreteClasses = GenerationDatabase<TObject>.GetConcreteClasses(behaviourInfo);
 
                 Type behaviourType = behaviourInfo.RetrieveType<TObject>();
 

@@ -138,10 +138,7 @@
                     continue; // concrete classes are already removed, no need to iterate through them.
                 }
 
-                bool concreteClassesSuccess = GenerationDatabase<TObject>.TryGetConcreteClassesByArgument(genericTypeInfo, argument, out ConcreteClass[] concreteClasses);
-
-                Assert.IsTrue(concreteClassesSuccess);
-
+                var concreteClasses = GenerationDatabase<TObject>.GetConcreteClassesByArgument(genericTypeInfo, argument);
                 _concreteClassChecker.UpdateConcreteClassesAssemblies(genericType, concreteClasses);
             }
         }
@@ -181,9 +178,7 @@
         {
             DebugUtility.Log($"{typeof(TObject).Name} typename updated: {genericType.TypeFullName} => {newType.FullName}");
 
-            bool success = GenerationDatabase<TObject>.TryGetConcreteClasses(genericType, out ConcreteClass[] concreteClasses);
-
-            Assert.IsTrue(success);
+            ConcreteClass[] concreteClasses = GenerationDatabase<TObject>.GetConcreteClasses(genericType);
 
             // Update database before operating on assemblies
             GenerationDatabase<TObject>.UpdateGenericTypeNameAndAssembly(ref genericType, newType);

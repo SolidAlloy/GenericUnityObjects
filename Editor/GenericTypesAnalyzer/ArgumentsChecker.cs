@@ -35,12 +35,10 @@
         public static void UpdateArgumentTypeName(ArgumentInfo argument, Type newType, GenericTypesChecker<TObject> genericTypesChecker)
         {
             // Retrieve the array of generic arguments where the old argument was listed
-            bool genericTypesSuccess = GenerationDatabase<TObject>.TryGetReferencedGenericTypes(argument, out GenericTypeInfo[] referencedGenericTypes);
+            var referencedGenericTypes = GenerationDatabase<TObject>.GetReferencedGenericTypes(argument);
 
             // update argument typename in database before updating assemblies and trying to find behaviour because behaviour might also need to be updated, and the argument should already be new
             GenerationDatabase<TObject>.UpdateArgumentNameAndAssembly(ref argument, newType);
-
-            Assert.IsTrue(genericTypesSuccess);
 
             genericTypesChecker.UpdateReferencedGenericTypes(argument, referencedGenericTypes);
         }
