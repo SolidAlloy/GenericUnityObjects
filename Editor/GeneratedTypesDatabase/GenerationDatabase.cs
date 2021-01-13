@@ -241,12 +241,12 @@
                 .ToArray();
         }
 
-        public static void UpdateArgumentGUID(ref ArgumentInfo argument, string newGUID)
+        public static void UpdateArgumentGUID(ArgumentInfo argument, string newGUID)
         {
-            Instance.UpdateArgumentGUIDImpl(ref argument, newGUID);
+            Instance.UpdateArgumentGUIDImpl(argument, newGUID);
         }
 
-        public void UpdateArgumentGUIDImpl(ref ArgumentInfo argument, string newGUID)
+        public void UpdateArgumentGUIDImpl(ArgumentInfo argument, string newGUID)
         {
             if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
@@ -262,12 +262,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateArgumentNameAndAssembly(ref ArgumentInfo argument, Type newType)
+        public static void UpdateArgumentNameAndAssembly(ArgumentInfo argument, Type newType)
         {
-            Instance.UpdateArgumentNameAndAssemblyImpl(ref argument, newType);
+            Instance.UpdateArgumentNameAndAssemblyImpl(argument, newType);
         }
 
-        public void UpdateArgumentNameAndAssemblyImpl(ref ArgumentInfo argument, Type newType)
+        public void UpdateArgumentNameAndAssemblyImpl(ArgumentInfo argument, Type newType)
         {
             if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
@@ -283,12 +283,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateGenericTypeGUID(ref GenericTypeInfo genericTypeInfo, string newGUID)
+        public static void UpdateGenericTypeGUID(GenericTypeInfo genericTypeInfo, string newGUID)
         {
-            Instance.UpdateGenericTypeGUIDImpl(ref genericTypeInfo, newGUID);
+            Instance.UpdateGenericTypeGUIDImpl(genericTypeInfo, newGUID);
         }
 
-        public void UpdateGenericTypeGUIDImpl(ref GenericTypeInfo genericTypeInfo, string newGUID)
+        public void UpdateGenericTypeGUIDImpl(GenericTypeInfo genericTypeInfo, string newGUID)
         {
             if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
@@ -304,12 +304,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateGenericTypeArgs(ref GenericTypeInfo genericTypeInfo, string[] newArgNames)
+        public static void UpdateGenericTypeArgs(GenericTypeInfo genericTypeInfo, string[] newArgNames)
         {
-            Instance.UpdateGenericTypeArgsImpl(ref genericTypeInfo, newArgNames);
+            Instance.UpdateGenericTypeArgsImpl(genericTypeInfo, newArgNames);
         }
 
-        public void UpdateGenericTypeArgsImpl(ref GenericTypeInfo genericTypeInfo, string[] newArgNames)
+        public void UpdateGenericTypeArgsImpl(GenericTypeInfo genericTypeInfo, string[] newArgNames)
         {
             if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
@@ -325,12 +325,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void UpdateGenericTypeNameAndAssembly(ref GenericTypeInfo genericTypeInfo, Type newType)
+        public static void UpdateGenericType(GenericTypeInfo genericTypeInfo, Type newType)
         {
-            Instance.UpdateGenericTypeNameAndAssemblyImpl(ref genericTypeInfo, newType);
+            Instance.UpdateGenericTypeImpl(genericTypeInfo, newType);
         }
 
-        public void UpdateGenericTypeNameAndAssemblyImpl(ref GenericTypeInfo genericTypeInfo, Type newType)
+        public void UpdateGenericTypeImpl(GenericTypeInfo genericTypeInfo, Type newType)
         {
             if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
@@ -340,6 +340,7 @@
             _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
             {
                 genericTypeToChange.UpdateNameAndAssembly(newType);
+                genericTypeToChange.UpdateArgNames(newType.GenericTypeArguments);
             });
 
             _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);

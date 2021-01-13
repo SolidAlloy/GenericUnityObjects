@@ -8,7 +8,6 @@
     using JetBrains.Annotations;
     using SolidUtilities.Extensions;
     using UnityEditor;
-    using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
     internal abstract class GenericTypesChecker<TObject>
@@ -61,39 +60,34 @@
                 {
                     GenericTypeInfo oldType = oldTypesOnly[i];
 
-                    if (newType.GUID == oldType.GUID)
-                    {
-                        if (newType.TypeNameAndAssembly == oldType.TypeNameAndAssembly)
-                        {
-                            needsAssetDatabaseRefresh |= UpdateGenericTypeArgNames(oldType, newType.ArgNames, newType.Type);
-                        }
-                        else
-                        {
-                            needsAssetDatabaseRefresh = true;
-                            UpdateGenericTypeName(oldType, newType.Type);
-                        }
+                    bool guidsDontMatch = newType.GUID != oldType.GUID;
+                    bool typeNamesDontMatch = newType.TypeNameAndAssembly != oldType.TypeNameAndAssembly;
 
-                        oldTypesOnly.Remove(oldType);
+                    // If both parameters don't match, the types are not equal
+                    if (guidsDontMatch && typeNamesDontMatch)
+                        continue;
+
+                    if (guidsDontMatch)
+                    {
+                        UpdateGenericTypeGUID(oldType, newType.GUID);
                         foundMatching = true;
-                        break;
+                    }
+                    else if (typeNamesDontMatch)
+                    {
+                        needsAssetDatabaseRefresh = true;
+                        UpdateGenericTypeName(oldType, newType.Type);
+                        foundMatching = true;
                     }
 
-                    if (newType.TypeNameAndAssembly == oldType.TypeNameAndAssembly)
+                    if ( ! newType.ArgNames.SequenceEqual(oldType.ArgNames))
                     {
-                        // new type GUID is empty -> leave the old GUID
-                        if (!string.IsNullOrEmpty(newType.GUID))
-                        {
-                            // new type GUID is not empty -> update old GUID
-                            UpdateGenericTypeGUID(oldType, newType.GUID);
-                        }
-
-                        if ( ! newType.ArgNames.SequenceEqual(oldType.ArgNames))
-                        {
-                            needsAssetDatabaseRefresh |= UpdateGenericTypeArgNames(oldType, newType.ArgNames, newType.Type);
-                        }
-
-                        oldTypesOnly.Remove(oldType);
+                        needsAssetDatabaseRefresh |= UpdateGenericTypeArgNames(oldType, newType.ArgNames, newType.Type);
                         foundMatching = true;
+                    }
+
+                    if (foundMatching)
+                    {
+                        oldTypesOnly.Remove(oldType);
                         break;
                     }
                 }
@@ -114,8 +108,12 @@
 
         private static void UpdateGenericTypeGUID(GenericTypeInfo genericType, string newGUID)
         {
+            // new type GUID is empty -> leave the old GUID
+            if (string.IsNullOrEmpty(newGUID))
+                return;
+
             DebugUtility.Log($"{typeof(TObject).Name} GUID updated: {genericType.GUID} => {newGUID}");
-            GenerationDatabase<TObject>.UpdateGenericTypeGUID(ref genericType, newGUID);
+            GenerationDatabase<TObject>.UpdateGenericTypeGUID(genericType, newGUID);
         }
 
         public void UpdateReferencedGenericTypes(ArgumentInfo argument, GenericTypeInfo[] referencedGenericTypes)
@@ -158,7 +156,7 @@
         protected virtual bool UpdateGenericTypeArgNames(GenericTypeInfo genericType, string[] newArgNames, Type newType)
         {
             DebugUtility.Log($"{typeof(TObject).Name} args updated: '{string.Join(", ", genericType.ArgNames)}' => '{string.Join(", ", newArgNames)}'");
-            GenerationDatabase<TObject>.UpdateGenericTypeArgs(ref genericType, newArgNames);
+            GenerationDatabase<TObject>.UpdateGenericTypeArgs(genericType, newArgNames);
             return false;
         }
 
@@ -181,8 +179,9 @@
             ConcreteClass[] concreteClasses = GenerationDatabase<TObject>.GetConcreteClasses(genericType);
 
             // Update database before operating on assemblies
-            GenerationDatabase<TObject>.UpdateGenericTypeNameAndAssembly(ref genericType, newType);
+            GenerationDatabase<TObject>.UpdateGenericType(genericType, newType);
             additionalGenericTypeUpdate?.Invoke();
+
             _concreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
         }
 

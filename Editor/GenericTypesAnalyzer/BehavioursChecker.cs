@@ -4,15 +4,12 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using SolidUtilities.Helpers;
-    using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
 
     internal class BehavioursChecker : GenericTypesChecker<MonoBehaviour>
     {
-        public static string GUID;
-
         protected override bool AddNewGenericTypes(GenericTypeInfo[] genericTypes)
         {
             base.AddNewGenericTypes(genericTypes);

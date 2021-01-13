@@ -22,7 +22,7 @@
             [Test]
             public void Updates_behaviour_arguments_in_behaviours_list()
             {
-                _database.UpdateGenericTypeArgsImpl(ref _behaviour, NewArgs);
+                _database.UpdateGenericTypeArgsImpl(_behaviour, NewArgs);
 
                 Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
                 Assert.Contains(_expectedBehaviour, _database.InstanceGenericTypes);
@@ -31,7 +31,7 @@
             [Test]
             public void Updates_behaviour_arguments_in_referenced_behaviours()
             {
-                _database.UpdateGenericTypeArgsImpl(ref _behaviour, NewArgs);
+                _database.UpdateGenericTypeArgsImpl(_behaviour, NewArgs);
 
                 bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] behaviours);
 
@@ -42,7 +42,7 @@
             [Test]
             public void Concrete_classes_can_be_found_by_new_behaviour()
             {
-                _database.UpdateGenericTypeArgsImpl(ref _behaviour, NewArgs);
+                _database.UpdateGenericTypeArgsImpl(_behaviour, NewArgs);
 
                 bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
 
@@ -53,7 +53,7 @@
             [Test]
             public void Updates_passed_argument_argNames()
             {
-                _database.UpdateGenericTypeArgsImpl(ref _behaviour, NewArgs);
+                _database.UpdateGenericTypeArgsImpl(_behaviour, NewArgs);
                 Assert.IsTrue(_behaviour.ArgNames == NewArgs);
             }
         }

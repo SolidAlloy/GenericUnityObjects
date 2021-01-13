@@ -2,7 +2,6 @@
 {
     using System;
     using GeneratedTypesDatabase;
-    using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
     internal static class ArgumentsChecker<TObject>
@@ -38,7 +37,7 @@
             var referencedGenericTypes = GenerationDatabase<TObject>.GetReferencedGenericTypes(argument);
 
             // update argument typename in database before updating assemblies and trying to find behaviour because behaviour might also need to be updated, and the argument should already be new
-            GenerationDatabase<TObject>.UpdateArgumentNameAndAssembly(ref argument, newType);
+            GenerationDatabase<TObject>.UpdateArgumentNameAndAssembly(argument, newType);
 
             genericTypesChecker.UpdateReferencedGenericTypes(argument, referencedGenericTypes);
         }

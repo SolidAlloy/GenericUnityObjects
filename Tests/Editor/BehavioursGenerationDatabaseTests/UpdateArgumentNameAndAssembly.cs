@@ -15,7 +15,7 @@
             private static TypeStub _typeStub;
 
             private static void CallUpdateArgumentNameAndAssembly() =>
-                _database.UpdateArgumentNameAndAssemblyImpl(ref _firstArg, _typeStub);
+                _database.UpdateArgumentNameAndAssemblyImpl(_firstArg, _typeStub);
 
             [OneTimeSetUp]
             public void BeforeAllTests()

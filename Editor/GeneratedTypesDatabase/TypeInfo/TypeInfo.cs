@@ -96,11 +96,11 @@
 
             if (this is ArgumentInfo argument)
             {
-                GenerationDatabase<TObject>.UpdateArgumentGUID(ref argument, currentGUID);
+                GenerationDatabase<TObject>.UpdateArgumentGUID(argument, currentGUID);
             }
             else if (this is GenericTypeInfo genericTypeInfo)
             {
-                GenerationDatabase<TObject>.UpdateGenericTypeGUID(ref genericTypeInfo, currentGUID);
+                GenerationDatabase<TObject>.UpdateGenericTypeGUID(genericTypeInfo, currentGUID);
             }
             else
             {

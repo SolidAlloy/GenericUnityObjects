@@ -38,6 +38,8 @@
 
         public void UpdateArgNames(string[] newNames) => _argNames = newNames;
 
+        public void UpdateArgNames(Type[] newTypes) => _argNames = newTypes.Select(newType => newType.Name).ToArray();
+
         public bool Equals(GenericTypeInfo p)
         {
             // If parameter is null, return false.
