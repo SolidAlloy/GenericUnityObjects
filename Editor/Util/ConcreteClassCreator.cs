@@ -15,6 +15,7 @@
         public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
+            PersistentStorage.AddAssemblyForIconChange(assemblyGUID);
             AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
@@ -33,6 +34,7 @@
 
             AssemblyAssetOperations.ReplaceAssemblyByGUID(concreteClass.AssemblyGUID, newAssemblyName,
                 () => CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName));
+            PersistentStorage.AddAssemblyForIconChange(concreteClass.AssemblyGUID);
         }
 
         private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,

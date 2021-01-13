@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.Editor.ScriptableObject
+﻿namespace GenericUnityObjects.Editor.ScriptableObjects
 {
     using System;
     using System.Linq;
@@ -35,7 +35,7 @@
             });
         }
 
-        [DidReloadScripts(Config.UnityObjectCreationOrder)]
+        [DidReloadScripts((int)DidReloadScriptsOrder.UnityObjectCreation)]
         private static void OnScriptsReload()
         {
             if ( ! PersistentStorage.NeedsSOCreation)

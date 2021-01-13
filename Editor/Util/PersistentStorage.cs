@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
+    using System.Collections.Generic;
     using GenericUnityObjects.Util;
     using TypeReferences;
     using UnityEditor;
@@ -19,11 +20,6 @@
         [SerializeField] private TypeReference _genericBehaviourType;
 
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
-        [SerializeField] private bool _usageExampleTypesAreAdded;
-
-        public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
-
-        public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
 
         public static MenuItemMethod[] MenuItemMethods
         {
@@ -35,6 +31,8 @@
             }
         }
 
+        [SerializeField] private bool _usageExampleTypesAreAdded;
+
         public static bool UsageExampleTypesAreAdded
         {
             get => Instance._usageExampleTypesAreAdded;
@@ -44,6 +42,22 @@
                 EditorUtility.SetDirty(Instance);
             }
         }
+
+        [SerializeField] private List<string> _iconChangeGUIDs = new List<string>();
+
+        public static IEnumerable<string> IconChangeGUIDs => Instance._iconChangeGUIDs;
+
+        public static void AddAssemblyForIconChange(string guid)
+        {
+            Instance._iconChangeGUIDs.Add(guid);
+            EditorUtility.SetDirty(Instance);
+        }
+
+        public static void ClearIconChangeGUIDS() => Instance._iconChangeGUIDs.Clear();
+
+        public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
+
+        public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
 
         public static void SaveForAssemblyReload(Type genericTypeToCreate, string fileName)
         {

@@ -6,6 +6,7 @@
     using System.Reflection.Emit;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;
+    using UnityEngine;
     using Object = UnityEngine.Object;
 
     internal static class ConcreteClassCreator
@@ -20,7 +21,7 @@
 
             TypeBuilder typeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericTypeWithArgs);
 
-            if (typeof(TObject) == typeof(UnityEngine.MonoBehaviour))
+            if (typeof(TObject) == typeof(MonoBehaviour))
             {
                 string componentName = "Scripts/" + GetComponentName(genericTypeWithArgs);
                 AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);

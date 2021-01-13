@@ -4,11 +4,15 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using SolidUtilities.Helpers;
+    using UnityEditor;
+    using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
 
-    internal class BehavioursChecker : GenericTypesChecker<UnityEngine.MonoBehaviour>
+    internal class BehavioursChecker : GenericTypesChecker<MonoBehaviour>
     {
+        public static string GUID;
+
         protected override bool AddNewGenericTypes(GenericTypeInfo[] genericTypes)
         {
             base.AddNewGenericTypes(genericTypes);
@@ -21,11 +25,11 @@
             Assert.IsNotNull(behaviourType);
 
             string assemblyName = GetSelectorAssemblyName(behaviourType);
-            CreateSelectorAssembly(behaviourType, assemblyName);
+            AssemblyCreator.CreateSelectorAssembly(assemblyName, behaviourType);
 
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
             genericTypeInfo.AssemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
-
+            PersistentStorage.AddAssemblyForIconChange(genericTypeInfo.AssemblyGUID);
             base.AddNewGenericType(genericTypeInfo);
         }
 
@@ -39,6 +43,7 @@
         {
             base.UpdateGenericTypeArgNames(genericType, newArgNames, newType);
             UpdateSelectorAssembly(genericType.AssemblyGUID, newType);
+            PersistentStorage.AddAssemblyForIconChange(genericType.AssemblyGUID);
             return true;
         }
 
@@ -56,13 +61,8 @@
 
             AssemblyAssetOperations.ReplaceAssemblyByGUID(selectorAssemblyGUID, newAssemblyName, () =>
             {
-                CreateSelectorAssembly(newType, newAssemblyName);
+                AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType);
             });
-        }
-
-        private static void CreateSelectorAssembly(Type genericTypeWithoutArgs, string assemblyName)
-        {
-            AssemblyCreator.CreateSelectorAssembly(assemblyName, genericTypeWithoutArgs);
         }
     }
 }

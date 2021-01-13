@@ -1,7 +1,6 @@
-﻿namespace GenericUnityObjects.Editor.MonoBehaviour
+﻿namespace GenericUnityObjects.Editor.MonoBehaviours
 {
     using System;
-    using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -30,7 +29,7 @@
             AssetDatabase.Refresh();
         }
 
-        [DidReloadScripts(Config.UnityObjectCreationOrder)]
+        [DidReloadScripts((int)DidReloadScriptsOrder.UnityObjectCreation)]
         private static void OnScriptsReload()
         {
             if ( ! PersistentStorage.NeedsBehaviourCreation)

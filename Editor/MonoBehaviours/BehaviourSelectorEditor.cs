@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.Editor.MonoBehaviour
+﻿namespace GenericUnityObjects.Editor.MonoBehaviours
 {
     using System.Linq;
     using GenericUnityObjects.Util;

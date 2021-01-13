@@ -3,7 +3,7 @@
     using System;
     using System.Reflection;
     using System.Reflection.Emit;
-    using ScriptableObject;
+    using ScriptableObjects;
     using UnityEditor;
     using UnityEngine.Assertions;
     using Util;

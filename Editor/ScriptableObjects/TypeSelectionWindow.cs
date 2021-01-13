@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.Editor.ScriptableObject
+﻿namespace GenericUnityObjects.Editor.ScriptableObjects
 {
     using System;
     using SelectionWindow;

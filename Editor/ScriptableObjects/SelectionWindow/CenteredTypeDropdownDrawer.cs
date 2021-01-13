@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.Editor.ScriptableObject.SelectionWindow
+﻿namespace GenericUnityObjects.Editor.ScriptableObjects.SelectionWindow
 {
     using System;
     using SolidUtilities.Editor.Helpers;
