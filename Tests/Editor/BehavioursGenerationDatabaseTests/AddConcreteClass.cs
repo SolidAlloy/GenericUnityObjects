@@ -22,9 +22,8 @@
             {
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
 
-                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
+                var concreteClasses = _database.GetConcreteClassesImpl(_behaviour);
 
-                Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Length == 1);
                 Assert.IsTrue(concreteClasses[0] == _expectedConcreteClass);
             }
@@ -41,8 +40,7 @@
             public void Adds_behaviour_to_each_argument_in_arguments_dict()
             {
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
-                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] firstBehaviours);
-                Assert.IsTrue(success);
+                GenericTypeInfo[] firstBehaviours = _database.GetReferencedGenericTypesImpl(_firstArg);
                 Assert.IsTrue(firstBehaviours.SequenceEqual(_expectedBehaviours));
             }
 
@@ -56,8 +54,7 @@
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
                 _database.AddConcreteClassImpl(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 
-                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] actualBehaviours);
-                Assert.IsTrue(success);
+                GenericTypeInfo[] actualBehaviours = _database.GetReferencedGenericTypesImpl(_firstArg);
                 Assert.IsTrue(actualBehaviours.SequenceEqual(expectedBehaviours));
             }
 

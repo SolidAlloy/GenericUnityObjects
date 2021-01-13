@@ -168,68 +168,17 @@
             return concreteClasses.Count != 0;
         }
 
-        // TODO: replace with GetReferencedGenericTypes in tests
-        public static bool TryGetReferencedGenericTypes(ArgumentInfo argument, out GenericTypeInfo[] referencedGenericTypeInfos)
-        {
-            return Instance.TryGetReferencedGenericTypesImpl(argument, out referencedGenericTypeInfos);
-        }
-
-        public bool TryGetReferencedGenericTypesImpl(ArgumentInfo argument, out GenericTypeInfo[] referencedGenericTypeInfos)
-        {
-            bool success = _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos);
-            referencedGenericTypeInfos = success ? genericTypeInfos.ToArray() : null;
-            return success;
-        }
-
         public static GenericTypeInfo[] GetReferencedGenericTypes(ArgumentInfo argument) =>
             Instance.GetReferencedGenericTypesImpl(argument);
 
         public GenericTypeInfo[] GetReferencedGenericTypesImpl(ArgumentInfo argument) =>
             _argumentGenericTypesDict[argument].ToArray();
 
-        // TODO: replace with GetConcreteClasses in tests
-        public static bool TryGetConcreteClasses(GenericTypeInfo genericTypeInfo, out ConcreteClass[] concreteClasses)
-        {
-            return Instance.TryGetConcreteClassesImpl(genericTypeInfo, out concreteClasses);
-        }
-
-        public bool TryGetConcreteClassesImpl(GenericTypeInfo genericTypeInfo, out ConcreteClass[] concreteClasses)
-        {
-            bool success = _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClassesList);
-            concreteClasses = success ? concreteClassesList.ToArray() : null;
-            return success;
-        }
-
         public static ConcreteClass[] GetConcreteClasses(GenericTypeInfo genericTypeInfo) =>
             Instance.GetConcreteClassesImpl(genericTypeInfo);
 
         public ConcreteClass[] GetConcreteClassesImpl(GenericTypeInfo genericTypeInfo) =>
             _genericTypeArgumentsDict[genericTypeInfo].ToArray();
-
-        public static bool TryGetConcreteClassesByArgument(GenericTypeInfo genericTypeInfo, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
-        {
-            return Instance.TryGetConcreteClassesByArgumentImpl(genericTypeInfo, argument, out concreteClasses);
-        }
-
-        // TODO: replace with GetConcreteClassesByArgument in tests
-        public bool TryGetConcreteClassesByArgumentImpl(GenericTypeInfo genericTypeInfo, ArgumentInfo argument, out ConcreteClass[] concreteClasses)
-        {
-            if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClassesList))
-            {
-                concreteClasses = null;
-                return false;
-            }
-
-            concreteClasses = concreteClassesList
-                .Where(concreteClass => concreteClass.Arguments.Contains(argument))
-                .ToArray();
-
-            if (concreteClasses.Length != 0)
-                return true;
-
-            concreteClasses = null;
-            return false;
-        }
 
         public static ConcreteClass[] GetConcreteClassesByArgument(GenericTypeInfo genericTypeInfo, ArgumentInfo argument) =>
             Instance.GetConcreteClassesByArgumentImpl(genericTypeInfo, argument);
@@ -248,18 +197,13 @@
 
         public void UpdateArgumentGUIDImpl(ArgumentInfo argument, string newGUID)
         {
-            if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos))
-                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
-
-            _argumentGenericTypesDict.Remove(argument);
-
-            _argumentsPool.ChangeItem(ref argument, argumentToChange =>
+            TemporarilyRemovingArgument(argument, () =>
             {
-                argumentToChange.UpdateGUID(newGUID);
+                _argumentsPool.ChangeItem(ref argument, argumentToChange =>
+                {
+                    argumentToChange.UpdateGUID(newGUID);
+                });
             });
-
-            _argumentGenericTypesDict.Add(argument, genericTypeInfos);
-            EditorUtility.SetDirty(this);
         }
 
         public static void UpdateArgumentNameAndAssembly(ArgumentInfo argument, Type newType)
@@ -269,18 +213,13 @@
 
         public void UpdateArgumentNameAndAssemblyImpl(ArgumentInfo argument, Type newType)
         {
-            if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
-                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
-
-            _argumentGenericTypesDict.Remove(argument);
-
-            _argumentsPool.ChangeItem(ref argument, argumentToChange =>
+            TemporarilyRemovingArgument(argument, () =>
             {
-                argumentToChange.UpdateNameAndAssembly(newType);
+                _argumentsPool.ChangeItem(ref argument, argumentToChange =>
+                {
+                    argumentToChange.UpdateNameAndAssembly(newType);
+                });
             });
-
-            _argumentGenericTypesDict.Add(argument, behaviours);
-            EditorUtility.SetDirty(this);
         }
 
         public static void UpdateGenericTypeGUID(GenericTypeInfo genericTypeInfo, string newGUID)
@@ -290,18 +229,13 @@
 
         public void UpdateGenericTypeGUIDImpl(GenericTypeInfo genericTypeInfo, string newGUID)
         {
-            if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
-
-            _genericTypeArgumentsDict.Remove(genericTypeInfo);
-
-            _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
+            TemporarilyRemovingGenericType(genericTypeInfo, () =>
             {
-                genericTypeToChange.UpdateGUID(newGUID);
+                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
+                {
+                    genericTypeToChange.UpdateGUID(newGUID);
+                });
             });
-
-            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
-            EditorUtility.SetDirty(this);
         }
 
         public static void UpdateGenericTypeArgs(GenericTypeInfo genericTypeInfo, string[] newArgNames)
@@ -311,18 +245,13 @@
 
         public void UpdateGenericTypeArgsImpl(GenericTypeInfo genericTypeInfo, string[] newArgNames)
         {
-            if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
-
-            _genericTypeArgumentsDict.Remove(genericTypeInfo);
-
-            _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
+            TemporarilyRemovingGenericType(genericTypeInfo, () =>
             {
-                genericTypeToChange.UpdateArgNames(newArgNames);
+                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
+                {
+                    genericTypeToChange.UpdateArgNames(newArgNames);
+                });
             });
-
-            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
-            EditorUtility.SetDirty(this);
         }
 
         public static void UpdateGenericType(GenericTypeInfo genericTypeInfo, Type newType)
@@ -332,18 +261,39 @@
 
         public void UpdateGenericTypeImpl(GenericTypeInfo genericTypeInfo, Type newType)
         {
+            TemporarilyRemovingGenericType(genericTypeInfo, () =>
+            {
+                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
+                {
+                    genericTypeToChange.UpdateNameAndAssembly(newType);
+                    genericTypeToChange.UpdateArgNames(newType.GenericTypeArguments);
+                });
+            });
+        }
+
+        private void TemporarilyRemovingGenericType(GenericTypeInfo genericTypeInfo, Action updateType)
+        {
             if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
 
             _genericTypeArgumentsDict.Remove(genericTypeInfo);
 
-            _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-            {
-                genericTypeToChange.UpdateNameAndAssembly(newType);
-                genericTypeToChange.UpdateArgNames(newType.GenericTypeArguments);
-            });
+            updateType();
 
             _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
+            EditorUtility.SetDirty(this);
+        }
+
+        private void TemporarilyRemovingArgument(ArgumentInfo argument, Action updateArgument)
+        {
+            if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
+                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
+
+            _argumentGenericTypesDict.Remove(argument);
+
+            updateArgument();
+
+            _argumentGenericTypesDict.Add(argument, behaviours);
             EditorUtility.SetDirty(this);
         }
     }

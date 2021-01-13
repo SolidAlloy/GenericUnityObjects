@@ -33,9 +33,8 @@
             {
                 _database.UpdateArgumentGUIDImpl(_firstArg, NewGUID);
 
-                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
+                var concreteClasses = _database.GetConcreteClassesImpl(_behaviour);
 
-                Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Any(concreteClass => concreteClass.Arguments.Contains(_expectedArg)));
             }
 
@@ -44,9 +43,7 @@
             {
                 _database.UpdateArgumentGUIDImpl(_firstArg, NewGUID);
 
-                bool success = _database.TryGetReferencedGenericTypesImpl(_expectedArg, out GenericTypeInfo[] behaviours);
-
-                Assert.IsTrue(success);
+                var behaviours = _database.GetReferencedGenericTypesImpl(_expectedArg);
                 Assert.IsTrue(behaviours.Length != 0);
             }
 

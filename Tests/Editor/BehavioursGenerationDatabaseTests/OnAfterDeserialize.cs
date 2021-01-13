@@ -68,8 +68,7 @@
             public void Restores_referenced_behaviours()
             {
                 ReserializeDatabase();
-                bool behavioursSuccess = GenerationDatabase<MonoBehaviour>.TryGetReferencedGenericTypes(_firstArg, out GenericTypeInfo[] referencedBehaviours);
-                Assert.IsTrue(behavioursSuccess);
+                GenericTypeInfo[] referencedBehaviours = GenerationDatabase<MonoBehaviour>.GetReferencedGenericTypes(_firstArg);
                 Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedBehaviours));
             }
 
@@ -77,8 +76,7 @@
             public void Restores_concrete_classes()
             {
                 ReserializeDatabase();
-                bool concreteClassesSuccess = GenerationDatabase<MonoBehaviour>.TryGetConcreteClasses(_behaviour, out ConcreteClass[] concreteClasses);
-                Assert.IsTrue(concreteClassesSuccess);
+                var concreteClasses = GenerationDatabase<MonoBehaviour>.GetConcreteClasses(_behaviour);
                 Assert.IsTrue(concreteClasses.Length == 1);
                 Assert.IsTrue(concreteClasses[0] == _expectedConcreteClass);
             }

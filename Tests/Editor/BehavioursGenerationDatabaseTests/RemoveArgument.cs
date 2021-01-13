@@ -33,9 +33,8 @@
             {
                 CallRemoveArgument();
 
-                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] actualClasses);
+                var actualClasses = _database.GetConcreteClassesImpl(_behaviour);
 
-                Assert.IsTrue(success);
                 Assert.IsFalse(actualClasses.Contains(_expectedConcreteClass));
             }
 

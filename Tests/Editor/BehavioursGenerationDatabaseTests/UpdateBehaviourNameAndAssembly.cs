@@ -45,9 +45,8 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] behaviours);
+                var behaviours = _database.GetReferencedGenericTypesImpl(_firstArg);
 
-                Assert.IsTrue(success);
                 Assert.IsTrue(behaviours.Any(behaviour => behaviour.TypeNameAndAssembly == TypeUtility.GetTypeNameAndAssembly(NewName, NewAssembly)));
             }
 
@@ -56,9 +55,8 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
+                var concreteClasses = _database.GetConcreteClassesImpl(_behaviour);
 
-                Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Length != 0);
             }
 

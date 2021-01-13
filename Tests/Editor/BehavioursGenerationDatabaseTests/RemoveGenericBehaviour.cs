@@ -40,12 +40,10 @@
             {
                 CallRemoveGenericBehaviour(_behaviour);
 
-                bool firstSuccess = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] firstBehaviours);
-                Assert.IsTrue(firstSuccess);
+                var firstBehaviours = _database.GetReferencedGenericTypesImpl(_firstArg);
                 Assert.IsFalse(firstBehaviours.Contains(_behaviour));
 
-                bool secondSuccess = _database.TryGetReferencedGenericTypesImpl(_secondArg, out GenericTypeInfo[] secondBehaviours);
-                Assert.IsTrue(secondSuccess);
+                var secondBehaviours = _database.GetReferencedGenericTypesImpl(_secondArg);
                 Assert.IsFalse(secondBehaviours.Contains(_behaviour));
             }
 

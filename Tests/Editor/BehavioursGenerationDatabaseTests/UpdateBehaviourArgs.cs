@@ -33,9 +33,7 @@
             {
                 _database.UpdateGenericTypeArgsImpl(_behaviour, NewArgs);
 
-                bool success = _database.TryGetReferencedGenericTypesImpl(_firstArg, out GenericTypeInfo[] behaviours);
-
-                Assert.IsTrue(success);
+                var behaviours = _database.GetReferencedGenericTypesImpl(_firstArg);
                 Assert.IsTrue(behaviours.Any(behaviour => behaviour.ArgNames.SequenceEqual(NewArgs)));
             }
 
@@ -44,9 +42,8 @@
             {
                 _database.UpdateGenericTypeArgsImpl(_behaviour, NewArgs);
 
-                bool success = _database.TryGetConcreteClassesImpl(_behaviour, out ConcreteClass[] concreteClasses);
+                var concreteClasses = _database.GetConcreteClassesImpl(_behaviour);
 
-                Assert.IsTrue(success);
                 Assert.IsTrue(concreteClasses.Length != 0);
             }
 
