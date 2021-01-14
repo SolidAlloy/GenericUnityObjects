@@ -53,7 +53,7 @@
             EditorUtility.SetDirty(Instance);
         }
 
-        public static void ClearIconChangeGUIDS() => Instance._iconChangeGUIDs.Clear();
+        public static void ClearIconChangeGUIDs() => Instance._iconChangeGUIDs.Clear();
 
         public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
 

@@ -22,7 +22,7 @@
                 MonoImporterProxy.CopyMonoScriptIconToImporters(script);
             }
 
-            PersistentStorage.ClearIconChangeGUIDS();
+            PersistentStorage.ClearIconChangeGUIDs();
         }
     }
 }
