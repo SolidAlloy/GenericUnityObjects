@@ -15,8 +15,8 @@
         ICanBeInitialized
         where TUnityObject : Object
     {
-        private Dictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
-        private Dictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
+        private FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
+        private FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
         private Pool<ArgumentInfo> _argumentsPool;
         private Pool<GenericTypeInfo> _genericTypesPool;
 
@@ -29,11 +29,11 @@
 
         public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
 
-        public ArgumentInfo[] InstanceArguments => _argumentGenericTypesDict.Keys.ToArray();
+        public ArgumentInfo[] InstanceArguments => _argumentGenericTypesDict.KeysCollection;
 
         public static GenericTypeInfo[] GenericTypes => Instance.InstanceGenericTypes;
 
-        public GenericTypeInfo[] InstanceGenericTypes => _genericTypeArgumentsDict.Keys.ToArray();
+        public GenericTypeInfo[] InstanceGenericTypes => _genericTypeArgumentsDict.KeysCollection;
 
         public static void AddGenericType(GenericTypeInfo genericTypeInfo)
         {
@@ -273,27 +273,13 @@
 
         private void TemporarilyRemovingGenericType(GenericTypeInfo genericTypeInfo, Action updateType)
         {
-            if (! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
-                throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
-
-            _genericTypeArgumentsDict.Remove(genericTypeInfo);
-
-            updateType();
-
-            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
+            _genericTypeArgumentsDict.UpdateKey(genericTypeInfo, updateType);
             EditorUtility.SetDirty(this);
         }
 
         private void TemporarilyRemovingArgument(ArgumentInfo argument, Action updateArgument)
         {
-            if (! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> behaviours))
-                throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
-
-            _argumentGenericTypesDict.Remove(argument);
-
-            updateArgument();
-
-            _argumentGenericTypesDict.Add(argument, behaviours);
+            _argumentGenericTypesDict.UpdateKey(argument, updateArgument);
             EditorUtility.SetDirty(this);
         }
     }

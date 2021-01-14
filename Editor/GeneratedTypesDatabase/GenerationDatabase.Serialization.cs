@@ -24,25 +24,18 @@
             if (! typeof(GenericTypeInfo).IsSerializable)
                 throw new SerializationException($"Cannot initialize a database with {typeof(GenericTypeInfo)} because the type is not serializable.");
 
-            _argumentGenericTypesDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
+            _argumentGenericTypesDict = new FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>>();
             _argumentsPool = new Pool<ArgumentInfo>();
-            _genericTypeArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>();
+            _genericTypeArgumentsDict = new FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>>();
             _genericTypesPool = new Pool<GenericTypeInfo>();
         }
 
         private void InitializeArgumentGenericTypesDict()
         {
-            if (_genericArgumentKeys == null)
-            {
-                _argumentGenericTypesDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>();
-                _argumentsPool = new Pool<ArgumentInfo>();
-                return;
-            }
-
             int keysLength = _genericArgumentKeys.Length;
             int valuesLength = _genericTypeValues.Length;
 
-            _argumentGenericTypesDict = new Dictionary<ArgumentInfo, List<GenericTypeInfo>>(keysLength);
+            _argumentGenericTypesDict = new FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>>(keysLength);
 
             _argumentsPool = new Pool<ArgumentInfo>(keysLength);
             _argumentsPool.AddRange(_genericArgumentKeys);
@@ -66,7 +59,7 @@
                 for (int valueIndex = 0; valueIndex < valuesArrayLength; valueIndex++)
                     valuesToAdd.Add(_genericTypesPool.GetOrAdd(valuesArray[valueIndex]));
 
-                _argumentGenericTypesDict[_genericArgumentKeys[keyIndex]] = valuesToAdd;
+                _argumentGenericTypesDict.Add(_genericArgumentKeys[keyIndex], valuesToAdd);
             }
         }
 
@@ -75,7 +68,7 @@
             int keysLength = _genericTypeKeys.Length;
             int valuesLength = _genericArgumentValues.Length;
 
-            _genericTypeArgumentsDict = new Dictionary<GenericTypeInfo, List<ConcreteClass>>(keysLength);
+            _genericTypeArgumentsDict = new FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>>(keysLength);
 
             if (keysLength != valuesLength)
             {
