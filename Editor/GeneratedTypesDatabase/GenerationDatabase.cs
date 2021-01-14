@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using GenericUnityObjects.Util;
+    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
     using Util;
