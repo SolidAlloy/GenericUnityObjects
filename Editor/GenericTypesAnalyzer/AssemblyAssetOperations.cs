@@ -24,28 +24,41 @@
             AssetDatabase.DeleteAsset(mdbPath);
         }
 
-        public static void ReplaceAssemblyByGUID(string assemblyGUID, string newAssemblyName, Action createAssembly)
-        {
-            string oldAssemblyPath = AssetDatabase.GUIDToAssetPath(assemblyGUID);
-            ReplaceAssemblyByPath(oldAssemblyPath, newAssemblyName, createAssembly);
-        }
-
-        public static void ReplaceAssemblyByPath(string oldAssemblyPath, string newAssemblyName, Action createAssembly)
-        {
-            string oldAssemblyPathWithoutExtension = RemoveDLLExtension(oldAssemblyPath);
-            File.Delete(oldAssemblyPath);
-            File.Delete($"{oldAssemblyPathWithoutExtension}.dll.mdb");
-
-            createAssembly();
-
-            string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{newAssemblyName}";
-            File.Move($"{oldAssemblyPathWithoutExtension}.dll.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
-            File.Move($"{oldAssemblyPathWithoutExtension}.dll.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
-        }
-
         private static string RemoveDLLExtension(string assemblyPath)
         {
             return assemblyPath.Substring(0, assemblyPath.Length - 4);
+        }
+
+        public readonly struct AssemblyReplacer : IDisposable
+        {
+            private readonly string _oldAssemblyPathWithoutExtension;
+            private readonly string _newAssemblyName;
+
+            private AssemblyReplacer(string oldAssemblyPath, string newAssemblyName)
+            {
+                _newAssemblyName = newAssemblyName;
+                _oldAssemblyPathWithoutExtension = RemoveDLLExtension(oldAssemblyPath);
+                File.Delete(oldAssemblyPath);
+                File.Delete($"{_oldAssemblyPathWithoutExtension}.dll.mdb");
+            }
+
+            public static AssemblyReplacer UsingGUID(string assemblyGUID, string newAssemblyName)
+            {
+                string oldAssemblyPath = AssetDatabase.GUIDToAssetPath(assemblyGUID);
+                return new AssemblyReplacer(oldAssemblyPath, newAssemblyName);
+            }
+
+            public static AssemblyReplacer UsingPath(string oldAssemblyPath, string newAssemblyName)
+            {
+                return new AssemblyReplacer(oldAssemblyPath, newAssemblyName);
+            }
+
+            public void Dispose()
+            {
+                string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{_newAssemblyName}";
+                File.Move($"{_oldAssemblyPathWithoutExtension}.dll.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
+                File.Move($"{_oldAssemblyPathWithoutExtension}.dll.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
+            }
         }
     }
 }

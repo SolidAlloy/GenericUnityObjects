@@ -56,10 +56,10 @@
         {
             string newAssemblyName = GetSelectorAssemblyName(newType);
 
-            AssemblyAssetOperations.ReplaceAssemblyByGUID(selectorAssemblyGUID, newAssemblyName, () =>
+            using (AssemblyAssetOperations.AssemblyReplacer.UsingGUID(selectorAssemblyGUID, newAssemblyName))
             {
                 AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType);
-            });
+            }
         }
     }
 }

@@ -100,10 +100,10 @@
         {
             string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
 
-            AssemblyAssetOperations.ReplaceAssemblyByPath(assemblyPath, AssemblyName, () =>
+            using (AssemblyAssetOperations.AssemblyReplacer.UsingPath(assemblyPath, AssemblyName))
             {
                 AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
-            });
+            }
         }
     }
 }

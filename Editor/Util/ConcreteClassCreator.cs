@@ -32,8 +32,10 @@
                 return;
             }
 
-            AssemblyAssetOperations.ReplaceAssemblyByGUID(concreteClass.AssemblyGUID, newAssemblyName,
-                () => CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName));
+            using (AssemblyAssetOperations.AssemblyReplacer.UsingGUID(concreteClass.AssemblyGUID, newAssemblyName))
+            {
+                CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName);
+            }
 
             PersistentStorage.AddAssemblyForIconChange(concreteClass.AssemblyGUID);
         }

@@ -17,13 +17,13 @@
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            EditorDrawHelper.InPropertyWrapper(position, label, property, () =>
+            using (var propertyLabel = new EditorDrawHelper.PropertyWrapper(position, label, property))
             {
-                Rect posWithoutLabel = EditorGUI.PrefixLabel(position, label);
+                Rect posWithoutLabel = EditorGUI.PrefixLabel(position, propertyLabel);
                 Type filterType = GetFilterType(property);
                 property.objectReferenceValue = EditorGUI.ObjectField(
                     posWithoutLabel, property.objectReferenceValue, filterType, false);
-            });
+            }
         }
 
         private static Type GetFilterType(SerializedProperty property)
