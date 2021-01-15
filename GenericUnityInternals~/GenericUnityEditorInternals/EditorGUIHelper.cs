@@ -1,7 +1,7 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
     extern alias CoreModule;
-    
+
     using JetBrains.Annotations;
     using UnityEditor;
     using UnityEditor.SceneManagement;
@@ -15,14 +15,14 @@
         {
             GUIContent label = EditorGUI.BeginProperty(position, null, property);
 
-            DoObjectField(position, property, label);
+            ObjectFieldInternal(position, property, label);
 
             EditorGUI.EndProperty();
         }
 
         // The method is long but there's no need to refactor it further as most of the not needed stuff is removed and
         // the real code changes are in ObjectSelector.ShowGeneric() and GetObjectFieldContent()
-        private static void DoObjectField(Rect position, SerializedProperty property, GUIContent label)
+        private static void ObjectFieldInternal(Rect position, SerializedProperty property, GUIContent label)
         {
             const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
 
@@ -36,11 +36,17 @@
 
             Object obj = property.objectReferenceValue;
             Event evt = Event.current;
-            EventType eventType = evt.type;
+            EventType eventType;
 
             // special case test, so we continue to ping/select objects with the object field disabled
-            if (!GUI.enabled && GUIClip.enabled && Event.current.rawType == EventType.MouseDown)
+            if ( ! GUI.enabled && GUIClip.enabled && Event.current.rawType == EventType.MouseDown)
+            {
                 eventType = Event.current.rawType;
+            }
+            else
+            {
+                eventType = evt.type;
+            }
 
             Vector2 oldIconSize = EditorGUIUtility.GetIconSize();
             EditorGUIUtility.SetIconSize(new Vector2(12, 12));  // Has to be this small to fit inside a single line height ObjectField
@@ -99,69 +105,69 @@
 
                     break;
                 case EventType.MouseDown:
-                    if (position.Contains(Event.current.mousePosition))
+                    if ( ! position.Contains(Event.current.mousePosition))
+                        break;
+
+                    if (Event.current.button == 1)
                     {
-                        if (Event.current.button == 1)
-                        {
-                            Object actualObject = property.objectReferenceValue;
-                            var contextMenu = new GenericMenu();
-                            contextMenu.AddItem(GUIContent.Temp("Properties..."), false, () => PropertyEditor.OpenPropertyEditor(actualObject));
-                            contextMenu.DropDown(position);
-                        }
-
-                        if (Event.current.button != 0)
-                            break;
-
-                        // Get button rect for Object Selector
-                        Rect buttonRect = EditorGUI.GetButtonRect(visualType, position);
-
-                        EditorGUIUtility.editingTextField = false;
-
-                        if (buttonRect.Contains(Event.current.mousePosition))
-                        {
-                            if (GUI.enabled)
-                            {
-                                GUIUtility.keyboardControl = id;
-                                ObjectSelector.get.ShowGeneric(property, allowSceneObjects, niceTypeName);
-                                ObjectSelector.get.objectSelectorID = id;
-
-                                evt.Use();
-                                GUIUtility.ExitGUI();
-                            }
-                        }
-                        else
-                        {
-                            Object actualTargetObject = property.objectReferenceValue;
-
-                            if (EditorGUI.showMixedValue)
-                            {
-                                actualTargetObject = null;
-                            }
-                            else if (actualTargetObject is Component component)
-                            {
-                                actualTargetObject = component.gameObject;
-                            }
-
-                            // One click shows where the referenced object is, or pops up a preview
-                            if (Event.current.clickCount == 1)
-                            {
-                                GUIUtility.keyboardControl = id;
-
-                                EditorGUI.PingObjectOrShowPreviewOnClick(actualTargetObject, position);
-                                evt.Use();
-                            }
-                            // Double click opens the asset in external app or changes selection to referenced object
-                            else if (Event.current.clickCount == 2)
-                            {
-                                if (actualTargetObject)
-                                {
-                                    AssetDatabase.OpenAsset(actualTargetObject);
-                                    GUIUtility.ExitGUI();
-                                }
-                                evt.Use();
-                            }
-                        }
+                        Object actualObject = property.objectReferenceValue;
+                        var contextMenu = new GenericMenu();
+                        contextMenu.AddItem(GUIContent.Temp("Properties..."), false,
+                            () => PropertyEditor.OpenPropertyEditor(actualObject));
+                        contextMenu.DropDown(position);
                     }
+
+                    if (Event.current.button != 0)
+                        break;
+
+                    // Get button rect for Object Selector
+                    Rect buttonRect = EditorGUI.GetButtonRect(visualType, position);
+
+                    EditorGUIUtility.editingTextField = false;
+
+                    if (buttonRect.Contains(Event.current.mousePosition) && GUI.enabled)
+                    {
+                        GUIUtility.keyboardControl = id;
+                        ObjectSelector.get.ShowGeneric(property, allowSceneObjects, niceTypeName);
+                        ObjectSelector.get.objectSelectorID = id;
+
+                        evt.Use();
+                        GUIUtility.ExitGUI();
+
+                        break;
+                    }
+
+                    Object actualTargetObject = property.objectReferenceValue;
+
+                    if (EditorGUI.showMixedValue)
+                    {
+                        actualTargetObject = null;
+                    }
+                    else if (actualTargetObject is Component component)
+                    {
+                        actualTargetObject = component.gameObject;
+                    }
+
+                    // One click shows where the referenced object is, or pops up a preview
+                    if (Event.current.clickCount == 1)
+                    {
+                        GUIUtility.keyboardControl = id;
+
+                        EditorGUI.PingObjectOrShowPreviewOnClick(actualTargetObject, position);
+                        evt.Use();
+                    }
+                    // Double click opens the asset in external app or changes selection to referenced object
+                    else if (Event.current.clickCount == 2)
+                    {
+                        if (actualTargetObject)
+                        {
+                            AssetDatabase.OpenAsset(actualTargetObject);
+                            GUIUtility.ExitGUI();
+                        }
+
+                        evt.Use();
+                    }
+
                     break;
                 case EventType.ExecuteCommand:
                     if (evt.commandName == ObjectSelector.ObjectSelectorUpdatedCommand &&
@@ -177,7 +183,7 @@
                         break;
 
                     if (evt.keyCode == KeyCode.Backspace ||
-                        evt.keyCode == KeyCode.Delete && (evt.modifiers & EventModifiers.Shift) == 0)
+                        (evt.keyCode == KeyCode.Delete && (evt.modifiers & EventModifiers.Shift) == 0))
                     {
                         property.objectReferenceValue = null;
                         GUI.changed = true;
@@ -225,7 +231,7 @@
             {
                 return EditorGUIUtility.TempContent($"None ({niceTypeName})");
             }
-            
+
             if (ValidateObjectFieldAssignment(new[] { obj }, property, EditorGUI.ObjectFieldValidatorOptions.ExactObjectTypeValidation) == null)
                 return EditorGUI.s_TypeMismatch;
 
@@ -258,7 +264,9 @@
 
             if (EditorSceneManager.preventCrossSceneReferences &&
                 EditorGUI.CheckForCrossSceneReferencing(references[0], property.serializedObject.targetObject))
+            {
                 return null;
+            }
 
             return references[0];
         }

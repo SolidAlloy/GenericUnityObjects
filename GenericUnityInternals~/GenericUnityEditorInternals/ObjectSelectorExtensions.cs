@@ -34,9 +34,8 @@
             this_.m_OnObjectSelectorClosed = null;
             this_.m_OnObjectSelectorUpdated = null;
 
-            // TODO: check this section to figure out how to disable Scene tab
             // Do not allow to show scene objects if the object being edited is persistent
-            this_.m_AllowSceneObjects = allowSceneObjects
+            this_.m_AllowSceneObjects = allowSceneObjects && ! typeof(ScriptableObject).IsAssignableFrom(requiredType)
                                         && (this_.m_ObjectBeingEdited == null
                                             || !EditorUtility.IsPersistent(this_.m_ObjectBeingEdited));
 
