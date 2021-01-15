@@ -1,7 +1,6 @@
-﻿namespace GenericUnityObjects.Editor.ScriptableObjects
+﻿namespace GenericUnityObjects.Editor
 {
     using UnityEditor;
-    using UnityEditorInternals;
     using UnityEngine;
 
     /// <summary>
@@ -19,14 +18,7 @@
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (property.type.Contains("`"))
-            {
-                EditorGUIHelper.GenericObjectField(position, property);
-            }
-            else
-            {
-                EditorGUI.PropertyField(position, property);
-            }
+            GenericObjectDrawer.ObjectField(position, property);
         }
     }
 }

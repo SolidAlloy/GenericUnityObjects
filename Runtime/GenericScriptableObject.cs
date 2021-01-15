@@ -25,7 +25,7 @@
             if (ScriptableObjectsDatabase.TryGetConcreteType(type, out Type concreteType))
                 return ScriptableObject.CreateInstance(concreteType);
 
-            concreteType = GeneratedUnityObjectCache.GetBehaviourClass(type);
+            concreteType = GeneratedUnityObjectCache.GetSOClass(type);
             if (concreteType != null)
                 return ScriptableObject.CreateInstance(concreteType);
 
