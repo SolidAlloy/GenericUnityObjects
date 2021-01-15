@@ -19,20 +19,6 @@ Obj/
 UnityGenerated/
 Library/
 
-# ===================================== #
-# Visual Studio / MonoDevelop generated #
-# ===================================== #
-ExportedObj/
-*.svd
-*.userprefs
-*.csproj
-*.pidb
-*.suo
-*.sln
-*.user
-*.unityproj
-*.booproj
-
 # ============ #
 # OS generated #
 # ============ #
@@ -44,3 +30,23 @@ ExportedObj/
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# Common IntelliJ Platform excludes
+
+# Jetbrain Rider Cache
+**/.idea/*
+
+*.suo
+*.user
+.vs/
+[Bb]in/
+[Oo]bj/
+_UpgradeReport_Files/
+[Pp]ackages/
+
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# The file being generated in root directory instead of obj/debug https://github.com/dotnet/roslyn/issues/48430
+*.GeneratedMSBuildEditorConfig.editorconfig
