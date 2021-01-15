@@ -13,11 +13,6 @@
         {
             ScriptAttributeUtility.GetFieldInfoFromProperty(property, out Type requiredType);
 
-            // case 951876: built-in types do not actually have reflectable fields, so their object types must be extracted from the type string
-            // this works because built-in types will only ever have serialized references to other built-in types, which this window's filter expects as unqualified names
-            if (requiredType == null)
-                this_.m_RequiredType = this_.s_MatchPPtrTypeName.Match(property.type).Groups[1].Value;
-
             // Don't select anything on multi selection
             Object obj = property.hasMultipleDifferentValues ? null : property.objectReferenceValue;
 
@@ -72,12 +67,11 @@
             this_.m_DelegateView = GUIView.current;
             // type filter requires unqualified names for built-in types, but will prioritize them over user types, so ensure user types are namespace-qualified
             // TODO: change m_RequiredType here to the concrete one.
-            if (requiredType != null)
-            {
-                this_.m_RequiredType = typeof(ScriptableObject).IsAssignableFrom(requiredType) || typeof(MonoBehaviour).IsAssignableFrom(requiredType)
-                    ? requiredType.FullName
-                    : requiredType.Name;
-            }
+
+            this_.m_RequiredType = typeof(ScriptableObject).IsAssignableFrom(requiredType) ||
+                                   typeof(MonoBehaviour).IsAssignableFrom(requiredType)
+                ? requiredType.FullName
+                : requiredType.Name;
 
             this_.m_SearchFilter = "";
             this_.m_OriginalSelection = obj;
@@ -146,7 +140,7 @@
 
             this_.ShowWithMode(ShowMode.AuxWindow);
             // TODO: Change requiredType.Name here.
-            this_.titleContent = EditorGUIUtility.TrTextContent("Select " + (requiredType == null ? this_.m_RequiredType : requiredType.Name));
+            this_.titleContent = EditorGUIUtility.TrTextContent("Select " + requiredType.Name);
 
             // Deal with window size
             Rect p = this_.m_Parent == null ? new Rect(0, 0, 1, 1) : this_.m_Parent.window.position;
