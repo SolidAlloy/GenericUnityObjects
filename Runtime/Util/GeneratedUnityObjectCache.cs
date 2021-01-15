@@ -14,12 +14,12 @@
 
     internal static class GeneratedUnityObjectCache
     {
-        private static readonly CacheImplementation BehaviourCache = new CacheImplementation();
-        private static readonly CacheImplementation ScriptableObjectCache = new CacheImplementation();
+        private static readonly CacheImplementation _behaviourCache = new CacheImplementation();
+        private static readonly CacheImplementation _scriptableObjectCache = new CacheImplementation();
 
-        public static Type GetBehaviourClass(Type genericBehaviourWithArgs) => BehaviourCache.GetClass(genericBehaviourWithArgs);
+        public static Type GetBehaviourClass(Type genericBehaviourWithArgs) => _behaviourCache.GetClass(genericBehaviourWithArgs);
 
-        public static Type GetSOClass(Type genericSOWithArgs) => ScriptableObjectCache.GetClass(genericSOWithArgs);
+        public static Type GetSOClass(Type genericSOWithArgs) => _scriptableObjectCache.GetClass(genericSOWithArgs);
 
         private class CacheImplementation
         {

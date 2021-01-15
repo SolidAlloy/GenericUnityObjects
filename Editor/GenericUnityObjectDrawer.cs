@@ -22,8 +22,6 @@
             if (property.type.Contains("`"))
             {
                 EditorGUIHelper.GenericObjectField(position, property);
-                // EditorGUI.ObjectField(position, property);
-                //
             }
             else
             {
