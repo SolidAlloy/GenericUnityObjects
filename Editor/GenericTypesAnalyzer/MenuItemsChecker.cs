@@ -87,7 +87,8 @@
         {
             AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
             string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
-            AssemblyGeneration.ImportAssemblyAsset(assemblyPath, true);
+            string assemblyGUID = AssemblyGeneration.GetUniqueGUID();
+            AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID, true);
         }
 
         private static void RemoveMenuItemsAssembly()

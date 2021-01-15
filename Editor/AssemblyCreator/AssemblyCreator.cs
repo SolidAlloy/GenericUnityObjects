@@ -6,13 +6,14 @@
 
     internal static class AssemblyCreator
     {
-        public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs) =>
-            BehaviourSelectorCreator.CreateSelectorAssemblyImpl(assemblyName, genericBehaviourWithoutArgs);
+        // AssemblyGUID is needed to name concrete classes uniquely. This is required to correctly filter types in object fields.
+        public static void CreateSelectorAssembly(string assemblyName, Type genericBehaviourWithoutArgs, string assemblyGUID) =>
+            BehaviourSelectorCreator.CreateSelectorAssemblyImpl(assemblyName, genericBehaviourWithoutArgs, assemblyGUID);
 
-        public static void CreateConcreteClass<TObject>(string assemblyName, Type genericBehaviourWithArgs)
+        public static void CreateConcreteClass<TObject>(string assemblyName, Type genericBehaviourWithArgs, string assemblyGUID)
             where TObject : Object
         {
-            ConcreteClassCreator.CreateConcreteClass<TObject>(assemblyName, genericBehaviourWithArgs);
+            ConcreteClassCreator.CreateConcreteClass<TObject>(assemblyName, genericBehaviourWithArgs, assemblyGUID);
         }
 
         public static void CreateMenuItems(string assemblyName, MenuItemMethod[] menuItemMethods) =>

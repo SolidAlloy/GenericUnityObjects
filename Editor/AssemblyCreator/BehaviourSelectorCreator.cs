@@ -7,9 +7,9 @@
 
     internal static class BehaviourSelectorCreator
     {
-        public static void CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs)
+        public static void CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs, string assemblyGUID)
         {
-            const string className = "ClassSelector";
+            string className = $"ClassSelector_{assemblyGUID}";
 
             AssemblyBuilder assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
             ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(assemblyBuilder, assemblyName);

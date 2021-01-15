@@ -34,16 +34,16 @@
 
             using (AssemblyAssetOperations.AssemblyReplacer.UsingGUID(concreteClass.AssemblyGUID, newAssemblyName))
             {
-                CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName);
+                CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
             }
 
             PersistentStorage.AddAssemblyForIconChange(concreteClass.AssemblyGUID);
         }
 
         private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
-            string newAssemblyName)
+            string newAssemblyName, string assemblyGUID)
         {
-            AssemblyCreator.CreateConcreteClass<TObject>(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes));
+            AssemblyCreator.CreateConcreteClass<TObject>(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), assemblyGUID);
         }
 
         private static void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID)
@@ -60,8 +60,9 @@
 
             using (new DisabledAssetDatabase(null))
             {
-                CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName);
-                assemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
+                assemblyGUID = AssemblyGeneration.GetUniqueGUID();
+                CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName, assemblyGUID);
+                AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID);
             }
 
             return assemblyGUID;

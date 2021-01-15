@@ -22,10 +22,12 @@
             Assert.IsNotNull(behaviourType);
 
             string assemblyName = GetSelectorAssemblyName(behaviourType);
-            AssemblyCreator.CreateSelectorAssembly(assemblyName, behaviourType);
+            genericTypeInfo.AssemblyGUID = AssemblyGeneration.GetUniqueGUID();
+
+            AssemblyCreator.CreateSelectorAssembly(assemblyName, behaviourType, genericTypeInfo.AssemblyGUID);
 
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
-            genericTypeInfo.AssemblyGUID = AssemblyGeneration.ImportAssemblyAsset(assemblyPath);
+            AssemblyGeneration.ImportAssemblyAsset(assemblyPath, genericTypeInfo.AssemblyGUID);
             PersistentStorage.AddAssemblyForIconChange(genericTypeInfo.AssemblyGUID);
             base.AddNewGenericType(genericTypeInfo);
         }
@@ -58,7 +60,7 @@
 
             using (AssemblyAssetOperations.AssemblyReplacer.UsingGUID(selectorAssemblyGUID, newAssemblyName))
             {
-                AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType);
+                AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType, selectorAssemblyGUID);
             }
         }
     }

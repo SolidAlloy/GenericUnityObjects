@@ -1,20 +1,18 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System;
-    using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
-    using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
+    using GenericUnityObjects.Util;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
     internal static class ConcreteClassCreator
     {
-        public static void CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs)
+        public static void CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs, string assemblyGUID)
             where TObject : Object
         {
-            const string concreteClassName = "ConcreteClass";
+            string concreteClassName = $"ConcreteClass_{assemblyGUID}";
 
             AssemblyBuilder assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
             ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(assemblyBuilder, assemblyName);
@@ -23,24 +21,12 @@
 
             if (typeof(TObject) == typeof(MonoBehaviour))
             {
-                string componentName = "Scripts/" + GetComponentName(genericTypeWithArgs);
+                string componentName = "Scripts/" + TypeUtility.GetGenericTypeNameWithBrackets(genericTypeWithArgs);
                 AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
             }
 
             typeBuilder.CreateType();
             assemblyBuilder.Save($"{assemblyName}.dll");
-        }
-
-        private static string GetComponentName(Type genericTypeWithArgs)
-        {
-            string typeNameWithoutSuffix = genericTypeWithArgs.Name.StripGenericSuffix();
-
-            var argumentNames = genericTypeWithArgs.GetGenericArguments()
-                .Select(argument => argument.FullName)
-                .Select(fullName => fullName.ReplaceWithBuiltInName())
-                .Select(fullName => fullName.GetSubstringAfterLast('.'));
-
-            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
     }
 }

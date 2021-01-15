@@ -1,5 +1,7 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
+    extern alias CoreModule;
+
     using System;
     using UnityEditor;
     using UnityEditor.SearchService;
@@ -9,7 +11,7 @@
 
     internal static class ObjectSelectorExtensions
     {
-        public static void ShowGeneric(this ObjectSelector this_, SerializedProperty property, bool allowSceneObjects)
+        public static void ShowGeneric(this ObjectSelector this_, SerializedProperty property, bool allowSceneObjects, string niceTypeName)
         {
             ScriptAttributeUtility.GetFieldInfoFromProperty(property, out Type requiredType);
 
@@ -18,9 +20,6 @@
 
             Object objectBeingEdited = property.serializedObject.targetObject;
             this_.m_EditedProperty = property;
-
-            // to remove
-            this_.Show(obj, requiredType, objectBeingEdited, allowSceneObjects);
 
             this_.m_ObjectSelectorReceiver = null;
             this_.m_IsShowingAssets = true;
@@ -35,6 +34,7 @@
             this_.m_OnObjectSelectorClosed = null;
             this_.m_OnObjectSelectorUpdated = null;
 
+            // TODO: check this section to figure out how to disable Scene tab
             // Do not allow to show scene objects if the object being edited is persistent
             this_.m_AllowSceneObjects = allowSceneObjects
                                         && (this_.m_ObjectBeingEdited == null
@@ -66,14 +66,10 @@
             // Set member variables
             this_.m_DelegateView = GUIView.current;
             // type filter requires unqualified names for built-in types, but will prioritize them over user types, so ensure user types are namespace-qualified
-            // TODO: change m_RequiredType here to the concrete one.
 
-            this_.m_RequiredType = typeof(ScriptableObject).IsAssignableFrom(requiredType) ||
-                                   typeof(MonoBehaviour).IsAssignableFrom(requiredType)
-                ? requiredType.FullName
-                : requiredType.Name;
+            this_.m_RequiredType = GenericTypeCache.GetConcreteType(requiredType).FullName;
 
-            this_.m_SearchFilter = "";
+            this_.m_SearchFilter = string.Empty;
             this_.m_OriginalSelection = obj;
             this_.m_ModalUndoGroup = Undo.GetCurrentGroup();
 
@@ -112,6 +108,7 @@
                 void OnSelectorClosed(Object selectedObj, bool canceled)
                 {
                     this_.m_SearchSessionHandler.EndSession();
+
                     if (canceled)
                     {
                         // Undo changes we have done in the ObjectSelector
@@ -119,7 +116,9 @@
                         this_.m_LastSelectedInstanceId = 0;
                     }
                     else
+                    {
                         this_.m_LastSelectedInstanceId = selectedObj == null ? 0 : selectedObj.GetInstanceID();
+                    }
 
                     this_.m_EditedProperty = null;
                     this_.NotifySelectorClosed(false);
@@ -134,13 +133,9 @@
             // SetFreezeDisplay(false) further down.
             ContainerWindow.SetFreezeDisplay(true);
 
-            Debug.Log($"required type: {requiredType}");
-            Debug.Log($"required type name: {this_.m_RequiredType}");
-            // TODO: investigate how to change this to include concrete type
-
             this_.ShowWithMode(ShowMode.AuxWindow);
-            // TODO: Change requiredType.Name here.
-            this_.titleContent = EditorGUIUtility.TrTextContent("Select " + requiredType.Name);
+
+            this_.titleContent = EditorGUIUtility.TrTextContent("Select " + niceTypeName);
 
             // Deal with window size
             Rect p = this_.m_Parent == null ? new Rect(0, 0, 1, 1) : this_.m_Parent.window.position;

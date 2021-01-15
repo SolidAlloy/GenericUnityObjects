@@ -6,9 +6,8 @@
 
     internal static class AssemblyGeneration
     {
-        public static string ImportAssemblyAsset(string assemblyPath, bool editorOnly = false)
+        public static void ImportAssemblyAsset(string assemblyPath, string assemblyGUID, bool editorOnly = false)
         {
-            string assemblyGUID = GetUniqueGUID();
             string metaContent = editorOnly ? GetEditorMetaContent(assemblyGUID) : GetMetaFileContent(assemblyGUID);
 
             // Starting from Unity 2019, .meta files are hidden and their direct editing via File.WriteAllText can
@@ -26,11 +25,9 @@
 
             AssetDatabase.ImportAsset(assemblyPath);
             AssetDatabase.ImportAsset($"{assemblyPath}.mdb");
-
-            return assemblyGUID;
         }
 
-        private static string GetUniqueGUID()
+        public static string GetUniqueGUID()
         {
             GUID newGUID;
 

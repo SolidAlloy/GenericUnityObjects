@@ -1,11 +1,12 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
+    extern alias CoreModule;
+    
     using JetBrains.Annotations;
     using UnityEditor;
     using UnityEditor.SceneManagement;
     using UnityEngine;
     using Object = UnityEngine.Object;
-    using ObjectSelector = UnityEditor.ObjectSelector;
 
     public static class EditorGUIHelper
     {
@@ -43,6 +44,8 @@
 
             Vector2 oldIconSize = EditorGUIUtility.GetIconSize();
             EditorGUIUtility.SetIconSize(new Vector2(12, 12));  // Has to be this small to fit inside a single line height ObjectField
+
+            string niceTypeName = GenericTypeCache.GetNiceTypeName(property);
 
             switch (eventType)
             {
@@ -119,7 +122,7 @@
                             if (GUI.enabled)
                             {
                                 GUIUtility.keyboardControl = id;
-                                ObjectSelector.get.ShowGeneric(property, allowSceneObjects);
+                                ObjectSelector.get.ShowGeneric(property, allowSceneObjects, niceTypeName);
                                 ObjectSelector.get.objectSelectorID = id;
 
                                 evt.Use();
@@ -185,7 +188,7 @@
                     // otherwise the Inspector will maximize upon pressing space.
                     if (evt.MainActionKeyForControl(id))
                     {
-                        ObjectSelector.get.ShowGeneric(property, allowSceneObjects);
+                        ObjectSelector.get.ShowGeneric(property, allowSceneObjects, niceTypeName);
                         ObjectSelector.get.objectSelectorID = id;
                         evt.Use();
                         GUIUtility.ExitGUI();
@@ -193,7 +196,7 @@
 
                     break;
                 case EventType.Repaint:
-                    GUIContent objectFieldContent = GetObjectFieldContent(obj, property);
+                    GUIContent objectFieldContent = GetObjectFieldContent(obj, property, niceTypeName);
                     EditorGUI.BeginHandleMixedValueContentColor();
                     EditorStyles.objectField.Draw(position, objectFieldContent, id, DragAndDrop.activeControlID == id, position.Contains(Event.current.mousePosition));
 
@@ -206,48 +209,39 @@
             EditorGUIUtility.SetIconSize(oldIconSize);
         }
 
-        private static GUIContent GetObjectFieldContent(Object obj, SerializedProperty property)
+        private static GUIContent GetObjectFieldContent(Object obj, SerializedProperty property, string niceTypeName)
         {
-            GUIContent temp;
-
             if (EditorGUI.showMixedValue)
             {
-                temp = EditorGUI.s_MixedValueContent;
+                return EditorGUI.s_MixedValueContent;
             }
-            else
+
+            // If obj is null, we have to rely on
+            // property.objectReferenceStringValue to display None/Missing and the
+            // correct type. But if not, EditorGUIUtility.ObjectContent is more reliable.
+            // It can take a more specific object type specified as argument into account,
+            // and it gets the icon at the same time.
+            if (obj == null)
             {
-                // If obj is null, we have to rely on
-                // property.objectReferenceStringValue to display None/Missing and the
-                // correct type. But if not, EditorGUIUtility.ObjectContent is more reliable.
-                // It can take a more specific object type specified as argument into account,
-                // and it gets the icon at the same time.
-                if (obj == null)
+                return EditorGUIUtility.TempContent($"None ({niceTypeName})");
+            }
+            
+            if (ValidateObjectFieldAssignment(new[] { obj }, property, EditorGUI.ObjectFieldValidatorOptions.ExactObjectTypeValidation) == null)
+                return EditorGUI.s_TypeMismatch;
+
+            EditorGUIUtility.s_ObjectContent.text = $"{obj.name} ({niceTypeName})";
+            EditorGUIUtility.s_ObjectContent.image = EditorGUIUtility.GetSkinnedIcon(AssetPreview.GetMiniThumbnail(obj));
+            GUIContent temp = EditorGUIUtility.s_ObjectContent;
+
+            if (EditorSceneManager.preventCrossSceneReferences && EditorGUI.CheckForCrossSceneReferencing(obj, property.serializedObject.targetObject))
+            {
+                if (EditorApplication.isPlaying)
                 {
-                    // TODO: modify TempContent icon for obj null. It seems if obj is not null, the icon is shown correctly
-                    temp = EditorGUIUtility.TempContent(property.objectReferenceStringValue);
+                    temp.text += $" ({EditorGUI.GetGameObjectFromObject(obj).scene.name})";
                 }
                 else
                 {
-                    // In order for ObjectContext to be able to distinguish between None/Missing,
-                    // we need to supply an instanceID. For some reason, getting the instanceID
-                    // from property.objectReferenceValue is not reliable, so we have to
-                    // explicitly check property.objectReferenceInstanceIDValue if a property exists.
-                    // TODO: modify ObjectContent to show generic type instead of concrete one
-                    temp = EditorGUIUtility.ObjectContent(obj, null, property.objectReferenceInstanceIDValue);
-                }
-
-                if (obj != null)
-                {
-                    Object[] references2 = { obj };
-                    if (EditorSceneManager.preventCrossSceneReferences && EditorGUI.CheckForCrossSceneReferencing(obj, property.serializedObject.targetObject))
-                    {
-                        if (!EditorApplication.isPlaying)
-                            temp = EditorGUI.s_SceneMismatch;
-                        else
-                            temp.text += $" ({EditorGUI.GetGameObjectFromObject(obj).scene.name})";
-                    }
-                    else if (ValidateObjectFieldAssignment(references2, property, EditorGUI.ObjectFieldValidatorOptions.ExactObjectTypeValidation) == null)
-                        temp = EditorGUI.s_TypeMismatch;
+                    return EditorGUI.s_SceneMismatch;
                 }
             }
 

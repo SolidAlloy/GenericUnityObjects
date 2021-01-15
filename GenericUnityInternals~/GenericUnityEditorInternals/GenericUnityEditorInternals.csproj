@@ -43,12 +43,17 @@
         <Reference Include="UnityEngine">
             <HintPath>C:\Program Files\Unity Editors\2020.2.1f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>C:\Program Files\Unity Editors\2020.2.1f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+            <Aliases>CoreModule</Aliases>
+        </Reference>
         <Reference Include="GenericUnityObjects">
             <HintPath>..\..\..\..\Library\ScriptAssemblies\GenericUnityObjects.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="EditorGUIHelper.cs" />
+        <Compile Include="GenericTypeCache.cs" />
         <Compile Include="ObjectSelectorExtensions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

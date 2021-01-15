@@ -48,5 +48,20 @@
             var argumentNames = genericArgs.Select(argument => argument.Name);
             return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";
         }
+
+        /// <summary>
+        /// Gets the type name for nice representation of the type. It looks like this: ClassName&lt;int,TestArg>.
+        /// </summary>
+        public static string GetGenericTypeNameWithBrackets(Type genericTypeWithArgs)
+        {
+            string typeNameWithoutSuffix = genericTypeWithArgs.Name.StripGenericSuffix();
+
+            var argumentNames = genericTypeWithArgs.GetGenericArguments()
+                .Select(argument => argument.FullName)
+                .Select(fullName => fullName.ReplaceWithBuiltInName())
+                .Select(fullName => fullName.GetSubstringAfterLast('.'));
+
+            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
+        }
     }
 }
