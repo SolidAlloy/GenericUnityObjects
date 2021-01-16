@@ -2,19 +2,31 @@
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
 
     internal class TypeStub : Type
     {
-        public TypeStub(string fakeFullName, string fakeAssemblyName)
+        private readonly Type[] _fakeArgNames;
+
+        public TypeStub(string fakeName, string fakeAssemblyName, TypeStub[] fakeArgNames = null)
         {
             Assembly = new AssemblyStub(fakeAssemblyName);
-            FullName = fakeFullName;
+            Name = fakeName;
+            FullName = fakeName;
+            _fakeArgNames = fakeArgNames?.Cast<Type>().ToArray();
         }
+
+        public override string Name { get; }
 
         public override string FullName { get; }
 
         public override Assembly Assembly { get; }
+
+        public override Type[] GetGenericArguments()
+        {
+            return _fakeArgNames ?? Array.Empty<Type>();
+        }
 
         private class AssemblyStub : Assembly
         {
@@ -167,8 +179,6 @@
         public override Module Module => throw new NotImplementedException();
 
         public override string Namespace => throw new NotImplementedException();
-
-        public override string Name => throw new NotImplementedException();
 
         protected override TypeAttributes GetAttributeFlagsImpl()
         {

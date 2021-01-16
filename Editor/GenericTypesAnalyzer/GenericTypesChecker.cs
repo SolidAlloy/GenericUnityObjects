@@ -6,7 +6,6 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
     using Object = UnityEngine.Object;
@@ -80,7 +79,9 @@
                         foundMatching = true;
                     }
 
-                    if ( ! newType.ArgNames.SequenceEqual(oldType.ArgNames))
+                    // If type names don't match, the old type name and arguments have already been updated,
+                    // so no need to check them twice.
+                    if ( ! (typeNamesDontMatch || newType.ArgNames.SequenceEqual(oldType.ArgNames)))
                     {
                         needsAssetDatabaseRefresh |= UpdateGenericTypeArgNames(oldType, newType.ArgNames, newType.Type);
                         foundMatching = true;

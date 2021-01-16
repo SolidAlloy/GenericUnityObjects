@@ -8,9 +8,9 @@
     using UnityEngine;
     using Util;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
-        public class OnAfterDeserialize : BehavioursGenerationDatabaseTests
+        public class OnAfterDeserialize : GenerationDatabaseTests
         {
             private static FieldInfo _instanceField;
             private static object _getterInstance;
@@ -40,8 +40,8 @@
                 var cleanInstance = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
                 _instanceField.SetValue(_getterInstance, cleanInstance);
                 GenerationDatabase<MonoBehaviour>.Instance.Initialize();
-                GenerationDatabase<MonoBehaviour>.AddGenericType(_behaviour);
-                GenerationDatabase<MonoBehaviour>.Instance.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
+                GenerationDatabase<MonoBehaviour>.AddGenericType(_genericType);
+                GenerationDatabase<MonoBehaviour>.Instance.AddConcreteClassImpl(_genericType, _firstSecondArgs, AssemblyGUID);
             }
 
             private static void ReserializeDatabase()
@@ -61,7 +61,7 @@
             public void Restores_behaviours()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.GenericTypes.SequenceEqual(_expectedBehaviours));
+                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.GenericTypes.SequenceEqual(_expectedGenericTypes));
             }
 
             [Test]
@@ -69,14 +69,14 @@
             {
                 ReserializeDatabase();
                 GenericTypeInfo[] referencedBehaviours = GenerationDatabase<MonoBehaviour>.GetReferencedGenericTypes(_firstArg);
-                Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedBehaviours));
+                Assert.IsTrue(referencedBehaviours.SequenceEqual(_expectedGenericTypes));
             }
 
             [Test]
             public void Restores_concrete_classes()
             {
                 ReserializeDatabase();
-                var concreteClasses = GenerationDatabase<MonoBehaviour>.GetConcreteClasses(_behaviour);
+                var concreteClasses = GenerationDatabase<MonoBehaviour>.GetConcreteClasses(_genericType);
                 Assert.IsTrue(concreteClasses.Length == 1);
                 Assert.IsTrue(concreteClasses[0] == _expectedConcreteClass);
             }

@@ -5,9 +5,9 @@
     using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
-        public class RemoveArgument : BehavioursGenerationDatabaseTests
+        public class RemoveArgument : GenerationDatabaseTests
         {
             [SetUp]
             public override void BeforeEachTest()
@@ -33,7 +33,7 @@
             {
                 CallRemoveArgument();
 
-                var actualClasses = _database.GetConcreteClassesImpl(_behaviour);
+                var actualClasses = _database.GetConcreteClassesImpl(_genericType);
 
                 Assert.IsFalse(actualClasses.Contains(_expectedConcreteClass));
             }

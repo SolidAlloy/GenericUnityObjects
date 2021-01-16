@@ -4,9 +4,9 @@
     using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
-        public class UpdateArgumentGUID : BehavioursGenerationDatabaseTests
+        public class UpdateArgumentGUID : GenerationDatabaseTests
         {
             private const string NewGUID = "newGUID";
             private static ArgumentInfo _expectedArg;
@@ -33,18 +33,18 @@
             {
                 _database.UpdateArgumentGUIDImpl(_firstArg, NewGUID);
 
-                var concreteClasses = _database.GetConcreteClassesImpl(_behaviour);
+                var concreteClasses = _database.GetConcreteClassesImpl(_genericType);
 
                 Assert.IsTrue(concreteClasses.Any(concreteClass => concreteClass.Arguments.Contains(_expectedArg)));
             }
 
             [Test]
-            public void Referenced_behaviours_can_be_found_by_new_argument()
+            public void Referenced_generic_types_can_be_found_by_new_argument()
             {
                 _database.UpdateArgumentGUIDImpl(_firstArg, NewGUID);
 
-                var behaviours = _database.GetReferencedGenericTypesImpl(_expectedArg);
-                Assert.IsTrue(behaviours.Length != 0);
+                var genericTypes = _database.GetReferencedGenericTypesImpl(_expectedArg);
+                Assert.IsTrue(genericTypes.Length != 0);
             }
 
             [Test]

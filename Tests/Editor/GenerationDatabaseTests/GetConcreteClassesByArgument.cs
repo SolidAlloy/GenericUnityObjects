@@ -5,9 +5,9 @@
     using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
-        public class GetConcreteClassesByArgument : BehavioursGenerationDatabaseTests
+        public class GetConcreteClassesByArgument : GenerationDatabaseTests
         {
             private const string SecondAssemblyGUID = "secondAssemblyGUID";
 
@@ -19,15 +19,15 @@
             {
                 base.BeforeEachTest();
 
-                _database.AddGenericTypeImpl(_behaviour);
-                _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
+                _database.AddGenericTypeImpl(_genericType);
+                _database.AddConcreteClassImpl(_genericType, _firstSecondArgs, AssemblyGUID);
                 _thirdArg = new ArgumentInfo("thirdArgumentName", "thirdArgumentGUID");
                 _secondThirdArgs = new[] { _secondArg, _thirdArg };
-                _database.AddConcreteClassImpl(_behaviour, _secondThirdArgs, SecondAssemblyGUID);
+                _database.AddConcreteClassImpl(_genericType, _secondThirdArgs, SecondAssemblyGUID);
             }
 
             private static ConcreteClass[] CallMethod() =>
-                _database.GetConcreteClassesByArgumentImpl(_behaviour, _firstArg);
+                _database.GetConcreteClassesByArgumentImpl(_genericType, _firstArg);
 
             [Test]
             public void Returns_concrete_classes_where_argument_is_listed()
@@ -48,7 +48,7 @@
             [Test]
             public void Throws_KeyNotFoundException_when_generic_type_is_not_in_the_database()
             {
-                _database.RemoveGenericTypeImpl(_behaviour, null);
+                _database.RemoveGenericTypeImpl(_genericType, null);
 
                 Assert.Throws<KeyNotFoundException>(() => CallMethod());
             }

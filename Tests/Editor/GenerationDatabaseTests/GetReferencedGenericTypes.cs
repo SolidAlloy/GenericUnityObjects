@@ -4,9 +4,9 @@
     using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
-        public class GetReferencedGenericTypes : BehavioursGenerationDatabaseTests
+        public class GetReferencedGenericTypes : GenerationDatabaseTests
         {
             private static GenericTypeInfo[] CallMethod() => _database.GetReferencedGenericTypesImpl(_firstArg);
 

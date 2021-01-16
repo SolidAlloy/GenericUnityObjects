@@ -5,9 +5,9 @@
     using NUnit.Framework;
     using Util;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
-        public class UpdateArgumentNameAndAssembly : BehavioursGenerationDatabaseTests
+        public class UpdateArgumentNameAndAssembly : GenerationDatabaseTests
         {
             private const string NewName = "newName";
             private const string NewAssembly = "newAssembly";
@@ -46,18 +46,18 @@
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                var concreteClasses = _database.GetConcreteClassesImpl(_behaviour);
+                var concreteClasses = _database.GetConcreteClassesImpl(_genericType);
 
                 Assert.IsTrue(concreteClasses.Any(concreteClass => concreteClass.Arguments.Contains(_expectedArg)));
             }
 
             [Test]
-            public void Referenced_behaviours_can_be_found_by_new_argument()
+            public void Referenced_generic_types_can_be_found_by_new_argument()
             {
                 CallUpdateArgumentNameAndAssembly();
 
-                var behaviours = _database.GetReferencedGenericTypesImpl(_expectedArg);
-                Assert.IsTrue(behaviours.Length != 0);
+                var genericTypes = _database.GetReferencedGenericTypesImpl(_expectedArg);
+                Assert.IsTrue(genericTypes.Length != 0);
             }
 
             [Test]

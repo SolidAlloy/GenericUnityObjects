@@ -5,16 +5,16 @@
     using NUnit.Framework;
     using UnityEngine;
 
-    internal partial class BehavioursGenerationDatabaseTests
+    internal partial class GenerationDatabaseTests
     {
         private const string AssemblyGUID = "testAssemblyGUID";
 
         private static GenerationDatabase<MonoBehaviour> _database;
-        private static GenericTypeInfo _behaviour;
+        private static GenericTypeInfo _genericType;
         private static ArgumentInfo _firstArg;
         private static ArgumentInfo _secondArg;
         private static ArgumentInfo[] _firstSecondArgs;
-        private static GenericTypeInfo[] _expectedBehaviours;
+        private static GenericTypeInfo[] _expectedGenericTypes;
         private static ConcreteClass _expectedConcreteClass;
 
         [SetUp]
@@ -23,18 +23,18 @@
             _database = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
             _database.Initialize();
 
-            _behaviour = new GenericTypeInfo("genericBehaviourName", "genericBehaviourGUID", new[] { "genericArg" });
+            _genericType = new GenericTypeInfo("genericTypeName", "genericTypeGUID", new[] { "genericArg" });
             _firstArg = new ArgumentInfo("firstArgumentName", "firstArgumentGUID");
             _secondArg = new ArgumentInfo("secondArgumentName", "secondArgumentGUID");
             _firstSecondArgs = new[] { _firstArg, _secondArg };
-            _expectedBehaviours = new[] { _behaviour };
+            _expectedGenericTypes = new[] { _genericType };
             _expectedConcreteClass = new ConcreteClass(_firstSecondArgs, AssemblyGUID);
         }
 
         private static void AddEntries()
         {
-            _database.AddGenericTypeImpl(_behaviour);
-            _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
+            _database.AddGenericTypeImpl(_genericType);
+            _database.AddConcreteClassImpl(_genericType, _firstSecondArgs, AssemblyGUID);
         }
     }
 }
