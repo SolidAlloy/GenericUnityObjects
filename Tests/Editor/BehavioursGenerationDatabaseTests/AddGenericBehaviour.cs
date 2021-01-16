@@ -15,7 +15,7 @@
             {
                 var expectedBehaviours = new[] { _behaviour };
 
-                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour);
 
                 Assert.IsTrue(_database.InstanceGenericTypes.SequenceEqual(expectedBehaviours));
                 Assert.IsEmpty(_database.InstanceArguments);
@@ -24,11 +24,11 @@
             [Test]
             public void Throws_ArgumentException_if_key_exists()
             {
-                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour);
 
                 Assert.Throws<ArgumentException>(() =>
                 {
-                    _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
+                    _database.AddGenericTypeImpl(_behaviour);
                 });
             }
         }

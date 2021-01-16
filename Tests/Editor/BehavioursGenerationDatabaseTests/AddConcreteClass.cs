@@ -14,7 +14,7 @@
             public override void BeforeEachTest()
             {
                 base.BeforeEachTest();
-                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour);
             }
 
             [Test]
@@ -50,7 +50,7 @@
                 var secondBehaviour = new GenericTypeInfo("secondBehaviourName", "secondBehaviourGUID", new[] { "secondArgs" });
                 var expectedBehaviours = new[] { _behaviour, secondBehaviour };
 
-                _database.AddGenericTypeImpl(secondBehaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(secondBehaviour);
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
                 _database.AddConcreteClassImpl(secondBehaviour, _firstSecondArgs, AssemblyGUID);
 

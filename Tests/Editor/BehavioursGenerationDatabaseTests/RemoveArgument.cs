@@ -18,7 +18,7 @@
 
             private static void CallRemoveArgument()
             {
-                _database.RemoveArgumentImpl(_firstArg, assemblyName => { });
+                _database.RemoveArgumentImpl(_firstArg, null);
             }
 
             [Test]

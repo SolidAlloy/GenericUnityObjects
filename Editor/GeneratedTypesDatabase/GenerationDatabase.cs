@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using GenericUnityObjects.Util;
+    using JetBrains.Annotations;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
@@ -38,14 +39,13 @@
 
         public static void AddGenericType(GenericTypeInfo genericTypeInfo)
         {
-            Instance.AddGenericTypeImpl(genericTypeInfo, out List<ConcreteClass> _);
+            Instance.AddGenericTypeImpl(genericTypeInfo);
         }
 
-        public void AddGenericTypeImpl(GenericTypeInfo genericTypeInfo, out List<ConcreteClass> concreteClasses)
+        public void AddGenericTypeImpl(GenericTypeInfo genericTypeInfo)
         {
-            concreteClasses = new List<ConcreteClass>();
             genericTypeInfo = _genericTypesPool.GetOrAdd(genericTypeInfo);
-            _genericTypeArgumentsDict.Add(genericTypeInfo, concreteClasses);
+            _genericTypeArgumentsDict.Add(genericTypeInfo, new List<ConcreteClass>());
             EditorUtility.SetDirty(this);
         }
 
@@ -104,12 +104,12 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void RemoveArgument(ArgumentInfo argument, Action<string> assemblyAction)
+        public static void RemoveArgument(ArgumentInfo argument, [CanBeNull] Action<string> removeAssembly)
         {
-            Instance.RemoveArgumentImpl(argument, assemblyAction);
+            Instance.RemoveArgumentImpl(argument, removeAssembly);
         }
 
-        public void RemoveArgumentImpl(ArgumentInfo argument, Action<string> assemblyAction)
+        public void RemoveArgumentImpl(ArgumentInfo argument, [CanBeNull] Action<string> removeAssembly)
         {
             if ( ! _argumentGenericTypesDict.TryGetValue(argument, out List<GenericTypeInfo> genericTypeInfos))
                 throw new KeyNotFoundException($"Argument '{argument}' was not found in the database.");
@@ -128,7 +128,7 @@
                     if (concreteClass.Arguments.Contains(argument))
                     {
                         concreteClasses.RemoveAt(i);
-                        assemblyAction(concreteClass.AssemblyGUID);
+                        removeAssembly?.Invoke(concreteClass.AssemblyGUID);
                     }
                 }
             }
@@ -136,17 +136,17 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static bool RemoveGenericType(GenericTypeInfo genericTypeInfo, Action<string> removeAssembly)
+        public static bool RemoveGenericType(GenericTypeInfo genericTypeInfo, [CanBeNull] Action<string> removeAssembly)
         {
             return Instance.RemoveGenericTypeImpl(genericTypeInfo, removeAssembly);
         }
 
-        public bool RemoveGenericTypeImpl(GenericTypeInfo genericTypeInfo, Action<string> removeAssembly)
+        public bool RemoveGenericTypeImpl(GenericTypeInfo genericTypeInfo, [CanBeNull] Action<string> removeAssembly)
         {
             if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
                 throw new KeyNotFoundException($"Unity.Object '{genericTypeInfo}' was not found in the database.");
 
-            removeAssembly(genericTypeInfo.AssemblyGUID);
+            removeAssembly?.Invoke(genericTypeInfo.AssemblyGUID);
             _genericTypeArgumentsDict.Remove(genericTypeInfo);
 
             foreach (ConcreteClass concreteClass in concreteClasses)
@@ -162,7 +162,7 @@
                         _argumentGenericTypesDict.Remove(argument);
                 }
 
-                removeAssembly(concreteClass.AssemblyGUID);
+                removeAssembly?.Invoke(concreteClass.AssemblyGUID);
             }
 
             EditorUtility.SetDirty(this);

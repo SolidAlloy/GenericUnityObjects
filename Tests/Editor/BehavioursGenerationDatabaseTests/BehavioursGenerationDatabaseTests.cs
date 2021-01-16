@@ -33,7 +33,7 @@
 
         private static void AddEntries()
         {
-            _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
+            _database.AddGenericTypeImpl(_behaviour);
             _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
         }
     }

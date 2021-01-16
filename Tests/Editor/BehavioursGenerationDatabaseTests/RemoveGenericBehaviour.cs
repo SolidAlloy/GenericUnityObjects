@@ -18,14 +18,14 @@
 
                 _secondBehaviour = new GenericTypeInfo("secondBehaviourName", "secondBehaviourGUID", new[] { "secondArgs" });
 
-                _database.AddGenericTypeImpl(_behaviour, out List<ConcreteClass> _);
-                _database.AddGenericTypeImpl(_secondBehaviour, out List<ConcreteClass> _);
+                _database.AddGenericTypeImpl(_behaviour);
+                _database.AddGenericTypeImpl(_secondBehaviour);
 
                 _database.AddConcreteClassImpl(_behaviour, _firstSecondArgs, AssemblyGUID);
                 _database.AddConcreteClassImpl(_secondBehaviour, _firstSecondArgs, AssemblyGUID);
             }
 
-            private void CallRemoveGenericBehaviour(GenericTypeInfo behaviour) => _database.RemoveGenericTypeImpl(behaviour, _ => { });
+            private void CallRemoveGenericBehaviour(GenericTypeInfo behaviour) => _database.RemoveGenericTypeImpl(behaviour, null);
 
             [Test]
             public void Removes_behaviour_from_behaviours_list()
@@ -64,7 +64,7 @@
 
                 Assert.Throws<KeyNotFoundException>(() =>
                 {
-                    _database.RemoveGenericTypeImpl(_behaviour, _ => { });
+                    _database.RemoveGenericTypeImpl(_behaviour, null);
                 });
             }
         }
