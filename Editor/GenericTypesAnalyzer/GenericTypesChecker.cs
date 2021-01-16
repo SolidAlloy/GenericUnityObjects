@@ -6,6 +6,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
+    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
     using Object = UnityEngine.Object;
@@ -64,7 +65,7 @@
                     bool typeNamesDontMatch = newType.TypeNameAndAssembly != oldType.TypeNameAndAssembly;
 
                     // If both parameters don't match, the types are not equal
-                    if (guidsDontMatch && typeNamesDontMatch)
+                    if (guidsDontMatch && typeNamesDontMatch && ! ActualTypesMatch(oldType, newType))
                         continue;
 
                     if (guidsDontMatch)
@@ -104,6 +105,16 @@
                 return needsAssetDatabaseRefresh;
 
             return RemoveGenericTypes(oldTypesOnly);
+        }
+
+        private static bool ActualTypesMatch(GenericTypeInfo oldTypeInfo, GenericTypeInfo newTypeInfo)
+        {
+            // When GUIDs and TypeNames don't match, there is possibility that the user renamed class name without
+            // renaming the file name. In this case, the new GUID is empty, but old GUID still exists, and the type
+            // loaded from the old GUID matches the new one. In such case, we can treat these types as equal.
+            return newTypeInfo.GUID.Length == 0
+                   && oldTypeInfo.GUID.Length != 0
+                   && oldTypeInfo.RetrieveType<TObject>() == newTypeInfo.Type;
         }
 
         private static void UpdateGenericTypeGUID(GenericTypeInfo genericType, string newGUID)
