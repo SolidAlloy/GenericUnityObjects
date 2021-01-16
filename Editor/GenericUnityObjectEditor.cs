@@ -2,9 +2,10 @@
 {
     using GenericUnityObjects;
     using UnityEditor;
+    using UnityEditorInternals;
     using UnityEngine;
 
-#if !DISABLE_GENERIC_OBJECT_EDITOR
+#if ! DISABLE_GENERIC_OBJECT_EDITOR
     [CanEditMultipleObjects]
     [CustomEditor(typeof(MonoBehaviour), true)]
     internal class MonoBehaviourEditor : GenericUnityObjectEditor { }
@@ -14,7 +15,7 @@
     internal class GenericScriptableObjectEditor : GenericUnityObjectEditor { }
 #endif
 
-    internal class GenericUnityObjectEditor : Editor
+    internal class GenericUnityObjectEditor : GenericObjectInternalEditor
     {
         private GenericUnityObjectHelper _helper;
 

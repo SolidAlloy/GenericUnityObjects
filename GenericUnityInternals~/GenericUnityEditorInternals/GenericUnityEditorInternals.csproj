@@ -37,7 +37,7 @@
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Xml" />
-        <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnityEditor">
           <HintPath>C:\Program Files\Unity Editors\2020.2.1f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
@@ -53,6 +53,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="EditorGUIHelper.cs" />
+        <Compile Include="GenericObjectInternalEditor.cs" />
         <Compile Include="GenericTypeCache.cs" />
         <Compile Include="ObjectSelectorExtensions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
