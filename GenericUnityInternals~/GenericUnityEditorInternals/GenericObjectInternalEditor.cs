@@ -29,25 +29,30 @@
             if (_targetTitlesCache.TryGetValue(target, out string title))
                 return title;
 
-            string typeName = TypeUtility.GetGenericTypeNameWithBrackets(genericType);
+            string typeName = GetTypeName(genericType);
+
+            // target.name is empty when a new asset is created interactively and has not been named yet.
+            if (string.IsNullOrEmpty(target.name))
+                return $"({typeName})";
+
             title = $"{ObjectNames.NicifyVariableName(target.name)} ({typeName})";
             _targetTitlesCache.Add(target, title);
-
-            if ( ! _typeNamesCache.ContainsKey(genericType))
-                _typeNamesCache.Add(genericType, typeName);
-
             return title;
         }
 
         private string GetMixedTitle(Type genericType)
         {
-            if ( ! _typeNamesCache.TryGetValue(genericType, out string typeName))
-            {
-                typeName = TypeUtility.GetGenericTypeNameWithBrackets(genericType);
-                _typeNamesCache.Add(genericType, typeName);
-            }
+            return $"{m_Targets.Length} objects of type {GetTypeName(genericType)}";
+        }
 
-            return $"{m_Targets.Length} objects of type {typeName}";
+        private static string GetTypeName(Type genericType)
+        {
+            if (_typeNamesCache.TryGetValue(genericType, out string typeName))
+                return typeName;
+
+            typeName = TypeUtility.GetGenericTypeNameWithBrackets(genericType);
+            _typeNamesCache.Add(genericType, typeName);
+            return typeName;
         }
     }
 }
