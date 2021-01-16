@@ -6,6 +6,7 @@
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     /// <summary>
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
@@ -43,17 +44,40 @@
             }
         }
 
-        [SerializeField] private List<string> _iconChangeGUIDs = new List<string>();
+        [SerializeField] private List<string> _behaviourIconGUIDs = new List<string>();
+        [SerializeField] private List<string> _scriptableObjectIconGUIDs = new List<string>();
 
-        public static IEnumerable<string> IconChangeGUIDs => Instance._iconChangeGUIDs;
+        public static IEnumerable<string> BehaviourIconGUIDs => Instance._behaviourIconGUIDs;
 
-        public static void AddAssemblyForIconChange(string guid)
+        public static IEnumerable<string> ScriptableObjectIconGUIDs => Instance._scriptableObjectIconGUIDs;
+
+        public static void AddAssemblyForIconChange<TObject>(string guid) where TObject : Object
         {
-            Instance._iconChangeGUIDs.Add(guid);
+            Type objectType = typeof(TObject);
+
+            if (objectType == typeof(MonoBehaviour))
+            {
+                Instance._behaviourIconGUIDs.Add(guid);
+            }
+            else if (objectType == typeof(GenericScriptableObject))
+            {
+                Instance._scriptableObjectIconGUIDs.Add(guid);
+            }
+            else
+            {
+                throw new ArgumentException(
+                    $"Expected type parameter {nameof(MonoBehaviour)} or {nameof(GenericScriptableObject)}. Got {objectType} instead.");
+            }
+
             EditorUtility.SetDirty(Instance);
         }
 
-        public static void ClearIconChangeGUIDs() => Instance._iconChangeGUIDs.Clear();
+        public static void ClearIconChangeGUIDs()
+        {
+            Instance._behaviourIconGUIDs.Clear();
+            Instance._scriptableObjectIconGUIDs.Clear();
+            EditorUtility.SetDirty(Instance);
+        }
 
         public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
 
