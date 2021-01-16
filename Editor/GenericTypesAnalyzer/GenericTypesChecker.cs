@@ -179,7 +179,7 @@
 
         protected virtual bool RemoveGenericType(GenericTypeInfo genericType)
         {
-            DebugUtility.Log($"Behaviour removed: {genericType.TypeFullName}");
+            DebugUtility.Log($"{typeof(TObject).Name} removed: {genericType.TypeFullName}");
             return GenerationDatabase<TObject>.RemoveGenericType(genericType, AssemblyAssetOperations.RemoveAssemblyByGUID);
         }
 

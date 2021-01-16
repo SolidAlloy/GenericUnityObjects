@@ -37,8 +37,7 @@
 
             try
             {
-                (GameObject gameObject, Type genericType) =
-                    PersistentStorage.GetGenericBehaviourDetails();
+                (GameObject gameObject, Type genericType) = PersistentStorage.GetGenericBehaviourDetails();
 
                 bool success = BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteType);
                 Assert.IsTrue(success);

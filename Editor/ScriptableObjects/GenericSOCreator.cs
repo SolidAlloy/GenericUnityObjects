@@ -43,8 +43,7 @@
 
             try
             {
-                (Type genericSOType, string fileName) =
-                    PersistentStorage.GetGenericSODetails();
+                (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
 
                 bool success = ScriptableObjectsDatabase.TryGetConcreteType(genericSOType, out Type concreteType);
                 Assert.IsTrue(success);

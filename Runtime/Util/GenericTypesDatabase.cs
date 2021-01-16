@@ -19,7 +19,7 @@
             Instance.InitializeImpl(dict);
         }
 
-        public void InitializeImpl(Dictionary<Type, Dictionary<Type[], Type>> dict)
+        private void InitializeImpl(Dictionary<Type, Dictionary<Type[], Type>> dict)
         {
             _dict = dict;
             SetDirty();
