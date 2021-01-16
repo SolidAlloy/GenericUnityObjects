@@ -1,5 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using GenericUnityObjects.Util;
     using UnityEditor;
@@ -10,47 +11,34 @@
     internal static class GenericTypesAnalyzer
     {
         [DidReloadScripts((int)DidReloadScriptsOrder.AssemblyGeneration)]
-        private static void AnalyzeBehaviours()
+        [SuppressMessage("ReSharper", "RCS1233",
+            Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
+        private static void AnalyzeGenericTypes()
         {
-            bool needsAssetDatabaseRefresh;
+            bool behavioursNeedDatabaseRefresh;
+            bool scriptableObjectsNeedDatabaseRefresh;
 
             var behavioursChecker = new BehavioursChecker();
-
-            using (new DisabledAssetDatabase(null))
-            {
-                Directory.CreateDirectory(Config.AssembliesDirPath);
-
-                needsAssetDatabaseRefresh =
-                    ArgumentsChecker<MonoBehaviour>.Check(behavioursChecker)
-                    | behavioursChecker.Check();
-            }
-
-            if (needsAssetDatabaseRefresh)
-                AssetDatabase.Refresh();
-
-            DictInitializer<MonoBehaviour>.Initialize();
-        }
-
-        [DidReloadScripts((int)DidReloadScriptsOrder.AssemblyGeneration)]
-        private static void AnalyzeScriptableObjects()
-        {
-            bool needsAssetDatabaseRefresh;
-
             var scriptableObjectsChecker = new ScriptableObjectsChecker();
 
             using (new DisabledAssetDatabase(null))
             {
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 
-                needsAssetDatabaseRefresh =
+                behavioursNeedDatabaseRefresh =
+                    ArgumentsChecker<MonoBehaviour>.Check(behavioursChecker)
+                    | behavioursChecker.Check();
+
+                scriptableObjectsNeedDatabaseRefresh =
                     ArgumentsChecker<GenericScriptableObject>.Check(scriptableObjectsChecker)
                     | scriptableObjectsChecker.Check()
                     | MenuItemsChecker.Check();
             }
 
-            if (needsAssetDatabaseRefresh)
+            if (behavioursNeedDatabaseRefresh || scriptableObjectsNeedDatabaseRefresh)
                 AssetDatabase.Refresh();
 
+            DictInitializer<MonoBehaviour>.Initialize();
             DictInitializer<GenericScriptableObject>.Initialize();
         }
     }
