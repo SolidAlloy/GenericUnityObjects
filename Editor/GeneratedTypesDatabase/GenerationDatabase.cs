@@ -267,7 +267,7 @@
                 _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
                 {
                     genericTypeToChange.UpdateNameAndAssembly(newType);
-                    genericTypeToChange.UpdateArgNames(newType.GenericTypeArguments);
+                    genericTypeToChange.UpdateArgNames(newType.GetGenericArguments());
                 });
             });
         }
