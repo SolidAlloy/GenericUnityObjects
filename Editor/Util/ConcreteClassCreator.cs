@@ -15,7 +15,7 @@
         public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
-            PersistentStorage.AddAssemblyForIconChange<TObject>(assemblyGUID);
+            MonoScriptIconSetter.AddAssemblyForIconChange<TObject>(assemblyGUID);
             AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
@@ -37,7 +37,7 @@
                 CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
             }
 
-            PersistentStorage.AddAssemblyForIconChange<TObject>(concreteClass.AssemblyGUID);
+            MonoScriptIconSetter.AddAssemblyForIconChange<TObject>(concreteClass.AssemblyGUID);
         }
 
         private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
