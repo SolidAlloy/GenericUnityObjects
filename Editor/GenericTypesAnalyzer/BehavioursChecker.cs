@@ -28,7 +28,7 @@
 
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, genericTypeInfo.AssemblyGUID);
-            MonoScriptIconSetter.AddAssemblyForIconChange<MonoBehaviour>(genericTypeInfo.AssemblyGUID);
+            BehaviourIconSetter.AddAssemblyForIconChange(genericTypeInfo.AssemblyGUID);
             base.AddNewGenericType(genericTypeInfo);
         }
 
@@ -42,7 +42,7 @@
         {
             base.UpdateGenericTypeArgNames(genericType, newArgNames, newType);
             UpdateSelectorAssembly(genericType.AssemblyGUID, newType);
-            MonoScriptIconSetter.AddAssemblyForIconChange<MonoBehaviour>(genericType.AssemblyGUID);
+            BehaviourIconSetter.AddAssemblyForIconChange(genericType.AssemblyGUID);
             return true;
         }
 

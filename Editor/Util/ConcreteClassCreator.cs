@@ -7,6 +7,7 @@
     using GenericUnityObjects.Util;
     using SolidUtilities.Extensions;
     using UnityEditor;
+    using UnityEngine;
     using Object = UnityEngine.Object;
 
     internal static class ConcreteClassCreator<TObject>
@@ -15,7 +16,8 @@
         public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
-            MonoScriptIconSetter.AddAssemblyForIconChange<TObject>(assemblyGUID);
+            if (typeof(TObject) == typeof(MonoBehaviour))
+                BehaviourIconSetter.AddAssemblyForIconChange(assemblyGUID);
             AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
@@ -37,7 +39,8 @@
                 CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
             }
 
-            MonoScriptIconSetter.AddAssemblyForIconChange<TObject>(concreteClass.AssemblyGUID);
+            if (typeof(TObject) == typeof(MonoBehaviour))
+                BehaviourIconSetter.AddAssemblyForIconChange(concreteClass.AssemblyGUID);
         }
 
         private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
