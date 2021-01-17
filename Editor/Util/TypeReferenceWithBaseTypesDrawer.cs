@@ -14,6 +14,8 @@
     [CustomPropertyDrawer(typeof(TypeReferenceWithBaseTypes))]
     internal class TypeReferenceWithBaseTypesDrawer : TypeReferencePropertyDrawer
     {
+        private static readonly string[] _additionalAssemblies = { "Assembly-CSharp" };
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Assert.IsNotNull(label);
@@ -28,24 +30,25 @@
                 property.FindPropertyRelative(nameof(TypeReferenceWithBaseTypes.BaseTypeNames));
 
             if (baseTypesProperty.arraySize == 0)
-                return new TypeOptionsAttribute();
+                return TypeOptionsAttribute.Default;
 
-            var baseTypes = new List<Type>(baseTypesProperty.arraySize);
+            var baseTypes = new Type[baseTypesProperty.arraySize];
+
             for (int i = 0; i < baseTypesProperty.arraySize; i++)
             {
                 SerializedProperty typeRefProperty = baseTypesProperty.GetArrayElementAtIndex(i);
                 Type baseType = TypeCache.GetType(typeRefProperty.stringValue);
-                baseTypes.Add(baseType);
+                baseTypes[i] = baseType;
             }
 
-            return new InheritsAttribute(baseTypes.ToArray()) { ExpandAllFolders = true };
+            return new InheritsAttribute(baseTypes) { ExpandAllFolders = true };
         }
 
         private void DrawTypeReferenceField(Rect position, SerializedProperty property)
         {
             TypeOptionsAttribute typeOptionsAttribute = GetAttribute(property);
             typeOptionsAttribute.ExcludeNone = true;
-            typeOptionsAttribute.IncludeAdditionalAssemblies = new[] { "Assembly-CSharp" };
+            typeOptionsAttribute.IncludeAdditionalAssemblies = _additionalAssemblies;
             typeOptionsAttribute.ShortName = true;
 
             var serializedTypeRef = new SerializedTypeReference(property);
