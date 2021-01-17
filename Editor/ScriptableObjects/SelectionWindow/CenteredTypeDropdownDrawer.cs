@@ -8,21 +8,22 @@
     using TypeReferences.Editor.TypeDropdown;
     using UnityEngine;
 
-    internal class CenteredTypeDropdownDrawer : TypeDropdownDrawer
+    internal class CenteredTypeDropdownDrawer
     {
+        private readonly TypeDropdownDrawer _parentDrawer;
         private readonly Type _selectedType;
         private readonly TypeOptionsAttribute _attribute;
 
         public CenteredTypeDropdownDrawer(Type selectedType, TypeOptionsAttribute attribute, Type declaringType)
-            : base(selectedType, attribute, declaringType)
         {
+            _parentDrawer = new TypeDropdownDrawer(selectedType, attribute, declaringType);
             _selectedType = selectedType;
             _attribute = attribute;
         }
 
-        public new DropdownWindow Draw(Action<Type> onTypeSelected)
+        public DropdownWindow Draw(Action<Type> onTypeSelected)
         {
-            var dropdownItems = GetDropdownItems();
+            var dropdownItems = _parentDrawer.GetDropdownItems();
             var selectionTree = new SelectionTree(dropdownItems, _selectedType, onTypeSelected,
                 _attribute.SearchbarMinItemsCount, _attribute.ExcludeNone);
 

@@ -13,7 +13,7 @@
     {
         private static ConstructorInfo _addComponentMenuConstructor;
 
-        public static ConstructorInfo AddComponentMenuConstructor
+        private static ConstructorInfo AddComponentMenuConstructor
         {
             get
             {

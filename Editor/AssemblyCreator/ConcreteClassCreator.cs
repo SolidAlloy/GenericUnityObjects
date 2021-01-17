@@ -21,7 +21,7 @@
 
             if (typeof(TObject) == typeof(MonoBehaviour))
             {
-                string componentName = "Scripts/" + TypeUtility.GetGenericTypeNameWithBrackets(genericTypeWithArgs);
+                string componentName = $"Scripts/{TypeUtility.GetGenericTypeNameWithBrackets(genericTypeWithArgs)}";
                 AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
             }
 

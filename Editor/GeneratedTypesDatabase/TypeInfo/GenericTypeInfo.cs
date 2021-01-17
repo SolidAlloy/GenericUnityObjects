@@ -38,7 +38,17 @@
 
         public void UpdateArgNames(string[] newNames) => _argNames = newNames;
 
-        public void UpdateArgNames(Type[] newTypes) => _argNames = newTypes.Select(newType => newType.Name).ToArray();
+        public void UpdateArgNames(Type[] newTypes)
+        {
+            var newNames = new string[newTypes.Length];
+
+            for (int i = 0; i < newTypes.Length; i++)
+            {
+                newNames[i] = newTypes[i].Name;
+            }
+
+            _argNames = newNames;
+        }
 
         public bool Equals(GenericTypeInfo p)
         {

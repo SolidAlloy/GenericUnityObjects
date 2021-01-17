@@ -15,6 +15,7 @@
         private ContentCache _contentCache;
         private BehaviourSelector _targetSelector;
         private string _genericTypeNameWithoutSuffix;
+        private string[] _argumentNames;
 
         private void OnEnable()
         {
@@ -25,6 +26,7 @@
             _typesArray = serializedObject.FindProperty(nameof(BehaviourSelector.TypeRefs));
             _contentCache = new ContentCache();
             _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
+            _argumentNames = new string[_targetSelector.TypeRefs.Length];
         }
 
         public override void OnInspectorGUI()
@@ -33,10 +35,11 @@
             {
                 EditorGUILayout.PropertyField(
                     _typesArray.GetArrayElementAtIndex(i),
-                    _contentCache.GetItem($"Type Parameter #{i+1}"));
+                    _contentCache.GetItem($"Type Parameter #{(i+1).ToString()}"),
+                    null);
             }
 
-            if ( ! GUILayout.Button($"Add {GetComponentName()}"))
+            if ( ! GUILayout.Button(GetButtonName()))
                 return;
 
             if (_targetSelector.TypeRefs.Any(typeRef => typeRef.Type == null))
@@ -53,14 +56,17 @@
             }
         }
 
-        private string GetComponentName()
+        private string GetButtonName()
         {
-            var argumentNames = _targetSelector.TypeRefs
-                .Select(typeRef => typeRef.Type == null ? string.Empty : typeRef.Type.FullName)
-                .Select(fullName => fullName.ReplaceWithBuiltInName())
-                .Select(fullName => fullName.GetSubstringAfterLast('.'));
+            for (int i = 0; i < _targetSelector.TypeRefs.Length; i++)
+            {
+                TypeReferenceWithBaseTypes typeRef = _targetSelector.TypeRefs[i];
+                string fullName = typeRef.Type == null ? string.Empty : typeRef.Type.FullName;
+                fullName = fullName.ReplaceWithBuiltInName();
+                _argumentNames[i] = fullName.GetSubstringAfterLast('.');
+            }
 
-            return $"{_genericTypeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
+            return $"Add {_genericTypeNameWithoutSuffix}<{string.Join(",", _argumentNames)}>";
         }
     }
 }

@@ -23,7 +23,7 @@
             [OneTimeSetUp]
             public void BeforeAllTests()
             {
-                var argTypeStub = new TypeStub("argName", "argAssembly");
+                var argTypeStub = new TypeStub(ArgName, "argAssembly");
                 _typeStub = new TypeStub(NewName, NewAssembly, new[] { argTypeStub });
             }
 
@@ -94,7 +94,7 @@
             public void Updates_passed_argument_argNames()
             {
                 CallUpdateGenericType();
-                Assert.IsTrue(_genericType.ArgNames == _newArgs);
+                Assert.IsTrue(_genericType.ArgNames.SequenceEqual(_newArgs));
             }
         }
     }

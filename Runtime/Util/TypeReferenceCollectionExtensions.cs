@@ -13,7 +13,14 @@
 
         public static Type[] CastToType(this TypeReferenceWithBaseTypes[] typeReferences)
         {
-            return typeReferences.Select(typeRef => typeRef.Type).ToArray();
+            var types = new Type[typeReferences.Length];
+
+            for (int i = 0; i < typeReferences.Length; i++)
+            {
+                types[i] = typeReferences[i].Type;
+            }
+
+            return types;
         }
     }
 }

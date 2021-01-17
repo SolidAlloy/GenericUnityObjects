@@ -233,7 +233,7 @@
         private static Component[] LogFailureArray(Type componentType)
         {
             LogFailure(componentType);
-            return new Component[] { };
+            return Array.Empty<Component>();
         }
     }
 }

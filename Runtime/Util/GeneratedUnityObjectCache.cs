@@ -48,7 +48,7 @@
 
             private const string AssemblyName = "GenericUnityObjects.DynamicAssembly";
 
-            private static readonly AssemblyBuilder AssemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
+            private static readonly AssemblyBuilder _assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName(AssemblyName)
             {
                 CultureInfo = CultureInfo.InvariantCulture,
@@ -57,7 +57,7 @@
                 VersionCompatibility = AssemblyVersionCompatibility.SameDomain
             }, AssemblyBuilderAccess.Run);
 
-            private static readonly ModuleBuilder ModuleBuilder = AssemblyBuilder.DefineDynamicModule(AssemblyName, EmitSymbolInfo);
+            private static readonly ModuleBuilder _moduleBuilder = _assemblyBuilder.DefineDynamicModule(AssemblyName, EmitSymbolInfo);
 
             private readonly Dictionary<string, Type> _classDict = new Dictionary<string, Type>();
 
@@ -82,7 +82,7 @@
 
             private static Type CreateClass(string className, Type genericTypeWithArgs)
             {
-                TypeBuilder typeBuilder = ModuleBuilder.DefineType(className, TypeAttributes.NotPublic, genericTypeWithArgs);
+                TypeBuilder typeBuilder = _moduleBuilder.DefineType(className, TypeAttributes.NotPublic, genericTypeWithArgs);
                 return typeBuilder.CreateType();
             }
 #endif
