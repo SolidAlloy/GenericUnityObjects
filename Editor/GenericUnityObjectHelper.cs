@@ -22,7 +22,6 @@
 
             _drawForGeneric = true;
             _monoScript = AssetSearcher.GetMonoScriptFromType(_genericType);
-            Assert.IsNotNull(_monoScript);
         }
 
         public void DrawMonoScript(SerializedProperty monoScriptProperty)
@@ -35,7 +34,7 @@
 
             using (new EditorGUI.DisabledScope(true))
             {
-                if (_drawForGeneric)
+                if (_drawForGeneric && ! (_monoScript is null))
                 {
                     EditorGUILayout.ObjectField("Script", _monoScript, _genericType, false, null);
                 }
@@ -43,6 +42,14 @@
                 {
                     EditorGUILayout.ObjectField(monoScriptProperty, (GUILayoutOption[]) null);
                 }
+            }
+
+            if (_drawForGeneric && _monoScript is null)
+            {
+                EditorGUILayout.HelpBox(
+                    "The associated script that contains the generic type could not be found.\n" +
+                    "Please check that its file name matches the class name.",
+                    MessageType.Warning);
             }
         }
     }
