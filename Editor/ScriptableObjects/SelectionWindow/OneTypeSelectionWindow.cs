@@ -11,14 +11,15 @@
     /// </summary>
     internal class OneTypeSelectionWindow : TypeSelectionWindow
     {
-        private Action<Type[]> _onTypeSelected;
+        public Action<Type[]> OnTypeSelected;
+
         private bool _guiWasSetUp;
         private Type[] _genericParamConstraints;
         private DropdownWindow _dropdownWindow;
 
         protected override void OnCreate(Action<Type[]> onTypeSelected, Type[][] genericParamConstraints)
         {
-            _onTypeSelected = onTypeSelected;
+            OnTypeSelected = onTypeSelected;
             _genericParamConstraints = genericParamConstraints[0];
             this.Resize(1f, 1f);
             this.MoveOutOfScreen();
@@ -38,7 +39,7 @@
             typeOptionsAttribute.ExcludeNone = true;
 
             var dropdownDrawer = new CenteredTypeDropdownDrawer(null, typeOptionsAttribute, null);
-            _dropdownWindow = dropdownDrawer.Draw(type => _onTypeSelected(new[] { type }));
+            _dropdownWindow = dropdownDrawer.Draw(type => OnTypeSelected(new[] { type }));
 
             _dropdownWindow.OnClose += () =>
             {
