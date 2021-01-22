@@ -1,0 +1,22 @@
+{
+    "name": "GenericUnityObjects.IntegrationTests",
+    "rootNamespace": "GenericUnityObjects.IntegrationTests",
+    "references": [
+        "GUID:9168b41b563c2d84b94cfe84212541a9",
+        "GUID:2e5fb71161fa6f74f958f989fbdbb839",
+        "GUID:48d58eaab94e1de429344393b7653b1f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
