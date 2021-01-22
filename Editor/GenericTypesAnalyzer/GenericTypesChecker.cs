@@ -72,7 +72,8 @@
                         UpdateGenericTypeGUID(oldType, newType.GUID);
                         foundMatching = true;
                     }
-                    else if (typeNamesDontMatch)
+
+                    if (typeNamesDontMatch)
                     {
                         needsAssetDatabaseRefresh = true;
                         UpdateGenericTypeName(oldType, newType.Type);
