@@ -5,7 +5,6 @@
     using GenericUnityObjects;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor.EditorWindows;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
@@ -14,6 +13,9 @@
 
     internal class GenericSOCreator
     {
+        private static Type _concreteType;
+        private static string _fileName;
+
         /// <summary>
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the
         /// <see cref="UnityEditor.MenuItem"/> attribute. Use it in classes that derive from <see cref="GenericSOCreator"/>.
@@ -43,11 +45,13 @@
 
             try
             {
-                (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
+                Type genericSOType;
+                (genericSOType, _fileName) = PersistentStorage.GetGenericSODetails();
 
-                bool success = ScriptableObjectsDatabase.TryGetConcreteType(genericSOType, out Type concreteType);
+                bool success = ScriptableObjectsDatabase.TryGetConcreteType(genericSOType, out _concreteType);
                 Assert.IsTrue(success);
-                CreateAssetInteractively(concreteType, fileName);
+
+                EditorApplication.update += CreateAssetInteractively;
             }
             finally
             {
@@ -59,9 +63,10 @@
         {
             Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
 
-            if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out Type concreteComponent))
+            if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out _concreteType))
             {
-                CreateAssetInteractively(concreteComponent, fileName);
+                _fileName = fileName;
+                CreateAssetInteractively();
                 return;
             }
 
@@ -71,10 +76,33 @@
             AssetDatabase.Refresh();
         }
 
-        private static void CreateAssetInteractively(Type concreteType, string fileName)
+        private static void CreateAssetInteractively()
         {
-            var asset = ScriptableObject.CreateInstance(concreteType);
-            AssetCreator.Create(asset, $"{fileName}.asset");
+            // If CreateAssetInteractively is called too early, editor styles are not initialized yet and throw
+            // NullReference exception. It usually takes one frame to initialize them, so it's not an expensive action
+            // to catch the exception and proceed to create the asset in the next frame.
+            try
+            {
+                var _ = EditorStyles.toolbar;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
+
+            var asset = ScriptableObject.CreateInstance(_concreteType);
+
+            try
+            {
+                ProjectWindowUtil.CreateAsset(asset, $"{_fileName}.asset");
+            }
+            catch (NullReferenceException)
+            {
+                Debug.LogError($"{nameof(CreateAssetInteractively)} was most likely called too early. Add it to EditorApplication.delayCall instead.");
+                throw;
+            }
+
+            EditorApplication.update -= CreateAssetInteractively;
         }
     }
 }
