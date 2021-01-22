@@ -24,23 +24,10 @@
             AssetDatabase.DeleteAsset(mdbPath);
         }
 
-        private static string RemoveDLLExtension(string assemblyPath)
-        {
-            return assemblyPath.Substring(0, assemblyPath.Length - 4);
-        }
-
         public readonly struct AssemblyReplacer : IDisposable
         {
-            private readonly string _oldAssemblyPathWithoutExtension;
+            private readonly string _oldAssemblyPath;
             private readonly string _newAssemblyName;
-
-            private AssemblyReplacer(string oldAssemblyPath, string newAssemblyName)
-            {
-                _newAssemblyName = newAssemblyName;
-                _oldAssemblyPathWithoutExtension = RemoveDLLExtension(oldAssemblyPath);
-                File.Delete(oldAssemblyPath);
-                File.Delete($"{_oldAssemblyPathWithoutExtension}.dll.mdb");
-            }
 
             public static AssemblyReplacer UsingGUID(string assemblyGUID, string newAssemblyName)
             {
@@ -53,11 +40,19 @@
                 return new AssemblyReplacer(oldAssemblyPath, newAssemblyName);
             }
 
+            private AssemblyReplacer(string oldAssemblyPath, string newAssemblyName)
+            {
+                _newAssemblyName = newAssemblyName;
+                _oldAssemblyPath = oldAssemblyPath;
+                File.Delete(_oldAssemblyPath);
+                File.Delete($"{_oldAssemblyPath}.mdb");
+            }
+
             public void Dispose()
             {
                 string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{_newAssemblyName}";
-                File.Move($"{_oldAssemblyPathWithoutExtension}.dll.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
-                File.Move($"{_oldAssemblyPathWithoutExtension}.dll.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
+                File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
+                File.Move($"{_oldAssemblyPath}.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
             }
         }
     }
