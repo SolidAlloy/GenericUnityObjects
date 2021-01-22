@@ -99,12 +99,8 @@
 
         private static void UpdateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
         {
-            string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
-
-            using (AssemblyAssetOperations.AssemblyReplacer.UsingPath(assemblyPath, AssemblyName))
-            {
-                AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
-            }
+            // No need to update it using AssemblyReplacer because the name doesn't change.
+            AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
         }
     }
 }
