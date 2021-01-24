@@ -1,10 +1,7 @@
 ﻿namespace GenericUnityObjects.EditorTests.Integration
 {
-    using System;
     using System.Collections;
     using System.IO;
-    using System.Reflection;
-    using System.Runtime.Remoting.Contexts;
     using JetBrains.Annotations;
     using NUnit.Framework;
     using UnityEditor;
@@ -64,20 +61,10 @@
             Assert.AreEqual(PlayerPrefs.GetString("previousGUID"), newGUID);
         }
 
-        private bool ValidateMenuItem(string menuItem)
-        {
-            MethodInfo validateMenuItem =
-                typeof(EditorApplication).GetMethod("ValidateMenuItem", BindingFlags.Static | BindingFlags.NonPublic);
-
-            Assert.IsNotNull(validateMenuItem);
-
-            return (bool) validateMenuItem.Invoke(null, new object[] { menuItem });
-        }
-
         [Test]
         public void Adding_generic_scriptable_object_adds_an_entry_to_Assets_Create_menu()
         {
-            Assert.IsTrue(ValidateMenuItem($"Assets/Create/{IntegrationTestHelper.DefaultClassName}1<T>"));
+            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{IntegrationTestHelper.DefaultGenericClassName}1<T>"));
         }
 
         [UnityTest]
@@ -119,10 +106,7 @@
             yield return null;
             yield return new WaitForDomainReload();
 
-            string menuItem = $"Assets/Create/{IntegrationTestHelper.DefaultClassName}1<T>";
-
-            Assert.IsFalse(ValidateMenuItem(menuItem));
-            LogAssert.Expect(LogType.Error, $"ValidateMenuItem failed because there is no menu named {menuItem}");
+            AssertMenuItemDoesNotExist();
         }
 
         [UnityTest]
@@ -165,7 +149,7 @@
             yield return null;
             yield return new WaitForDomainReload();
 
-            Assert.IsTrue(ValidateMenuItem($"Assets/Create/{newMenuName}"));
+            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{newMenuName}"));
         }
 
         [UnityTest]
@@ -173,12 +157,12 @@
         {
             const string newTypeName = "NewName";
 
-            IntegrationTestHelper.ChangeTypeAndFileName(1, newTypeName);
+            IntegrationTestHelper.ChangeTypeAndFileName($"{IntegrationTestHelper.DefaultGenericClassName}1", newTypeName);
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
 
-            Assert.IsTrue(ValidateMenuItem($"Assets/Create/{newTypeName}1<T>"));
+            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{newTypeName}1<T>"));
         }
 
         [UnityTest]
@@ -191,7 +175,38 @@
             yield return null;
             yield return new WaitForDomainReload();
 
-            Assert.IsTrue(ValidateMenuItem($"Assets/Create/{IntegrationTestHelper.DefaultClassName}1<{newArgumentName}>"));
+            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{IntegrationTestHelper.DefaultGenericClassName}1<{newArgumentName}>"));
+        }
+
+        [UnityTest]
+        public IEnumerator Menu_entry_is_not_generated_for_abstract_class_with_CreateGenericAssetMenu_attribute()
+        {
+            IntegrationTestHelper.MakeAbstract($"{IntegrationTestHelper.DefaultGenericClassName}1");
+
+            yield return new WaitForDomainReload();
+            yield return null;
+            yield return new WaitForDomainReload();
+
+            AssertMenuItemDoesNotExist();
+        }
+
+        [UnityTest]
+        public IEnumerator Menu_entry_is_not_generated_for_non_generic_class_with_CreateGenericAssetMenu_attribute()
+        {
+            IntegrationTestHelper.MakeNonGeneric($"{IntegrationTestHelper.DefaultGenericClassName}1");
+
+            yield return new WaitForDomainReload();
+            yield return null;
+            yield return new WaitForDomainReload();
+
+            AssertMenuItemDoesNotExist();
+        }
+
+        private static void AssertMenuItemDoesNotExist()
+        {
+            string menuItem = $"Assets/Create/{IntegrationTestHelper.DefaultGenericClassName}1<T>";
+            Assert.IsFalse(IntegrationTestHelper.ValidateMenuItem(menuItem));
+            LogAssert.Expect(LogType.Error, $"ValidateMenuItem failed because there is no menu named {menuItem}");
         }
     }
 }

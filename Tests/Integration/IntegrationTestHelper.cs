@@ -14,7 +14,7 @@
         public const string DefaultGenericClassName = "GenericSOTest";
         public const string DefaultAssetPath = TestingDir + "/New " + DefaultGenericClassName + "1`1.asset";
 
-        private static string GetAssetPath(int number)
+        public static string GetAssetPath(int number)
         {
             return $"{TestingDir}/{DefaultGenericClassName}{number}.cs";
         }
@@ -34,6 +34,34 @@
         public static void AddArgumentScript(string argName)
         {
             File.WriteAllText($"{TestingDir}/{argName}.cs", $"[System.Serializable] public class {argName} {{ }}");
+            AssetDatabase.Refresh();
+        }
+
+        public static void MakeAbstract(string className)
+        {
+            string filePath = $"{TestingDir}/{className}.cs";
+
+            string content = File.ReadAllText(filePath);
+            int classIndex = content.IndexOf("class", StringComparison.Ordinal);
+            content = content.Substring(0, classIndex) + "abstract " +
+                      content.Substring(classIndex, content.Length - classIndex);
+
+            File.WriteAllText(filePath, content);
+            AssetDatabase.Refresh();
+        }
+
+        public static void MakeNonGeneric(string className)
+        {
+            string filePath = $"{TestingDir}/{className}.cs";
+
+            string content = File.ReadAllText(filePath);
+            int genericArgIndex = content.IndexOf("<T>", StringComparison.Ordinal);
+            int afterGenericArg = genericArgIndex + 3;
+
+            content = content.Substring(0, genericArgIndex)
+                      + content.Substring(afterGenericArg, content.Length - afterGenericArg);
+
+            File.WriteAllText(filePath, content);
             AssetDatabase.Refresh();
         }
 
