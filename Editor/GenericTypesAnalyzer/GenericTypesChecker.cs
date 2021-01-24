@@ -6,6 +6,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
+    using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using UnityEditor;
     using Object = UnityEngine.Object;
@@ -181,6 +182,9 @@
 
         protected virtual bool RemoveGenericType(GenericTypeInfo genericType)
         {
+            // 'ConcreteClass_ade148c5c4a7ea64bb9a635005ef6220' is missing the class attribute 'ExtensionOfNativeClass'!
+            LogHelper.RemoveLogEntriesByMode(LogModes.EditorErrors);
+
             DebugUtility.Log($"{typeof(TObject).Name} removed: {genericType.TypeFullName}");
             return GenerationDatabase<TObject>.RemoveGenericType(genericType, AssemblyAssetOperations.RemoveAssemblyByGUID);
         }
