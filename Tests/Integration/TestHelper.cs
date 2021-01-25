@@ -1,15 +1,15 @@
-﻿namespace GenericUnityObjects.EditorTests.Integration
+﻿namespace GenericUnityObjects.IntegrationTests
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using Editor.ScriptableObjects.SelectionWindow;
     using NUnit.Framework;
+    using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
     using Util;
-    using System.Linq;
-    using SolidUtilities.Editor.Helpers;
 
     public static class TestHelper
     {

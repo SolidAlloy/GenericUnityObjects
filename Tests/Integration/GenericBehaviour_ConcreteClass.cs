@@ -1,17 +1,17 @@
-﻿namespace GenericUnityObjects.EditorTests.Integration
+﻿namespace GenericUnityObjects.IntegrationTests
 {
     using System;
     using System.Collections;
     using System.IO;
+    using System.Linq;
     using Editor.MonoBehaviours;
     using JetBrains.Annotations;
     using NUnit.Framework;
+    using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.TestTools;
     using Util;
-    using System.Linq;
-    using SolidUtilities.Editor.Helpers;
 
     public class GenericBehaviour_ConcreteClass : ScriptableObject
     {

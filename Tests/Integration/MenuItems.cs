@@ -1,4 +1,4 @@
-﻿namespace GenericUnityObjects.EditorTests.Integration
+﻿namespace GenericUnityObjects.IntegrationTests
 {
     using System.Collections;
     using System.IO;
