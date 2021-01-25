@@ -28,7 +28,11 @@
                 return;
 
             ConcreteClassCreator<TObject>.UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass);
+
+            // 'ConcreteClass_ade148c5c4a7ea64bb9a635005ef6220' is missing the class attribute 'ExtensionOfNativeClass'!
             LogHelper.RemoveLogEntriesByMode(LogModes.EditorErrors);
+
+            // GameObject (named 'New Game Object') references runtime script in scene file. Fixing!
             LogHelper.RemoveLogEntriesByMode(LogModes.UserAndEditorWarnings);
         }
 

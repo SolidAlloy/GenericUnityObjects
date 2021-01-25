@@ -42,7 +42,7 @@
 
         private static string GetMetaFileContent(string guid)
         {
-            // Auto Reference is disabled, all platforms are enabled, and Any CPU/OS is chosen for all platforms.
+            // Auto Reference is disabled, Validate References is disabled, all platforms are enabled, and Any CPU/OS is chosen for all platforms.
             return $@"fileFormatVersion: 2
 guid: {guid}
 PluginImporter:
@@ -54,7 +54,7 @@ PluginImporter:
   isPreloaded: 0
   isOverridable: 0
   isExplicitlyReferenced: 1
-  validateReferences: 1
+  validateReferences: 0
   platformData:
   - first:
       : Any
@@ -117,7 +117,7 @@ PluginImporter:
 
         private static string GetEditorMetaContent(string guid)
         {
-            // Auto Reference is disabled, only Editor platform is enabled.
+            // Auto Reference is disabled, Validate References is disabled, only Editor platform is enabled.
             return $@"fileFormatVersion: 2
 guid: {guid}
 PluginImporter:
@@ -129,7 +129,7 @@ PluginImporter:
   isPreloaded: 0
   isOverridable: 0
   isExplicitlyReferenced: 1
-  validateReferences: 1
+  validateReferences: 0
   platformData:
   - first:
       : Any
