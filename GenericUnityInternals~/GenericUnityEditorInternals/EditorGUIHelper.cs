@@ -51,7 +51,7 @@
             Vector2 oldIconSize = EditorGUIUtility.GetIconSize();
             EditorGUIUtility.SetIconSize(new Vector2(12, 12));  // Has to be this small to fit inside a single line height ObjectField
 
-            string niceTypeName = GenericTypeCache.GetNiceTypeName(property);
+            string niceTypeName = GenericTypeHelper.GetNiceTypeName(property);
 
             switch (eventType)
             {

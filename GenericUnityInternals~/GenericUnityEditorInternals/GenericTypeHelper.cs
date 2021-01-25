@@ -6,18 +6,11 @@
     using UnityEngine;
     using Util;
 
-    internal static class GenericTypeCache
+    internal static class GenericTypeHelper
     {
-        private static readonly Dictionary<string, Type> _cachedTypes = new Dictionary<string, Type>();
-
         private static Type GetGenericType(SerializedProperty property)
         {
-            if (_cachedTypes.TryGetValue(property.type, out Type genericType))
-                return genericType;
-
-            // The method is apparently pretty performant, but caching types is still better
-            ScriptAttributeUtility.GetFieldInfoFromProperty(property, out genericType);
-            _cachedTypes.Add(property.type, genericType);
+            ScriptAttributeUtility.GetFieldInfoFromProperty(property, out Type genericType);
             return genericType;
         }
 

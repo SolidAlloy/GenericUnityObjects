@@ -66,7 +66,7 @@
             this_.m_DelegateView = GUIView.current;
             // type filter requires unqualified names for built-in types, but will prioritize them over user types, so ensure user types are namespace-qualified
 
-            this_.m_RequiredType = GenericTypeCache.GetConcreteType(requiredType).FullName;
+            this_.m_RequiredType = GenericTypeHelper.GetConcreteType(requiredType).FullName;
 
             this_.m_SearchFilter = string.Empty;
             this_.m_OriginalSelection = obj;

@@ -54,7 +54,7 @@
     <ItemGroup>
         <Compile Include="EditorGUIHelper.cs" />
         <Compile Include="GenericObjectInternalEditor.cs" />
-        <Compile Include="GenericTypeCache.cs" />
+        <Compile Include="GenericTypeHelper.cs" />
         <Compile Include="ObjectSelectorExtensions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
