@@ -39,6 +39,12 @@
                 {
                     string path = AssetDatabase.GUIDToAssetPath(iconChangeGUID);
                     var script = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
+
+                    // Something unexpected happened. The newly generated assembly was removed while the scripts were reloading.
+                    // It shouldn't stop us from setting other assemblies' icons and clearing them up in the end.
+                    if (script == null)
+                        continue;
+
                     EditorGUIUtilityProxy.SetIconForObject(script, BehaviourIcon);
                     MonoImporterProxy.CopyMonoScriptIconToImporters(script);
                 }
