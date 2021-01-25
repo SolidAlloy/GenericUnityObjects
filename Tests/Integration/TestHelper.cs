@@ -6,12 +6,15 @@
     using Editor.ScriptableObjects.SelectionWindow;
     using NUnit.Framework;
     using UnityEditor;
+    using UnityEngine;
     using Util;
+    using System.Linq;
+    using SolidUtilities.Editor.Helpers;
 
-    internal static class IntegrationTestHelper
+    public static class TestHelper
     {
         public const string TestingDir = "Assets/Testing";
-        public const string DefaultGenericClassName = "GenericSOTest";
+        public const string DefaultGenericClassName = "GenericTest";
         public const string DefaultAssetPath = TestingDir + "/New " + DefaultGenericClassName + "1`1.asset";
 
         public static string GetAssetPath(int number)
@@ -19,7 +22,7 @@
             return $"{TestingDir}/{DefaultGenericClassName}{number}.cs";
         }
 
-        public static void AddScript(int scriptNum, bool withAttribute = true, params string[] genericAssetMenuParams)
+        public static void AddScriptableObjectScript(int scriptNum, bool withAttribute = true, params string[] genericAssetMenuParams)
         {
             string usingLine = "using GenericUnityObjects;\n";
             string attributeLine = $"[CreateGenericAssetMenu({string.Join(", ", genericAssetMenuParams)})]\n";
@@ -28,6 +31,17 @@
             string content = withAttribute ? usingLine + attributeLine + classLine : usingLine + classLine;
 
             File.WriteAllText(GetAssetPath(scriptNum), content);
+            AssetDatabase.Refresh();
+        }
+
+        public static void AddBehaviourScript()
+        {
+            string usingLine = "using UnityEngine;\n";
+            string classLine = $"public class {DefaultGenericClassName}<T> : MonoBehaviour {{}}";
+
+            string content = usingLine + classLine;
+
+            File.WriteAllText($"{TestingDir}/{DefaultGenericClassName}.cs", content);
             AssetDatabase.Refresh();
         }
 
@@ -78,34 +92,36 @@
             AssetDatabase.Refresh();
         }
 
-        public static void ChangeGUID(int scriptNum)
+        public static void ChangeGUID(string className)
         {
-            string content = File.ReadAllText($"{TestingDir}/{DefaultGenericClassName}{scriptNum}.cs");
-            File.WriteAllText($"{TestingDir}/{DefaultGenericClassName}{scriptNum}`1.cs", content);
-            AssetDatabase.DeleteAsset($"{TestingDir}/{DefaultGenericClassName}{scriptNum}.cs");
+            string content = File.ReadAllText($"{TestingDir}/{className}.cs");
+            File.WriteAllText($"{TestingDir}/{className}`1.cs", content);
+            AssetDatabase.DeleteAsset($"{TestingDir}/{className}.cs");
             AssetDatabase.Refresh();
         }
 
-        public static void ChangeTypeNameOnly(int scriptNum, string newName)
+        public static void ChangeTypeNameOnly(string oldName, string newName)
         {
-            string assetPath = GetAssetPath(scriptNum);
+            string assetPath = $"{TestingDir}/{oldName}.cs";
             string content = File.ReadAllText(assetPath);
-            content = content.Replace(DefaultGenericClassName, newName);
+            content = content.Replace(oldName, newName);
             File.WriteAllText(assetPath, content);
             AssetDatabase.Refresh();
         }
 
-        public static void ChangeArgumentName(int scriptNum, string newArgumentName)
+        public static void ChangeArgumentName(string className, string newArgumentName)
         {
-            string content = File.ReadAllText(GetAssetPath(scriptNum));
+            string path = $"{TestingDir}/{className}.cs";
+
+            string content = File.ReadAllText(path);
             content = content.Replace("<T>", $"<{newArgumentName}>");
-            File.WriteAllText(GetAssetPath(scriptNum), content);
+            File.WriteAllText(path, content);
             AssetDatabase.Refresh();
         }
 
-        public static void RemoveScript(int scriptNum)
+        public static void RemoveScript(string scriptName)
         {
-            AssetDatabase.DeleteAsset(GetAssetPath(scriptNum));
+            AssetDatabase.DeleteAsset($"{TestingDir}/{scriptName}.cs");
             AssetDatabase.Refresh();
         }
 
@@ -117,41 +133,6 @@
             Assert.IsNotNull(validateMenuItem);
 
             return (bool) validateMenuItem.Invoke(null, new object[] { menuItem });
-        }
-
-        public static void AssertThatConcreteClassIsUpdated(Type genericTypeDefinition, Type argType)
-        {
-            // scriptable object of new type can be instantiated
-            var genericType = genericTypeDefinition.MakeGenericType(argType);
-            var testInstance = GenericScriptableObject.CreateInstance(genericType);
-            Assert.IsNotNull(testInstance);
-
-            // LoadAssetAtPath is not null
-            var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
-            Assert.IsNotNull(asset);
-        }
-
-        public static void AssertThatConcreteClassIsRemoved(Type argType)
-        {
-            // dll does not exist
-            Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{argType.Name}.dll"));
-
-            // LoadAssetAtPath is null
-            var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
-            Assert.IsNull(asset);
-        }
-
-        public static void AssertThatConcreteClassChanged(string newTypeName, Type argType)
-        {
-            // old dll does not exist
-            Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{argType.Name}.dll"));
-
-            // LoadAssetAtPath is null
-            var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
-            Assert.IsNull(asset);
-
-            // new type is added to menu items
-            Assert.IsTrue(ValidateMenuItem($"Assets/Create/{newTypeName}1<T>"));
         }
 
         public static void CreateFolder(string folder)
@@ -236,6 +217,98 @@
             Type type = Assembly.Load("Assembly-CSharp").GetType(typeName);
             Assert.IsNotNull(type);
             return type;
+        }
+
+        public static void AssertNumberOfLogs(int expectedErrorLogs = 0, int expectedWarningLogs = 1)
+        {
+            (int errorCount, int warningCount, int _) = LogHelper.GetCountByType();
+
+            Assert.That(errorCount, Is.EqualTo(expectedErrorLogs));
+
+            // Only one warning must exist after the type is removed:
+            // GameObject (named 'New Game Object') references runtime script in scene file. Fixing!
+            Assert.That(warningCount, Is.EqualTo(expectedWarningLogs));
+        }
+
+        public static class ScriptableObject
+        {
+            public static void AssertThatConcreteClassIsUpdated(Type genericTypeDefinition, Type argType)
+            {
+                // scriptable object of new type can be instantiated
+                var genericType = genericTypeDefinition.MakeGenericType(argType);
+                var testInstance = GenericScriptableObject.CreateInstance(genericType);
+                Assert.IsNotNull(testInstance);
+
+                // LoadAssetAtPath is not null
+                var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
+                Assert.IsNotNull(asset);
+            }
+
+            public static void AssertThatConcreteClassIsRemoved(string argName, string secondArgName = null)
+            {
+                // dll does not exist
+                Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{argName}.dll"));
+
+                if (secondArgName != null)
+                    Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{secondArgName}.dll"));
+
+                // LoadAssetAtPath is null
+                var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
+                Assert.IsNull(asset);
+            }
+
+            public static void AssertThatConcreteClassChanged(string newTypeName, Type argType)
+            {
+                // old dll does not exist
+                Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{argType.Name}.dll"));
+
+                // LoadAssetAtPath is null
+                var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
+                Assert.IsNull(asset);
+
+                // new type is added to menu items
+                Assert.IsTrue(ValidateMenuItem($"Assets/Create/{newTypeName}<T>"));
+            }
+        }
+
+        public static class Behaviour
+        {
+            public static void AssertThatConcreteClassIsUpdated(GameObject testGameObject, string className, string argName, Type argType)
+            {
+                var genericType = GetTestType($"{className}`1")
+                    .MakeGenericType(argType);
+
+                bool success = BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteType);
+                Assert.That(success, Is.True);
+                Assert.That(concreteType, Is.Not.Null);
+
+                Assert.That(testGameObject.GetGenericComponent(genericType), Is.Not.Null);
+
+                var menuPaths = Unsupported.GetSubmenus("Component");
+                Assert.That(menuPaths.Contains($"Component/Scripts/{className}<{argName}>"));
+            }
+
+            public static void AssertThatConcreteClassIsRemoved(GameObject testGameObject, string className, string fullArgName, string shortArgName)
+            {
+                Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{className}_{fullArgName}.dll"));
+
+                var menuPaths = Unsupported.GetSubmenus("Component");
+                Assert.IsFalse(menuPaths.Contains($"Component/Scripts/{className}<{shortArgName}>"));
+
+                var components = testGameObject.GetComponents<Component>();
+                Assert.That(components.Length, Is.EqualTo(2));
+                Assert.That(components[1], Is.Null);
+            }
+
+            public static void AssertThatConcreteClassChanged(GameObject testGameObject, string oldClassName, string newClassName, string fullArgName, string shortArgName)
+            {
+                AssertThatConcreteClassIsRemoved(testGameObject, oldClassName, fullArgName, shortArgName);
+
+                Assert.That(File.Exists($"{Config.AssembliesDirPath}/{newClassName}_1.dll"));
+
+                var menuPaths = Unsupported.GetSubmenus("Component");
+                Assert.That(menuPaths.Contains($"Component/Scripts/{newClassName}<T>"));
+            }
         }
     }
 }

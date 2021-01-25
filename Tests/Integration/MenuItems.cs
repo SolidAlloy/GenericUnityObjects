@@ -4,6 +4,7 @@
     using System.IO;
     using JetBrains.Annotations;
     using NUnit.Framework;
+    using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.TestTools;
@@ -11,13 +12,16 @@
 
     public class MenuItems : ScriptableObject
     {
+        private const string OneErrorLog = "OneErrorLog";
         private static readonly string _menuItemsDLLPath = $"{Config.AssembliesDirPath}/{Config.MenuItemsAssemblyName}.dll";
 
         [UnitySetUp, UsedImplicitly]
         public IEnumerator BeforeEachTest()
         {
-            Directory.CreateDirectory(IntegrationTestHelper.TestingDir);
-            IntegrationTestHelper.AddScript(1);
+            LogHelper.Clear();
+
+            Directory.CreateDirectory(TestHelper.TestingDir);
+            TestHelper.AddScriptableObjectScript(1);
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -27,7 +31,7 @@
         [UnityTearDown, UsedImplicitly]
         public IEnumerator AfterEachTest()
         {
-            AssetDatabase.DeleteAsset(IntegrationTestHelper.TestingDir);
+            AssetDatabase.DeleteAsset(TestHelper.TestingDir);
 
             DirectoryInfo dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
 
@@ -38,6 +42,17 @@
 
             AssetDatabase.Refresh();
             yield return new RecompileScripts(false);
+            yield return null;
+            yield return new RecompileScripts(false);
+
+            if (TestContext.CurrentContext.Test.Properties["Category"].Contains(OneErrorLog))
+            {
+                TestHelper.AssertNumberOfLogs(expectedErrorLogs: 1, expectedWarningLogs: 0);
+            }
+            else
+            {
+                TestHelper.AssertNumberOfLogs(expectedWarningLogs: 0);
+            }
         }
 
         [Test]
@@ -52,7 +67,7 @@
         {
             PlayerPrefs.SetString("previousGUID", AssetDatabase.AssetPathToGUID(_menuItemsDLLPath));
 
-            IntegrationTestHelper.AddScript(2);
+            TestHelper.AddScriptableObjectScript(2);
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
@@ -64,13 +79,13 @@
         [Test]
         public void Adding_generic_scriptable_object_adds_an_entry_to_Assets_Create_menu()
         {
-            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{IntegrationTestHelper.DefaultGenericClassName}1<T>"));
+            Assert.IsTrue(TestHelper.ValidateMenuItem($"Assets/Create/{TestHelper.DefaultGenericClassName}1<T>"));
         }
 
         [UnityTest]
         public IEnumerator Removing_a_single_generic_scriptable_object_removes_MenuItems_dll()
         {
-            IntegrationTestHelper.RemoveScript(1);
+            TestHelper.RemoveScript($"{TestHelper.DefaultGenericClassName}1");
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
@@ -81,12 +96,12 @@
         [UnityTest]
         public IEnumerator Removing_second_generic_scriptable_object_does_not_remove_MenuItems_dll()
         {
-            IntegrationTestHelper.AddScript(2);
+            TestHelper.AddScriptableObjectScript(2);
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
 
-            IntegrationTestHelper.RemoveScript(2);
+            TestHelper.RemoveScript($"{TestHelper.DefaultGenericClassName}2");
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -98,10 +113,10 @@
             Assert.IsTrue(File.Exists(_menuItemsDLLPath));
         }
 
-        [UnityTest]
+        [UnityTest, Category(OneErrorLog)]
         public IEnumerator Removing_generic_scriptable_object_removes_entry_from_Assets_Create_menu()
         {
-            IntegrationTestHelper.RemoveScript(1);
+            TestHelper.RemoveScript($"{TestHelper.DefaultGenericClassName}1");
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
@@ -112,7 +127,7 @@
         [UnityTest]
         public IEnumerator Removing_CreateGenericAssetMenu_attribute_from_class_removes_MenuItems_dll()
         {
-            IntegrationTestHelper.AddScript(1, false);
+            TestHelper.AddScriptableObjectScript(1, false);
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
@@ -123,14 +138,14 @@
         [UnityTest]
         public IEnumerator Adding_CreateGenericAssetMenu_attribute_to_existing_class_creates_MenuItems_dll()
         {
-            IntegrationTestHelper.RemoveScript(1);
-            IntegrationTestHelper.AddScript(2, false);
+            TestHelper.RemoveScript($"{TestHelper.DefaultGenericClassName}1");
+            TestHelper.AddScriptableObjectScript(2, false);
 
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
 
-            IntegrationTestHelper.AddScript(2, true);
+            TestHelper.AddScriptableObjectScript(2, true);
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -144,12 +159,12 @@
         {
             const string newMenuName = "New Name";
 
-            IntegrationTestHelper.AddScript(1, true, $"MenuName = \"{newMenuName}\"");
+            TestHelper.AddScriptableObjectScript(1, true, $"MenuName = \"{newMenuName}\"");
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
 
-            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{newMenuName}"));
+            Assert.IsTrue(TestHelper.ValidateMenuItem($"Assets/Create/{newMenuName}"));
         }
 
         [UnityTest]
@@ -157,12 +172,12 @@
         {
             const string newTypeName = "NewName";
 
-            IntegrationTestHelper.ChangeTypeAndFileName($"{IntegrationTestHelper.DefaultGenericClassName}1", newTypeName);
+            TestHelper.ChangeTypeAndFileName($"{TestHelper.DefaultGenericClassName}1", newTypeName);
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
 
-            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{newTypeName}1<T>"));
+            Assert.IsTrue(TestHelper.ValidateMenuItem($"Assets/Create/{newTypeName}<T>"));
         }
 
         [UnityTest]
@@ -170,18 +185,18 @@
         {
             const string newArgumentName = "TNew";
 
-            IntegrationTestHelper.ChangeArgumentName(1, newArgumentName);
+            TestHelper.ChangeArgumentName($"{TestHelper.DefaultGenericClassName}1", newArgumentName);
             yield return new WaitForDomainReload();
             yield return null;
             yield return new WaitForDomainReload();
 
-            Assert.IsTrue(IntegrationTestHelper.ValidateMenuItem($"Assets/Create/{IntegrationTestHelper.DefaultGenericClassName}1<{newArgumentName}>"));
+            Assert.IsTrue(TestHelper.ValidateMenuItem($"Assets/Create/{TestHelper.DefaultGenericClassName}1<{newArgumentName}>"));
         }
 
         [UnityTest]
         public IEnumerator Menu_entry_is_not_generated_for_abstract_class_with_CreateGenericAssetMenu_attribute()
         {
-            IntegrationTestHelper.MakeAbstract($"{IntegrationTestHelper.DefaultGenericClassName}1");
+            TestHelper.MakeAbstract($"{TestHelper.DefaultGenericClassName}1");
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -193,7 +208,7 @@
         [UnityTest]
         public IEnumerator Menu_entry_is_not_generated_for_non_generic_class_with_CreateGenericAssetMenu_attribute()
         {
-            IntegrationTestHelper.MakeNonGeneric($"{IntegrationTestHelper.DefaultGenericClassName}1");
+            TestHelper.MakeNonGeneric($"{TestHelper.DefaultGenericClassName}1");
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -204,8 +219,8 @@
 
         private static void AssertMenuItemDoesNotExist()
         {
-            string menuItem = $"Assets/Create/{IntegrationTestHelper.DefaultGenericClassName}1<T>";
-            Assert.IsFalse(IntegrationTestHelper.ValidateMenuItem(menuItem));
+            string menuItem = $"Assets/Create/{TestHelper.DefaultGenericClassName}1<T>";
+            Assert.IsFalse(TestHelper.ValidateMenuItem(menuItem));
             LogAssert.Expect(LogType.Error, $"ValidateMenuItem failed because there is no menu named {menuItem}");
         }
     }
