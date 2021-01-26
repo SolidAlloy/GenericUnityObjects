@@ -1,7 +1,5 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
-    extern alias CoreModule;
-
     using System;
     using UnityEditor;
     using UnityEditor.SearchService;

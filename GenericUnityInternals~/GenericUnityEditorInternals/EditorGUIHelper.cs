@@ -1,15 +1,37 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
-    extern alias CoreModule;
-
+    using System;
     using JetBrains.Annotations;
     using UnityEditor;
     using UnityEditor.SceneManagement;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+    public static class EditorGUILayoutHelper
+    {
+        public static Object GenericObjectField(string label, Object oldTarget, Type objType, bool allowSceneObjects)
+        {
+            EditorGUILayout.s_LastRect = EditorGUILayout.GetControlRect(
+                true,
+                EditorGUI.kSingleLineHeight,
+                (GUILayoutOption[]) null);
+
+            return EditorGUIHelper.GenericObjectField(
+                EditorGUILayout.s_LastRect,
+                EditorGUIUtility.TempContent(label),
+                oldTarget,
+                objType,
+                allowSceneObjects);
+        }
+    }
+
     public static class EditorGUIHelper
     {
+        public static Object GenericObjectField(Rect position, GUIContent label, Object oldTarget, Type objType, bool allowSceneObjects)
+        {
+            return null;
+        }
+
         [PublicAPI]
         public static void GenericObjectField(Rect position, SerializedProperty property)
         {
@@ -20,8 +42,16 @@
             EditorGUI.EndProperty();
         }
 
-        // The method is long but there's no need to refactor it further as most of the not needed stuff is removed and
-        // the real code changes are in ObjectSelector.ShowGeneric() and GetObjectFieldContent()
+        private static Object ObjectFieldInternal(Rect position, GUIContent label, Type objType, bool allowSceneObjects)
+        {
+            const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
+
+            int id = GUIUtility.GetControlID(EditorGUI.s_PPtrHash, FocusType.Keyboard, position);
+            position = EditorGUI.PrefixLabel(position, id, label);
+
+            return null;
+        }
+
         private static void ObjectFieldInternal(Rect position, SerializedProperty property, GUIContent label)
         {
             const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
@@ -33,6 +63,8 @@
 
             // Allow scene objects if the object being edited is NOT persistent
             bool allowSceneObjects = ! (objectBeingEdited == null || EditorUtility.IsPersistent(objectBeingEdited));
+
+
 
             Object obj = property.objectReferenceValue;
             Event evt = Event.current;
@@ -48,8 +80,8 @@
                 eventType = evt.type;
             }
 
-            Vector2 oldIconSize = EditorGUIUtility.GetIconSize();
-            EditorGUIUtility.SetIconSize(new Vector2(12, 12));  // Has to be this small to fit inside a single line height ObjectField
+            // Has to be this small to fit inside a single line height ObjectField
+            using var _ = new EditorGUIUtility.IconSizeScope(new Vector2(12f, 12f));
 
             string niceTypeName = GenericTypeHelper.GetNiceTypeName(property);
 
@@ -174,7 +206,6 @@
                         ObjectSelector.get.objectSelectorID == id && GUIUtility.keyboardControl == id)
                     {
                         AssignSelectedObject(property, evt);
-                        return;
                     }
 
                     break;
@@ -211,8 +242,6 @@
                     EditorGUI.EndHandleMixedValueContentColor();
                     break;
             }
-
-            EditorGUIUtility.SetIconSize(oldIconSize);
         }
 
         private static GUIContent GetObjectFieldContent(Object obj, SerializedProperty property, string niceTypeName)

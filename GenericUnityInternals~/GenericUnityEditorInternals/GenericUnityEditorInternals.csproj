@@ -11,6 +11,7 @@
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <_OutputCopyLocation>..\..\</_OutputCopyLocation>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,21 +39,37 @@
         <Reference Include="System.Core" />
         <Reference Include="System.Xml" />
         <Reference Include="UnityEditor">
-          <HintPath>C:\Program Files\Unity Editors\2020.2.1f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
+          <HintPath>C:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
-            <HintPath>C:\Program Files\Unity Editors\2020.2.1f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+            <HintPath>C:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>C:\Program Files\Unity Editors\2020.2.1f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
-            <Aliases>CoreModule</Aliases>
+            <HintPath>C:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+            <Aliases>UnityEngineCore</Aliases>
+        </Reference>
+        <Reference Include="UnityEditor.CoreModule">
+            <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
+            <Aliases>UnityEditorCore</Aliases>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
+            <Aliases>IMGUIModule</Aliases>
         </Reference>
         <Reference Include="GenericUnityObjects">
             <HintPath>..\..\..\..\Library\ScriptAssemblies\GenericUnityObjects.dll</HintPath>
         </Reference>
+        <Reference Include="SolidUtilities.Editor">
+            <HintPath>..\..\..\..\Library\ScriptAssemblies\SolidUtilities.Editor.dll</HintPath>
+        </Reference>
+        <Reference Include="SolidUtilities">
+            <HintPath>..\..\..\..\Library\ScriptAssemblies\SolidUtilities.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="AssemblyInfo.cs" />
         <Compile Include="EditorGUIHelper.cs" />
+        <Compile Include="InternalMonoImporterEditor.cs" />
         <Compile Include="GenericObjectInternalEditor.cs" />
         <Compile Include="GenericTypeHelper.cs" />
         <Compile Include="ObjectSelectorExtensions.cs" />
