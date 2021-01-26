@@ -7,17 +7,13 @@
 
     internal static class GenericTypeHelper
     {
-        private static Type GetGenericType(SerializedProperty property)
+        public static Type GetGenericType(SerializedProperty property)
         {
             ScriptAttributeUtility.GetFieldInfoFromProperty(property, out Type genericType);
             return genericType;
         }
 
-        public static string GetNiceTypeName(SerializedProperty property)
-        {
-            Type genericType = GetGenericType(property);
-            return TypeUtility.GetGenericTypeNameWithBrackets(genericType);
-        }
+        public static string GetNiceTypeName(Type genericType) => TypeUtility.GetGenericTypeNameWithBrackets(genericType);
 
         public static Type GetConcreteType(Type genericType)
         {

@@ -9,16 +9,8 @@
 
     internal static class ObjectSelectorExtensions
     {
-        public static void ShowGeneric(this ObjectSelector this_, SerializedProperty property, bool allowSceneObjects, string niceTypeName)
+        public static void ShowGeneric(this ObjectSelector this_, Object obj, Object objectBeingEdited, Type requiredType, bool allowSceneObjects, string niceTypeName)
         {
-            ScriptAttributeUtility.GetFieldInfoFromProperty(property, out Type requiredType);
-
-            // Don't select anything on multi selection
-            Object obj = property.hasMultipleDifferentValues ? null : property.objectReferenceValue;
-
-            Object objectBeingEdited = property.serializedObject.targetObject;
-            this_.m_EditedProperty = property;
-
             this_.m_ObjectSelectorReceiver = null;
             this_.m_IsShowingAssets = true;
             this_.m_SkipHiddenPackages = true;

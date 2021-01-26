@@ -3,33 +3,14 @@
     using System;
     using JetBrains.Annotations;
     using UnityEditor;
-    using UnityEditor.SceneManagement;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
-    public static class EditorGUILayoutHelper
-    {
-        public static Object GenericObjectField(string label, Object oldTarget, Type objType, bool allowSceneObjects)
-        {
-            EditorGUILayout.s_LastRect = EditorGUILayout.GetControlRect(
-                true,
-                EditorGUI.kSingleLineHeight,
-                (GUILayoutOption[]) null);
-
-            return EditorGUIHelper.GenericObjectField(
-                EditorGUILayout.s_LastRect,
-                EditorGUIUtility.TempContent(label),
-                oldTarget,
-                objType,
-                allowSceneObjects);
-        }
-    }
-
     public static class EditorGUIHelper
     {
-        public static Object GenericObjectField(Rect position, GUIContent label, Object oldTarget, Type objType, bool allowSceneObjects)
+        public static Object GenericObjectField(Rect position, GUIContent label, Object currentTarget, Type objType, bool allowSceneObjects)
         {
-            return null;
+            return ObjectFieldInternal(position, label, currentTarget, allowSceneObjects, new ObjectFieldHelper(objType));
         }
 
         [PublicAPI]
@@ -42,31 +23,25 @@
             EditorGUI.EndProperty();
         }
 
-        private static Object ObjectFieldInternal(Rect position, GUIContent label, Type objType, bool allowSceneObjects)
-        {
-            const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
-
-            int id = GUIUtility.GetControlID(EditorGUI.s_PPtrHash, FocusType.Keyboard, position);
-            position = EditorGUI.PrefixLabel(position, id, label);
-
-            return null;
-        }
-
         private static void ObjectFieldInternal(Rect position, SerializedProperty property, GUIContent label)
         {
-            const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
-
-            int id = GUIUtility.GetControlID(EditorGUI.s_PPtrHash, FocusType.Keyboard, position);
-            position = EditorGUI.PrefixLabel(position, id, label);
-
             Object objectBeingEdited = property.serializedObject.targetObject;
 
             // Allow scene objects if the object being edited is NOT persistent
             bool allowSceneObjects = ! (objectBeingEdited == null || EditorUtility.IsPersistent(objectBeingEdited));
 
+            property.objectReferenceValue = ObjectFieldInternal(position, label, property.objectReferenceValue, 
+                allowSceneObjects, new ObjectFieldHelper(property));
+        }
 
+        private static Object ObjectFieldInternal(Rect position, GUIContent label, Object currentTarget, 
+            bool allowSceneObjects, ObjectFieldHelper helper)
+        {
+            const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
 
-            Object obj = property.objectReferenceValue;
+            int id = GUIUtility.GetControlID(EditorGUI.s_PPtrHash, FocusType.Keyboard, position);
+            position = EditorGUI.PrefixLabel(position, id, label);
+
             Event evt = Event.current;
             EventType eventType;
 
@@ -83,7 +58,9 @@
             // Has to be this small to fit inside a single line height ObjectField
             using var _ = new EditorGUIUtility.IconSizeScope(new Vector2(12f, 12f));
 
-            string niceTypeName = GenericTypeHelper.GetNiceTypeName(property);
+            string niceTypeName = GenericTypeHelper.GetNiceTypeName(helper.ObjType);
+
+            Object newTarget = currentTarget;
 
             switch (eventType)
             {
@@ -106,8 +83,7 @@
                         break;
 
                     Object[] references = DragAndDrop.objectReferences;
-                    Object validatedObject = ValidateObjectFieldAssignment(references, property,
-                        EditorGUI.ObjectFieldValidatorOptions.None);
+                    Object validatedObject = helper.ValidateObjectFieldAssignment(references, EditorGUI.ObjectFieldValidatorOptions.None);
 
                     if (validatedObject != null)
                     {
@@ -122,7 +98,7 @@
                     DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
                     if (eventType == EventType.DragPerform)
                     {
-                        property.objectReferenceValue = validatedObject;
+                        newTarget = validatedObject;
 
                         GUI.changed = true;
                         DragAndDrop.AcceptDrag();
@@ -142,10 +118,9 @@
 
                     if (Event.current.button == 1)
                     {
-                        Object actualObject = property.objectReferenceValue;
                         var contextMenu = new GenericMenu();
                         contextMenu.AddItem(GUIContent.Temp("Properties..."), false,
-                            () => PropertyEditor.OpenPropertyEditor(actualObject));
+                            () => PropertyEditor.OpenPropertyEditor(currentTarget));
                         contextMenu.DropDown(position);
                     }
 
@@ -160,7 +135,7 @@
                     if (buttonRect.Contains(Event.current.mousePosition) && GUI.enabled)
                     {
                         GUIUtility.keyboardControl = id;
-                        ObjectSelector.get.ShowGeneric(property, allowSceneObjects, niceTypeName);
+                        helper.ShowObjectSelector(allowSceneObjects, niceTypeName, currentTarget);
                         ObjectSelector.get.objectSelectorID = id;
 
                         evt.Use();
@@ -169,7 +144,7 @@
                         break;
                     }
 
-                    Object actualTargetObject = property.objectReferenceValue;
+                    Object actualTargetObject = currentTarget;
 
                     if (EditorGUI.showMixedValue)
                     {
@@ -191,7 +166,7 @@
                     // Double click opens the asset in external app or changes selection to referenced object
                     else if (Event.current.clickCount == 2)
                     {
-                        if (actualTargetObject)
+                        if (actualTargetObject != null)
                         {
                             AssetDatabase.OpenAsset(actualTargetObject);
                             GUIUtility.ExitGUI();
@@ -205,7 +180,11 @@
                     if (evt.commandName == ObjectSelector.ObjectSelectorUpdatedCommand &&
                         ObjectSelector.get.objectSelectorID == id && GUIUtility.keyboardControl == id)
                     {
-                        AssignSelectedObject(property, evt);
+                        newTarget = helper.ValidateObjectFieldAssignment(
+                            new[] { ObjectSelector.GetCurrentObject() },
+                            EditorGUI.ObjectFieldValidatorOptions.None);
+                        GUI.changed = true;
+                        evt.Use();
                     }
 
                     break;
@@ -216,7 +195,7 @@
                     if (evt.keyCode == KeyCode.Backspace ||
                         (evt.keyCode == KeyCode.Delete && (evt.modifiers & EventModifiers.Shift) == 0))
                     {
-                        property.objectReferenceValue = null;
+                        newTarget = null;
                         GUI.changed = true;
                         evt.Use();
                     }
@@ -225,7 +204,7 @@
                     // otherwise the Inspector will maximize upon pressing space.
                     if (evt.MainActionKeyForControl(id))
                     {
-                        ObjectSelector.get.ShowGeneric(property, allowSceneObjects, niceTypeName);
+                        helper.ShowObjectSelector(allowSceneObjects, niceTypeName, currentTarget);
                         ObjectSelector.get.objectSelectorID = id;
                         evt.Use();
                         GUIUtility.ExitGUI();
@@ -233,7 +212,7 @@
 
                     break;
                 case EventType.Repaint:
-                    GUIContent objectFieldContent = GetObjectFieldContent(obj, property, niceTypeName);
+                    GUIContent objectFieldContent = helper.GetObjectFieldContent(currentTarget, niceTypeName);
                     EditorGUI.BeginHandleMixedValueContentColor();
                     EditorStyles.objectField.Draw(position, objectFieldContent, id, DragAndDrop.activeControlID == id, position.Contains(Event.current.mousePosition));
 
@@ -242,74 +221,8 @@
                     EditorGUI.EndHandleMixedValueContentColor();
                     break;
             }
-        }
 
-        private static GUIContent GetObjectFieldContent(Object obj, SerializedProperty property, string niceTypeName)
-        {
-            if (EditorGUI.showMixedValue)
-            {
-                return EditorGUI.s_MixedValueContent;
-            }
-
-            // If obj is null, we have to rely on
-            // property.objectReferenceStringValue to display None/Missing and the
-            // correct type. But if not, EditorGUIUtility.ObjectContent is more reliable.
-            // It can take a more specific object type specified as argument into account,
-            // and it gets the icon at the same time.
-            if (obj == null)
-            {
-                return EditorGUIUtility.TempContent($"None ({niceTypeName})");
-            }
-
-            if (ValidateObjectFieldAssignment(new[] { obj }, property, EditorGUI.ObjectFieldValidatorOptions.ExactObjectTypeValidation) == null)
-                return EditorGUI.s_TypeMismatch;
-
-            EditorGUIUtility.s_ObjectContent.text = $"{obj.name} ({niceTypeName})";
-            EditorGUIUtility.s_ObjectContent.image = EditorGUIUtility.GetSkinnedIcon(AssetPreview.GetMiniThumbnail(obj));
-            GUIContent temp = EditorGUIUtility.s_ObjectContent;
-
-            if (EditorSceneManager.preventCrossSceneReferences && EditorGUI.CheckForCrossSceneReferencing(obj, property.serializedObject.targetObject))
-            {
-                if (EditorApplication.isPlaying)
-                {
-                    temp.text += $" ({EditorGUI.GetGameObjectFromObject(obj).scene.name})";
-                }
-                else
-                {
-                    return EditorGUI.s_SceneMismatch;
-                }
-            }
-
-            return temp;
-        }
-
-        private static Object ValidateObjectFieldAssignment(Object[] references, SerializedProperty property, EditorGUI.ObjectFieldValidatorOptions options)
-        {
-            if (references.Length == 0)
-                return null;
-
-            if (references[0] == null || ! EditorGUI.ValidateObjectReferenceValue(property, references[0], options))
-                return null;
-
-            if (EditorSceneManager.preventCrossSceneReferences &&
-                EditorGUI.CheckForCrossSceneReferencing(references[0], property.serializedObject.targetObject))
-            {
-                return null;
-            }
-
-            return references[0];
-        }
-
-        private static void AssignSelectedObject(SerializedProperty property, Event evt)
-        {
-            Object[] references = { ObjectSelector.GetCurrentObject() };
-            Object assigned = ValidateObjectFieldAssignment(references, property, EditorGUI.ObjectFieldValidatorOptions.None);
-
-            // Assign the value
-            property.objectReferenceValue = assigned;
-
-            GUI.changed = true;
-            evt.Use();
+            return newTarget;
         }
     }
 }

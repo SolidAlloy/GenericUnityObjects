@@ -1,18 +1,15 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
-    extern alias UnityEditorCore;
-    extern alias UnityEngineCore;
-    extern alias IMGUIModule;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using SolidUtilities.Editor.Extensions;
-    using UnityEditorCore::UnityEditor;
+    using UnityEditor;
     using UnityEditorInternal;
-    using UnityEngineCore::UnityEngine;
-    using Object = UnityEngineCore::UnityEngine.Object;
+    using UnityEngine;
     using SolidUtilities.Extensions;
+    using Object = UnityEngine.Object;
 
     internal readonly struct ObjectField
     {
@@ -26,7 +23,8 @@
         }
     }
 
-    internal class InternalMonoImporterEditor : MonoScriptImporterInspector
+    [CustomEditor(typeof(MonoImporter))]
+    internal class GenericMonoImporterInspector : MonoScriptImporterInspector
     {
         private MonoImporter _targetImporter;
         private bool _isTypeCompatible;
@@ -74,7 +72,7 @@
                     var field = _objectFields[i];
 
                     Object oldTarget = _targetImporter.GetDefaultReference(field.Name);
-                    Object newTarget = EditorGUILayout.ObjectField(ObjectNames.NicifyVariableName(field.Name), oldTarget, field.Type, false);
+                    Object newTarget = ObjectField(oldTarget, field);
                     didModify |= oldTarget != newTarget;
 
                     _newTargets[i] = newTarget;

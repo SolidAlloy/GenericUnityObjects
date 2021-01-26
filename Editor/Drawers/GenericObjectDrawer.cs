@@ -1,9 +1,11 @@
 ﻿namespace GenericUnityObjects.Editor
 {
+    using System;
     using JetBrains.Annotations;
     using UnityEditor;
     using UnityEditorInternals;
     using UnityEngine;
+    using Object = UnityEngine.Object;
 
     public static class GenericObjectDrawer
     {
@@ -24,6 +26,24 @@
             {
                 EditorGUI.PropertyField(rect, property);
             }
+        }
+
+        [PublicAPI]
+        public static Object ObjectField(Rect rect, GUIContent label, Object currentTarget, Type objType,
+            bool allowSceneObjects)
+        {
+            return objType.IsGenericType
+                ? EditorGUIHelper.GenericObjectField(rect, label, currentTarget, objType, allowSceneObjects)
+                : EditorGUI.ObjectField(rect, label, currentTarget, objType, allowSceneObjects);
+        }
+
+        [PublicAPI]
+        public static Object ObjectField(string label, Object currentTarget, Type objType,
+            bool allowSceneObjects)
+        {
+            return objType.IsGenericType
+                ? EditorGUILayoutHelper.GenericObjectField(label, currentTarget, objType, allowSceneObjects)
+                : EditorGUILayout.ObjectField(label, currentTarget, objType, allowSceneObjects);
         }
     }
 }
