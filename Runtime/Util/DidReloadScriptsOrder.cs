@@ -1,10 +1,9 @@
 ﻿namespace GenericUnityObjects.Util
 {
-    internal enum DidReloadScriptsOrder
+    public enum DidReloadScriptsOrder
     {
         BeforeAssemblyGeneration = 1,
         AssemblyGeneration = 2,
-        AfterAssemblyGeneration = 3,
-        UnityObjectCreation = 4
+        AfterAssemblyGeneration = 3
     }
 }

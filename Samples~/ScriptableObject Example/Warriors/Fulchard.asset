@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c74ad55232f4ce680f3fc54c402e7a3, type: 3}
+  m_Name: Fulchard
+  m_EditorClassIdentifier: 
+  _hasMeleeAttack: 1
+  _hasRangedAttack: 0
+  _hasAOEAttack: 0
+  Stats: {fileID: 11400000, guid: 86fdcf4314685a54a8d82bfdc0b47977, type: 2}

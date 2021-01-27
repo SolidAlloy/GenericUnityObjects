@@ -19,9 +19,9 @@
   },
   "samples": [
     {
-      "displayName": "Usage Example",
-      "description": "A scene that shows how generic scriptable objects can be implemented and used",
-      "path": "Samples~/Usage Example"
+      "displayName": "ScriptableObject Example",
+      "description": "An example that shows how generic scriptable objects can be implemented and used",
+      "path": "Samples~/ScriptableObject Example"
     }
   ],
   "type": "tool"

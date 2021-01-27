@@ -1,1 +1,0 @@
-namespace GenericScriptableObjects.Usage_Example.ConcreteImplementations { public class WarriorStats_1_Archer : GenericScriptableObjects.Usage_Example.WarriorStats<GenericScriptableObjects.Usage_Example.Classes.Archer> { } }

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000e287a106e415e95a3c215d416486b, type: 3}
+  m_Name: Edun
+  m_EditorClassIdentifier: 
+  _hasMeleeAttack: 0
+  _hasRangedAttack: 1
+  _hasAOEAttack: 0
+  Stats: {fileID: 11400000, guid: 256faa2df31684647a9a313711568c1d, type: 2}
