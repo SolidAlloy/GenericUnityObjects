@@ -23,11 +23,12 @@
       "description": "An example that shows how generic scriptable objects can be implemented and used",
       "path": "Samples~/ScriptableObject Example"
     },
-	{
+    {
       "displayName": "MonoBehaviour Example",
       "description": "An example that shows how generic MonoBehaviours can be implemented and used",
       "path": "Samples~/MonoBehaviour Example"
     }
   ],
-  "type": "tool"
+  "type": "tool",
+  "unity": "2020.2"
 }
