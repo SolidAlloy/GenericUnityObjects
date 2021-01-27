@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
@@ -38,6 +39,14 @@
                     }
 
                     string assemblyPath = AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID);
+
+                    // This means the assembly was physically removed, so it shouldn't be in the database anymore.
+                    if ( ! File.Exists(assemblyPath))
+                    {
+                        GenerationDatabase<TObject>.RemoveConcreteClass(behaviourInfo, concreteClass);
+                        continue;
+                    }
+
                     var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
 
                     // There was once NullReferenceReference here because Unity lost a MonoScript asset connected to

@@ -66,7 +66,7 @@
 
         public void AddConcreteClassImpl(GenericTypeInfo genericTypeInfo, ArgumentInfo[] arguments, string assemblyGUID)
         {
-            if (!_genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+            if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
             {
                 throw new KeyNotFoundException($"Cannot add a concrete class to a generic Unity.Object '{genericTypeInfo}' because it is not present in the database.");
             }
@@ -134,6 +134,21 @@
             }
 
             EditorUtility.SetDirty(this);
+        }
+
+        public static void RemoveConcreteClass(GenericTypeInfo genericTypeInfo, ConcreteClass concreteClass)
+        {
+            Instance.RemoveConcreteClassImpl(genericTypeInfo, concreteClass);
+        }
+
+        public void RemoveConcreteClassImpl(GenericTypeInfo genericTypeInfo, ConcreteClass concreteClass)
+        {
+            if ( ! _genericTypeArgumentsDict.TryGetValue(genericTypeInfo, out List<ConcreteClass> concreteClasses))
+            {
+                throw new KeyNotFoundException($"Failed to find generic Unity.Object '{genericTypeInfo}' in the database.");
+            }
+
+            concreteClasses.Remove(concreteClass);
         }
 
         public static bool RemoveGenericType(GenericTypeInfo genericTypeInfo, [CanBeNull] Action<string> removeAssembly)
