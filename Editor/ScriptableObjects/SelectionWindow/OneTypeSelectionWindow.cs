@@ -4,6 +4,7 @@
     using SolidUtilities.Editor.Extensions;
     using TypeReferences;
     using TypeReferences.Editor.TypeDropdown;
+    using Util;
 
     /// <summary>
     /// A window that shows the type selection dropdown immediately after the creation,
@@ -32,12 +33,7 @@
 
             _guiWasSetUp = true;
 
-            TypeOptionsAttribute typeOptionsAttribute = _genericParamConstraints.Length == 0
-                ? new TypeOptionsAttribute()
-                : new InheritsAttribute(_genericParamConstraints) { ExpandAllFolders = true };
-
-            typeOptionsAttribute.ExcludeNone = true;
-
+            var typeOptionsAttribute = new NonGenericAttribute(_genericParamConstraints);
             var dropdownDrawer = new CenteredTypeDropdownDrawer(null, typeOptionsAttribute, null);
             _dropdownWindow = dropdownDrawer.Draw(type => OnTypeSelected(new[] { type }));
 

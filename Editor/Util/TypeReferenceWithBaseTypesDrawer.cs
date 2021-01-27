@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
-    using System.Collections.Generic;
     using GenericUnityObjects.Util;
     using TypeReferences;
     using TypeReferences.Editor.Drawers;
@@ -24,13 +23,10 @@
             DrawTypeReferenceField(position, property);
         }
 
-        private static TypeOptionsAttribute GetAttribute(SerializedProperty property)
+        private static NonGenericAttribute GetAttribute(SerializedProperty property)
         {
             SerializedProperty baseTypesProperty =
                 property.FindPropertyRelative(nameof(TypeReferenceWithBaseTypes.BaseTypeNames));
-
-            if (baseTypesProperty.arraySize == 0)
-                return TypeOptionsAttribute.Default;
 
             var baseTypes = new Type[baseTypesProperty.arraySize];
 
@@ -41,15 +37,12 @@
                 baseTypes[i] = baseType;
             }
 
-            return new InheritsAttribute(baseTypes) { ExpandAllFolders = true };
+            return new NonGenericAttribute(baseTypes);
         }
 
         private void DrawTypeReferenceField(Rect position, SerializedProperty property)
         {
-            TypeOptionsAttribute typeOptionsAttribute = GetAttribute(property);
-            typeOptionsAttribute.ExcludeNone = true;
-            typeOptionsAttribute.IncludeAdditionalAssemblies = _additionalAssemblies;
-            typeOptionsAttribute.ShortName = true;
+            NonGenericAttribute typeOptionsAttribute = GetAttribute(property);
 
             var serializedTypeRef = new SerializedTypeReference(property);
 
