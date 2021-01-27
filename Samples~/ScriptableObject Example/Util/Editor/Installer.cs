@@ -38,7 +38,7 @@ namespace GenericUnityObjects.ScriptableObject_Example.Editor
                 new KeyValuePair<Type, Type[]>(typeof(WarriorsRelationship<,>), new[] { typeof(Berserker), typeof(Knight) }),
             };
 
-            ExampleInstaller.InstallScriptableObjects(typesToAdd, CreateScriptableObjects);
+            ExampleInstaller.AddConcreteClasses<GenericScriptableObject>(typesToAdd, CreateScriptableObjects);
         }
 
         private static string FindExampleFolder()

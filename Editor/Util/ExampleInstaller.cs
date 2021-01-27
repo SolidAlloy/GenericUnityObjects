@@ -6,19 +6,25 @@
     using JetBrains.Annotations;
     using UnityEditor;
     using UnityEngine.Events;
+    using Object = UnityEngine.Object;
 
     public static class ExampleInstaller
     {
         [UsedImplicitly]
-        public static void InstallScriptableObjects(KeyValuePair<Type, Type[]>[] typesToAdd, UnityAction afterAddingTypes)
+        public static void AddConcreteClasses<TObject>(KeyValuePair<Type, Type[]>[] typesToAdd, UnityAction afterAddingTypes)
+            where TObject : Object
         {
-            foreach (var pair in typesToAdd)
+            using (new DisabledAssetDatabase(null))
             {
-                ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(pair.Key, pair.Value);
+                foreach (var pair in typesToAdd)
+                {
+                    ConcreteClassCreator<TObject>.CreateConcreteClass(pair.Key, pair.Value);
+                }
             }
 
-            PersistentStorage.ExecuteOnScriptsReload(afterAddingTypes);
             AssetDatabase.Refresh();
+
+            PersistentStorage.ExecuteOnScriptsReload(afterAddingTypes);
         }
     }
 }

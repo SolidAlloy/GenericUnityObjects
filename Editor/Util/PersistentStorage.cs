@@ -46,10 +46,15 @@
         [DidReloadScripts((int)DidReloadScriptsOrder.AfterAssemblyGeneration)]
         private static void OnScriptsReload()
         {
-            Instance._afterReloadEvent.Invoke();
-
-            if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
-                Instance._afterReloadEvent = new UnityEvent();
+            try
+            {
+                Instance._afterReloadEvent.Invoke();
+            }
+            finally
+            {
+                if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
+                    Instance._afterReloadEvent = new UnityEvent();
+            }
         }
 
         public static void SaveForScriptsReload(Type genericTypeToCreate, string fileName)
