@@ -19,21 +19,12 @@
         [PublicAPI, CanBeNull, Pure]
         public static new ScriptableObject CreateInstance(Type type)
         {
-            if ( ! type.IsGenericType)
-                return ScriptableObject.CreateInstance(type);
+            var instance = TryCreateInstance(type);
 
-            if (ScriptableObjectsDatabase.TryGetConcreteType(type, out Type concreteType))
-                return ScriptableObject.CreateInstance(concreteType);
+            if ( ! (instance is null))
+                return instance;
 
-            concreteType = GeneratedUnityObjectCache.GetSOClass(type);
-            if (concreteType != null)
-                return ScriptableObject.CreateInstance(concreteType);
-
-            Debug.LogWarning($"There is no {type.GetGenericTypeDefinition()} derivative with type parameters " +
-                             $"{string.Join(", ", type.GetGenericArguments().Select(typeParam => typeParam.Name))} " +
-                             "and a type cannot be created dynamically in an IL2CPP build. " +
-                             "Please create an asset with such type parameters once to be able to create it from code.");
-
+            Debug.LogWarning(GetErrorText(type));
             return null;
         }
 
@@ -47,6 +38,40 @@
             where T : ScriptableObject
         {
             return (T) CreateInstance(typeof(T));
+        }
+
+        public static ScriptableObject CreateInstanceStrict(Type type)
+        {
+            ScriptableObject instance = TryCreateInstance(type);
+
+            // ReSharper disable once Unity.NoNullCoalescing
+            return instance ?? throw new NotSupportedException(GetErrorText(type));
+        }
+
+        public static T CreateInstanceStrict<T>() where T : ScriptableObject
+        {
+            return (T) CreateInstanceStrict(typeof(T));
+        }
+
+        private static string GetErrorText(Type type)
+        {
+            return $"There is no {type.GetGenericTypeDefinition()} derivative with type parameters " +
+                   $"{string.Join(", ", type.GetGenericArguments().Select(typeParam => typeParam.Name))} " +
+                   "and a type cannot be created dynamically in an IL2CPP build. " +
+                   "Please create an asset with such type parameters once to be able to create it from code.";
+        }
+
+        [CanBeNull]
+        private static ScriptableObject TryCreateInstance(Type type)
+        {
+            if ( ! type.IsGenericType)
+                return ScriptableObject.CreateInstance(type);
+
+            if (ScriptableObjectsDatabase.TryGetConcreteType(type, out Type concreteType))
+                return ScriptableObject.CreateInstance(concreteType);
+
+            concreteType = GeneratedUnityObjectCache.GetSOClass(type);
+            return concreteType != null ? ScriptableObject.CreateInstance(concreteType) : null;
         }
     }
 }
