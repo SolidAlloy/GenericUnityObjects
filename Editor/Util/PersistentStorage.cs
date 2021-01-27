@@ -4,7 +4,10 @@
     using GenericUnityObjects.Util;
     using TypeReferences;
     using UnityEditor;
+    using UnityEditor.Callbacks;
+    using UnityEditor.Events;
     using UnityEngine;
+    using UnityEngine.Events;
 
     /// <summary>
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
@@ -30,29 +33,32 @@
             }
         }
 
-        [SerializeField] private bool _usageExampleTypesAreAdded;
+        [SerializeField] private UnityEvent _afterReloadEvent = new UnityEvent();
 
-        public static bool UsageExampleTypesAreAdded
+        public static void ExecuteOnScriptsReload(UnityAction action)
         {
-            get => Instance._usageExampleTypesAreAdded;
-            set
-            {
-                Instance._usageExampleTypesAreAdded = value;
-                EditorUtility.SetDirty(Instance);
-            }
+            UnityEventTools.AddVoidPersistentListener(Instance._afterReloadEvent, action);
+            int lastListener = Instance._afterReloadEvent.GetPersistentEventCount() - 1;
+            Instance._afterReloadEvent.SetPersistentListenerState(lastListener, UnityEventCallState.EditorAndRuntime);
+            EditorUtility.SetDirty(Instance);
         }
 
-        public static bool NeedsSOCreation => Instance._genericSOType?.Type != null;
+        [DidReloadScripts((int)DidReloadScriptsOrder.AfterAssemblyGeneration)]
+        private static void OnScriptsReload()
+        {
+            Instance._afterReloadEvent.Invoke();
 
-        public static bool NeedsBehaviourCreation => Instance._genericBehaviourType?.Type != null;
+            if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
+                Instance._afterReloadEvent = new UnityEvent();
+        }
 
-        public static void SaveForAssemblyReload(Type genericTypeToCreate, string fileName)
+        public static void SaveForScriptsReload(Type genericTypeToCreate, string fileName)
         {
             Instance._genericSOType = genericTypeToCreate;
             Instance._fileName = fileName;
         }
 
-        public static void SaveForAssemblyReload(GameObject gameObject, Type genericType)
+        public static void SaveForScriptsReload(GameObject gameObject, Type genericType)
         {
             Instance._gameObject = gameObject;
             Instance._genericBehaviourType = genericType;

@@ -37,12 +37,8 @@
             });
         }
 
-        [DidReloadScripts((int)DidReloadScriptsOrder.UnityObjectCreation)]
-        private static void OnScriptsReload()
+        private static void FinishSOCreation()
         {
-            if ( ! PersistentStorage.NeedsSOCreation)
-                return;
-
             try
             {
                 Type genericSOType;
@@ -70,7 +66,8 @@
                 return;
             }
 
-            PersistentStorage.SaveForAssemblyReload(genericType, fileName);
+            PersistentStorage.SaveForScriptsReload(genericType, fileName);
+            PersistentStorage.ExecuteOnScriptsReload(FinishSOCreation);
 
             ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();

@@ -22,19 +22,17 @@
                 return;
             }
 
-            PersistentStorage.SaveForAssemblyReload(gameObject, genericType);
+            PersistentStorage.SaveForScriptsReload(gameObject, genericType);
+            PersistentStorage.ExecuteOnScriptsReload(FinishBehaviourCreation);
+
             DestroySelectorComponent(gameObject, selectorComponentType);
 
             ConcreteClassCreator<MonoBehaviour>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();
         }
 
-        [DidReloadScripts((int)DidReloadScriptsOrder.UnityObjectCreation)]
-        private static void OnScriptsReload()
+        private static void FinishBehaviourCreation()
         {
-            if ( ! PersistentStorage.NeedsBehaviourCreation)
-                return;
-
             try
             {
                 (GameObject gameObject, Type genericType) = PersistentStorage.GetGenericBehaviourDetails();
