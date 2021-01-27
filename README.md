@@ -1,18 +1,14 @@
-# Generic ScriptableObjects
-[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-scriptable-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericScriptableObjects/blob/main/LICENSE)
+# Generic Unity.Objects
+[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-scriptable-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericScriptableObjects/blob/main/LICENSE) ![Unity: 2020.2](https://img.shields.io/badge/unity-2020.2-yellow)
 
-This package allows to create and use generic ScriptableObjects in Unity3D. Although generic serializable classes are now supported by Unity 2020, generic ScriptableObject and MonoBehaviour are not yet, and this plugin allows to overcome this limitation.
+This package allows to create and use generic ScriptableObjects and MonoBehaviours in Unity3D. Although generic serializable classes are now supported by Unity 2020, generic ScriptableObject and MonoBehaviour are not yet, and this plugin allows to overcome this limitation.
 
 **What you can do with it:**
 
-- Implement your own generic ScriptableObjects (e.g. `Generic<T>`).
-- Create them from a context menu (similarly to the `[CreateAssetMenu]` attribute) and choose the generic argument type in the process.
-- Create object fields for the generic ScriptableObjects and drag-and-drop the created assets to those fields.
-- Instantiate generic ScriptableObjects from scripts (but see the limitations.)
-
-**What you cannot do:**
-
-- Instantiate a generic ScriptableObject from script if you haven't created a single asset of this scriptable object with such generic arguments (e.g. you are trying to instantiate `Generic<int>` but you haven't created a single `Generic<int>` asset yet.)
+- Implement generic classes that inherit from ScriptableObject or MonoBehaviour (e.g. `class GenericBehaviour<T> : MonoBehaviour { }`).
+- Create assets/components from a context menu and choose the generic argument type in the process.
+- Create object fields for generic Unity.Objects and assigned created assets/components to those fields.
+- Instantiate generic Unity.Objects from scripts (but see the limitations.)
 
 ## How To Install
 
@@ -21,7 +17,7 @@ This package allows to create and use generic ScriptableObjects in Unity3D. Alth
 Once you have the OpenUPM cli, run the following command:
 
 ```
-openupm install com.solidalloy.generic-scriptable-objects
+openupm install com.solidalloy.generic-unity-objects
 ```
 
 Or if you don't have it, add the scoped registry to manifest.json with the desired dependency semantic version:
@@ -34,13 +30,13 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
       "scopes": [
         "com.solidalloy.util",
         "com.solidalloy.type.references",
-        "com.solidalloy.generic-scriptable-objects",
+        "com.solidalloy.generic-unity-objects",
         "com.openupm"
       ]
     }
   ],
   "dependencies": {
-    "com.solidalloy.generic-scriptable-objects": "1.0.0"
+    "com.solidalloy.generic-unity-objects": "1.15.0"
   },
 ```
 
@@ -55,20 +51,21 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 3. Enter "https://github.com/SolidAlloy/SolidUtilities.git" and press **Add**.
 4. Do the same with two more packages:
    - https://github.com/SolidAlloy/ClassTypeReference-for-Unity.git
-   - https://github.com/SolidAlloy/GenericScriptableObjects.git
+   - https://github.com/SolidAlloy/GenericUnityObjects.git
 
 
 
-## Usage
+## Generic ScriptableObject Usage
 
 #### Implementing a generic ScriptableObject
 
 To create a generic ScriptableObject, you need to derive the class from `GenericScriptableObject`:
 
 ```csharp
+using System;
 using GenericScriptableObjects;
 
-[System.Serializable]
+[Serializable]
 public class WarriorStats<TClass> : GenericScriptableObject
     where TClass : Class
 {
@@ -82,32 +79,24 @@ public class WarriorStats<TClass> : GenericScriptableObject
 }
 ```
 
-Note that you can skip the `Serializable` attribute. You will be able to create assets without it, but if you want to reference an asset in other classes' serialized fields, you need to include the attribute. Unity implicitly marks inheritors of `ScriptableObject` as serializable, but not if they are generic.
+If you use Unity 2020, you need to specify the `Serializable` attribute explicitly. Otherwise, fields of type `WarriorStats<TClass>` will not be serialized. If you use Unity 2021, this bug is fixed and Unity automatically marks generic Unity.Objects as serializable.
 
 In this example, there is only one generic argument, but you can use as many as you want.
 
 #### CreateGenericAssetMenu attribute
 
-Now, to be able to create assets from the context menu, you can add the `[CreateGenericAssetMenu]` attribute to the class. It has all the same optional properties as the [[CreateAssetMenu]](https://docs.unity3d.com/ScriptReference/CreateAssetMenuAttribute.html) attribute: FileName, MenuName, Order. But there are also two additional ones: NamespaceName and ScriptsPath.
-
-- NamespaceName - Custom namespace name to set for auto-generated classes derived from this class. Default is "GenericScriptableObjectTypes".
-- ScriptsPath - Custom path to a folder where auto-generated classes must be kept. Default is "Scripts/GenericSOTypes".
+Now, to be able to create assets from the context menu, you can add the `[CreateGenericAssetMenu]` attribute to the class. It has all the same optional properties as the [[CreateAssetMenu]](https://docs.unity3d.com/ScriptReference/CreateAssetMenuAttribute.html) attribute: FileName, MenuName, Order.
 
 ```csharp
+using System;
 using GenericScriptableObjects;
 
-[System.Serializable]
+[Serializable]
 [CreateGenericAssetMenu] // You can find "WarriorStats<TClass>" at the top of Create menu.
 public class WarriorStats<TClass> : GenericScriptableObject
     where TClass : Class
 {
-    public int Health;
-    public int Damage;
-        
-	public TClass[] FindAllWarriorsWithTheseStats()
-    {
-        return FindObjectsOfType<TClass>();
-    }
+    // ...
 }
 ```
 
@@ -115,7 +104,7 @@ Now you can create assets:
 
 ![](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableObjects/main/.asset-creation.gif?token=AFOZEDUUFHKZ3NXOYTFZFTS7ULXZE)
 
-When you create an asset with certain generic arguments for the first time, the assemblies will reload. This is an expected behavior because the plugin must create a non-generic class that is derived from the generic class with the arguments you've chosen. Once the assemblies reload, the usual asset creation dialog will appear, where you will be prompted to enter the name of your new asset.
+When you create an asset with certain generic arguments for the first time, a short compile dialog will show up. This is an expected behavior because the plugin needs to generate a non-generic class that derives from the generic class with the arguments you've chosen. Once the class is generated, a usual asset creation dialog will appear, where you will be prompted to enter the name of your new asset.
 
 The type selection pop-up is powered by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity).
 
@@ -130,13 +119,11 @@ public class Knight : Class
 }
 ```
 
-Remember to add the Serializable attribute to your class to be able to reference it in other classes.
+In Unity 2020, remember to add the Serializable attribute to your class to be able to reference it in other classes.
 
 You will get the object field in the inspector:
 
 ![](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.object-field.png?token=AFOZEDWJGJ7L4OHVQ537XRS7ULQ4E)
-
-Unfortunately, Unity shows *WarriorStats`1* there instead of *WarriorStats\<Knight>*. They are aware of [this problem](https://forum.unity.com/threads/generic-scriptable-object-fields.790763/), and hopefully it will be fixed soon.
 
 #### Creating an instance at runtime
 
@@ -146,8 +133,6 @@ A generic ScriptableObject instance can be created at runtime. The CreateInstanc
 var knightStats = GenericScriptableObject.CreateInstance<WarriorStats<Knight>>();
 
 var knightStats2 = GenericScriptableObject.CreateInstance(typeof(WarriorStats<Knight>));
-
-var knightStats3 = GenericScriptableObject.CreateInstance(typeof(WarriorStats<>), typeof(Knight));
 ```
 
 You can also use these methods inside the generic ScriptableObject without specifying the GenericScriptableObject class:
@@ -169,19 +154,15 @@ public class WarriorStats<TClass> : GenericScriptableObject
 }
 ```
 
-***Warning!*** If you haven't created a single asset of type WarriorStats\<Knight>, the method will return null. You need to create an asset with a specific argument type at least once to be able to use CreateInstance with this argument type. This is needed to generate a concrete inheritor for this generic class. Without a concrete implementation, Unity won't allow to create a generic scriptable object.
+***Warning!*** See the limitations of creating instances at runtime. **(TODO: Add link)**
 
 #### File Naming
 
-When you create a GenericScriptableObject class, please name the file specifying the number of generic arguments at the end:
+The file name of a generic Unity.Object must contain the name of the type ("WarriorStats" in `WarriorStats<TClass>`). Suffixes are up to you:
 
 - WarriorStats`1.cs :heavy_check_mark:
-- WarriorStats.cs :x:
+- WarriorStatsOfTClass.cs :heavy_check_mark:
+- WarriorStats.cs :heavy_check_mark:
+- Stats.cs :x:
 
-This way you ensure that the plugin will not lose reference to the class and there will be no issues with instantiating your class if you decide to rename it later.
-
-Also, when renaming a class, it's recommended to rename the file first, and then the class itself.
-
-#### What happens if I remove a class that derives from GenericScriptableObject?
-
-The plugin handles removal of the auto-generated classes. You may see an error in the console for one second, then the editor will recompile assemblies again, and all the auto-generated classes will be removed.
+This way the plugin will be able to detect class name change.
