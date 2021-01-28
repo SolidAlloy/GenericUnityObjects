@@ -26,6 +26,12 @@
 
         public override void OnInspectorGUI()
         {
+            if (target == null)
+            {
+                DrawMissingScript();
+                return;
+            }
+
             EditorGUI.BeginChangeCheck();
             serializedObject.UpdateIfRequiredOrScript();
 
@@ -44,6 +50,14 @@
 
             serializedObject.ApplyModifiedProperties();
             EditorGUI.EndChangeCheck();
+        }
+
+        private void DrawMissingScript()
+        {
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
+            }
         }
     }
 }
