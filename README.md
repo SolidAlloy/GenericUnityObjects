@@ -1,4 +1,4 @@
-# Generic Unity.Objects
+# Generic UnityEngine.Objects
 [![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-scriptable-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericScriptableObjects/blob/main/LICENSE) ![Unity: 2020.2](https://img.shields.io/badge/unity-2020.2-yellow) ![.NET 4.x](https://img.shields.io/badge/.NET-4.x-9cf)
 
 This package allows to create and use generic ScriptableObjects and MonoBehaviours in Unity3D. Although generic serializable classes are now supported by Unity 2020, generic ScriptableObject and MonoBehaviour are not yet, and this plugin allows to overcome this limitation.
@@ -7,8 +7,8 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 
 - Implement generic classes that inherit from ScriptableObject or MonoBehaviour (e.g. `class GenericBehaviour<T> : MonoBehaviour { }`).
 - Create assets/components from a context menu and choose the generic argument type in the process.
-- Create object fields for generic Unity.Objects and assigned created assets/components to those fields.
-- Instantiate generic Unity.Objects from scripts (but see the limitations.)
+- Create object fields for generic UnityEngine.Objects and assigned created assets/components to those fields.
+- Instantiate generic UnityEngine.Objects from scripts (but see the limitations.)
 
 ## How To Install
 
@@ -79,7 +79,7 @@ public class WarriorStats<TClass> : GenericScriptableObject
 }
 ```
 
-If you use Unity 2020, you need to specify the `Serializable` attribute explicitly. Otherwise, fields of type `WarriorStats<TClass>` will not be serialized. If you use Unity 2021, this bug is fixed and Unity automatically marks generic Unity.Objects as serializable.
+If you use Unity 2020, you need to specify the `Serializable` attribute explicitly. Otherwise, fields of type `WarriorStats<TClass>` will not be serialized. If you use Unity 2021, this bug is fixed and Unity automatically marks generic UnityEngine.Objects as serializable.
 
 In this example, there is only one generic argument, but you can use as many as you want.
 
@@ -157,7 +157,7 @@ public class Unit<TWarrior> : MonoBehaviour
 }
 ```
 
-Note that the `Serializable` attribute is needed for a generic class to be serialized by Unity 2020. It is fixed in Unity 2021, and you don't need to put `[Serializable]` above generic Unity.Objects.
+Note that the `Serializable` attribute is needed for a generic class to be serialized by Unity 2020. It is fixed in Unity 2021, and you don't need to put `[Serializable]` above generic UnityEngine.Objects.
 
 Once the script is saved, you will be able to add a generic component through the **Add Component** button:
 
@@ -178,7 +178,7 @@ var knightsGroupComponent = gameObject.GetGenericComponent(typeof(Unit<Knight>))
 
 ## Common
 
-#### Referencing a generic Unity.Object
+#### Referencing a generic UnityEngine.Object
 
 You can create a serialized field for a generic ScriptableObject or MonoBehaviour just like for the usual one:
 
@@ -197,7 +197,7 @@ You will get an object field in the inspector:
 
 #### File Naming
 
-The file name of a generic Unity.Object must contain the name of the type (e.g. "WarriorStats" in `WarriorStats<TClass>`). Suffixes are up to you:
+The file name of a generic UnityEngine.Object must contain the name of the type (e.g. "WarriorStats" in `WarriorStats<TClass>`). Suffixes are up to you:
 
 - WarriorStats`1.cs :heavy_check_mark:
 - WarriorStatsOfTClass.cs :heavy_check_mark:
@@ -220,6 +220,28 @@ When you create a GenericScriptableObject asset with new sequence of generic arg
 
 The principle is the same as with GenericScriptableObjects. Let's say you have a MonoBehaviour class called `GenericBehaviour<T>`, and have already added a `GenericBehaviour<int>` component through the **Add Component** button. In **Play Mode**, both calls will be fine: `gameObject.AddGenericComponent<GenericBehaviour<int>>()` and `gameObject.AddGenericComponent<GenericBehaviour<bool>>()`. But in Edit Mode, `gameObject.AddGenericComponent<GenericBehaviour<bool>>()` will produce a component that will start showing "Missing Mono Script" after recompilation.
 
-##### If a generic Unity.Object with specific generic arguments has not been created/added through Editor UI, it cannot be instantiated in IL2CPP builds.
+##### If a generic UnityEngine.Object with specific generic arguments has not been created/added through Editor UI, it cannot be instantiated in IL2CPP builds.
 
 If you've created an asset of `GenericSO<int>` through the **Assets/Create** menu once, a supporting concrete class has already been generated, so you can instantiate `GenericSO<int>` in IL2CPP build. But `GenericScriptableObject.CreateInstance<GenericSO<bool>>()` will throw `NotSupportedException` because an underlying concrete class was not generated in Editor, and IL2CPP doesn't support [Reflection.Emit](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit) to generate classes dynamically.
+
+##### Using a generic class as a generic argument is prohibited (e.g. `GenericBehaviour<AnotherClass<int>>`).
+
+In theory, it can be implemented, but it will add more complexity to the system and is used so rarely that I decided not to add such a feature.
+
+##### Generic UnityEngine.Object cannot be internal
+
+Otherwise, when a concrete class is generated, it cannot access the constructor of the internal generic class. [IgnoreAccessCheckTo](https://www.strathweb.com/2018/10/no-internalvisibleto-no-problem-bypassing-c-visibility-rules-with-roslyn/) should work but in Unity it doesn't for some reason. You will be able to create assets and add components of internal generic types, and see their fields in the inspector just fine, but every time you instantiate a generic UnityEngine.Object, an error will show up in the Console.
+
+## Custom Editors
+
+#### MonoScript field
+
+By default, inspector shows incorrect script in the ***Script*** field of generic objects. To draw the MonoScript field correctly, the plugin uses a custom editor for MonoBehaviour and GenericScriptableObject types. If you need to implement your own custom editor but still want to see the correct ***Script*** field, use the GenericUnityObjectHelper class. Instantiate a helper in `OnEnable()`, then draw the ***Script*** field inside `OnInspectorGUI()` with the `DrawMonoScript(property)` method.
+
+You can also disable custom editors completely by defining the `DISABLE_GENERIC_OBJECT_EDITOR` directive.
+
+#### Object field
+
+Unity can't handle object fields for generic objects properly. For example, it will show ``GenericBehaviour`1`` instead of `GenericBehaviour<int>`, and will not list assets when you want to choose a generic ScriptableObject.
+
+The plugin uses custom ObjectField() methods for fields of generic objects. You can also use it in your custom editor. **GenericObjectDrawer** class overloads of EditorGUI.ObjectField and EditorGUILayout.ObjectField that support generic objects.
