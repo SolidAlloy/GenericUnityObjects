@@ -6,6 +6,9 @@
     using JetBrains.Annotations;
     using UnityEditor;
 
+    /// <summary>
+    /// A class that contains methods related to t
+    /// </summary>
     internal static class AssemblyAssetOperations
     {
         public static void RemoveAssemblyByGUID([CanBeNull] string assemblyGUID)
@@ -32,11 +35,6 @@
             public static AssemblyReplacer UsingGUID(string assemblyGUID, string newAssemblyName)
             {
                 string oldAssemblyPath = AssetDatabase.GUIDToAssetPath(assemblyGUID);
-                return new AssemblyReplacer(oldAssemblyPath, newAssemblyName);
-            }
-
-            public static AssemblyReplacer UsingPath(string oldAssemblyPath, string newAssemblyName)
-            {
                 return new AssemblyReplacer(oldAssemblyPath, newAssemblyName);
             }
 

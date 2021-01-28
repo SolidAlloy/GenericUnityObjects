@@ -1,17 +1,19 @@
-﻿namespace Testing.Editor
+﻿namespace GenericUnityObjects.Editor.Util
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using GenericUnityObjects.Util;
+    using System.Linq;
     using UnityEditor;
     using UnityEditor.Compilation;
     using Debug = UnityEngine.Debug;
 
+    /// <summary>
+    /// Logs how many assemblies were compiled. It may be useful to check that only the assemblies you expect to be
+    /// affected are compiled and not more.
+    /// </summary>
     [InitializeOnLoad]
     internal static class CompilationChecker
     {
-        private static readonly Dictionary<string, Stopwatch> Dictionary;
-        private static readonly Stopwatch Stopwatch;
+        private static readonly List<string> _assemblies;
 
         static CompilationChecker()
         {
@@ -19,42 +21,27 @@
             CompilationPipeline.compilationStarted += OnCompilationStarted;
             CompilationPipeline.compilationFinished += OnCompilationFinished;
             CompilationPipeline.assemblyCompilationStarted += OnAssemblyCompilationStarted;
-            CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
-            Dictionary = new Dictionary<string, Stopwatch>();
-            Stopwatch = new Stopwatch();
+            _assemblies = new List<string>();
 #endif
         }
 
         private static void OnCompilationStarted(object context)
         {
-            Dictionary.Clear();
-            Stopwatch.Start();
+            _assemblies.Clear();
         }
 
         private static void OnCompilationFinished(object context)
         {
-            var elapsed = Stopwatch.Elapsed;
+            string assemblyNames = string.Join(", ", _assemblies
+                .Select(name => name.Replace("Library/ScriptAssemblies/", string.Empty)
+                    .Replace(".dll", string.Empty)));
 
-            Stopwatch.Stop();
-            Stopwatch.Reset();
-
-            foreach (var pair in Dictionary)
-            {
-                Debug.Log($"Assembly {pair.Key.Replace("Library/ScriptAssemblies/", string.Empty)} " +
-                          $"built in {pair.Value.Elapsed.TotalSeconds:F} seconds.");
-            }
-
-            Debug.Log($"Total compilation time: {elapsed.TotalSeconds:F} seconds.");
+            Debug.Log($"{_assemblies.Count} assemblies were compiled: {assemblyNames}");
         }
 
-        private static void OnAssemblyCompilationStarted(string value)
+        private static void OnAssemblyCompilationStarted(string assemblyName)
         {
-            Dictionary.Add(value, Stopwatch.StartNew());
-        }
-
-        private static void OnAssemblyCompilationFinished(string value, CompilerMessage[] messages)
-        {
-            Dictionary[value].Stop();
+            _assemblies.Add(assemblyName);
         }
     }
 }

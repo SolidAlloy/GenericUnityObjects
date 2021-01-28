@@ -9,6 +9,11 @@
     using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A class that gathers data from <see cref="GenerationDatabase{TUnityObject}"/> and
+    /// fills <see cref="GenericTypesDatabase{TObject}"/> with items to be used at runtime.
+    /// </summary>
+    /// <typeparam name="TObject"> A type derived from <see cref="UnityEngine.Object"/>. </typeparam>
     internal static class DictInitializer<TObject>
         where TObject : Object
     {

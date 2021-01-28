@@ -8,6 +8,9 @@
     using UnityEngine;
     using Util;
 
+    /// <summary>
+    /// A class that gathers all changes related to generic types and generates/updates/removes DLLs based on the changes.
+    /// </summary>
     internal static class GenericTypesAnalyzer
     {
         [DidReloadScripts((int)DidReloadScriptsOrder.AssemblyGeneration)]
@@ -21,7 +24,7 @@
             var behavioursChecker = new BehavioursChecker();
             var scriptableObjectsChecker = new ScriptableObjectsChecker();
 
-            using (new DisabledAssetDatabase(null))
+            using (new DisabledAssetDatabase(true))
             {
                 Directory.CreateDirectory(Config.AssembliesDirPath);
 

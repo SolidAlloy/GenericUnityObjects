@@ -8,6 +8,11 @@
     using UnityEngine.Assertions;
     using Util;
 
+    /// <summary>
+    /// Emits and saves an assembly that represents a class derived from <see cref="GenericSOCreator"/> and containing
+    /// a number of methods marked with <see cref="SetMenuItemAttribute"/>. Each method represents a generic
+    /// ScriptableObject that can be created using the Assets/Create menu.
+    /// </summary>
     internal static class MenuItemsCreator
     {
         private static MethodInfo _createAsset;

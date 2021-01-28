@@ -3,25 +3,31 @@
     using System;
     using UnityEditor;
 
-    internal struct DisabledAssetDatabase : IDisposable
+    /// <summary>
+    /// Completely prevents AssetDatabase from importing assets or refreshing.
+    /// </summary>
+    internal readonly struct DisabledAssetDatabase : IDisposable
     {
-        private bool _disposed;
+        private readonly bool _disable;
 
-        public DisabledAssetDatabase(object _)
+        public DisabledAssetDatabase(bool disable)
         {
-            AssetDatabase.DisallowAutoRefresh();
-            AssetDatabase.StartAssetEditing();
-            _disposed = false;
+            _disable = disable;
+
+            if (_disable)
+            {
+                AssetDatabase.DisallowAutoRefresh();
+                AssetDatabase.StartAssetEditing();
+            }
         }
 
         public void Dispose()
         {
-            if (_disposed)
-                return;
-
-            _disposed = true;
-            AssetDatabase.StopAssetEditing();
-            AssetDatabase.AllowAutoRefresh();
+            if (_disable)
+            {
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.AllowAutoRefresh();
+            }
         }
     }
 }

@@ -11,6 +11,10 @@
     using UnityEditor;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A class that checks changes to generic types in the project, and updates DLLs and info in the database based on them.
+    /// </summary>
+    /// <typeparam name="TObject"> A type derived from <see cref="UnityEngine.Object"/>. </typeparam>
     internal abstract class GenericTypesChecker<TObject>
         where TObject : Object
     {
@@ -112,7 +116,7 @@
 
         private static bool ActualTypesMatch(GenericTypeInfo oldTypeInfo, GenericTypeInfo newTypeInfo)
         {
-            // When GUIDs and TypeNames don't match, there is possibility that the user renamed class name without
+            // When GUIDs and TypeNames don't match, there is a possibility that the user renamed class name without
             // renaming the file name. In this case, the new GUID is empty, but old GUID still exists, and the type
             // loaded from the old GUID matches the new one. In such case, we can treat these types as equal.
             return newTypeInfo.GUID.Length == 0

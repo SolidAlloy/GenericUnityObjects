@@ -12,8 +12,13 @@
     using System.Reflection.Emit;
 #endif
 
+    /// <summary>
+    /// A class that emits classes and stores them in cache so that they are not emitted twice.
+    /// </summary>
     internal static class GeneratedUnityObjectCache
     {
+        // MonoBehaviours and ScriptableObjects are emitted identically. There are two caches to reduce number of
+        // objects in each cache and speed up the search.
         private static readonly CacheImplementation _behaviourCache = new CacheImplementation();
         private static readonly CacheImplementation _scriptableObjectCache = new CacheImplementation();
 

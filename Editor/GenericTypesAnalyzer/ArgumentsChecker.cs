@@ -4,6 +4,10 @@
     using GeneratedTypesDatabase;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// Checks if any argument types were changed/updated, updates them in the database and regenerates DLLs if needed.
+    /// </summary>
+    /// <typeparam name="TObject"> A type derived from <see cref="UnityEngine.Object"/>. </typeparam>
     internal static class ArgumentsChecker<TObject>
         where TObject : Object
     {
@@ -33,10 +37,11 @@
 
         public static void UpdateArgumentTypeName(ArgumentInfo argument, Type newType, GenericTypesChecker<TObject> genericTypesChecker)
         {
-            // Retrieve the array of generic arguments where the old argument was listed
+            // Retrieve an array of generic arguments where the old argument was listed
             var referencedGenericTypes = GenerationDatabase<TObject>.GetReferencedGenericTypes(argument);
 
-            // update argument typename in database before updating assemblies and trying to find behaviour because behaviour might also need to be updated, and the argument should already be new
+            // Update argument typename in the database before updating assemblies and trying to find behaviour
+            // because behaviour might also need to be updated, and the argument should already be new.
             GenerationDatabase<TObject>.UpdateArgumentNameAndAssembly(argument, newType);
 
             genericTypesChecker.UpdateReferencedGenericTypes(argument, referencedGenericTypes);

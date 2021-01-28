@@ -9,6 +9,10 @@
     using Util;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A class responsible for adding a generic component to game objects. If a concrete class is not generated it,
+    /// it generates one, then adds a component after recompilation.
+    /// </summary>
     internal static class GenericBehaviourCreator
     {
         public static void AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
@@ -36,9 +40,7 @@
             try
             {
                 (GameObject gameObject, Type genericType) = PersistentStorage.GetGenericBehaviourDetails();
-
-                bool success = BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteType);
-                Assert.IsTrue(success);
+                Type concreteType = BehavioursDatabase.GetConcreteType(genericType);
                 gameObject.AddComponent(concreteType);
             }
             finally

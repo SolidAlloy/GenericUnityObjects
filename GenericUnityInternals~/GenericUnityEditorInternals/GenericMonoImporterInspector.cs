@@ -5,24 +5,17 @@
     using System.Linq;
     using System.Reflection;
     using SolidUtilities.Editor.Extensions;
+    using SolidUtilities.Extensions;
     using UnityEditor;
     using UnityEditorInternal;
     using UnityEngine;
-    using SolidUtilities.Extensions;
     using Object = UnityEngine.Object;
 
-    internal readonly struct ObjectField
-    {
-        public readonly string Name;
-        public readonly Type Type;
-
-        public ObjectField(string name, Type type)
-        {
-            Name = name;
-            Type = type;
-        }
-    }
-
+    /// <summary>
+    /// A custom editor for MonoImporter (inspector that you see when you select a C# script asset). Unlike the
+    /// default MonoImporter, it can detect that a script contains a generic UnityEngine.Object and draws default
+    /// references fields if the script contains any.
+    /// </summary>
     [CustomEditor(typeof(MonoImporter))]
     internal class GenericMonoImporterInspector : MonoScriptImporterInspector
     {
@@ -72,7 +65,7 @@
                     var field = _objectFields[i];
 
                     Object oldTarget = _targetImporter.GetDefaultReference(field.Name);
-                    Object newTarget = ObjectField(oldTarget, field);
+                    Object newTarget = DrawObjectField(oldTarget, field);
                     didModify |= oldTarget != newTarget;
 
                     _newTargets[i] = newTarget;
@@ -104,7 +97,6 @@
             return fields.ToArray();
         }
 
-
         private void AddObjectFields(Type type, List<ObjectField> fields)
         {
             foreach (FieldInfo field in type.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
@@ -121,13 +113,25 @@
             }
         }
 
-        private Object ObjectField(Object oldTarget, ObjectField field)
+        private Object DrawObjectField(Object oldTarget, ObjectField field)
         {
             string niceName = ObjectNames.NicifyVariableName(field.Name);
 
             return field.Type.IsGenericType
                 ? EditorGUILayoutHelper.GenericObjectField(niceName, oldTarget, field.Type, false)
                 : EditorGUILayout.ObjectField(niceName, oldTarget, field.Type, false);
+        }
+
+        private readonly struct ObjectField
+        {
+            public readonly string Name;
+            public readonly Type Type;
+
+            public ObjectField(string name, Type type)
+            {
+                Name = name;
+                Type = type;
+            }
         }
     }
 }

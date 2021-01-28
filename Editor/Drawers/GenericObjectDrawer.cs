@@ -7,11 +7,14 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A class that holds overriden versions of EditorGUI and EditorGUILayout ObjectField methods that support generic types.
+    /// </summary>
     public static class GenericObjectDrawer
     {
         /// <summary>
-        /// Works the same as <see cref="EditorGUI.ObjectField(Rect, SerializedProperty)"/> except that it has support
-        /// for generic Unity objects.
+        /// Works the same way as <see cref="EditorGUI.ObjectField(Rect, SerializedProperty)"/> except that it has
+        /// support for generic types.
         /// </summary>
         /// <param name="rect">Rectangle of the object field.</param>
         /// <param name="property">Property that references a <see cref="UnityEngine.Object"/>.</param>
@@ -28,6 +31,16 @@
             }
         }
 
+        /// <summary>
+        /// Works the same way as <see cref="EditorGUI.ObjectField(Rect, GUIContent, Object, Type, bool)"/> except
+        /// that it has support for generic types.
+        /// </summary>
+        /// <param name="rect">Rectangle on the screen to use for the field.</param>
+        /// <param name="label">Optional label in front of the field.</param>
+        /// <param name="currentTarget">The object the field shows.</param>
+        /// <param name="objType">The type of the objects that can be assigned.</param>
+        /// <param name="allowSceneObjects">Allow assigning Scene objects. See Description for more info.</param>
+        /// <returns>A new object assigned to the field.</returns>
         [PublicAPI]
         public static Object ObjectField(Rect rect, GUIContent label, Object currentTarget, Type objType,
             bool allowSceneObjects)
@@ -37,6 +50,15 @@
                 : EditorGUI.ObjectField(rect, label, currentTarget, objType, allowSceneObjects);
         }
 
+        /// <summary>
+        /// Works the same way as <see cref="EditorGUILayout.ObjectField(string, Object, Type, bool, GUILayoutOption[])"/>
+        /// except that it has support for generic types.
+        /// </summary>
+        /// <param name="label">Optional label in front of the field.</param>
+        /// <param name="currentTarget">The object the field shows.</param>
+        /// <param name="objType">The type of the objects that can be assigned.</param>
+        /// <param name="allowSceneObjects">Allow assigning Scene objects. See Description for more info.</param>
+        /// <returns>A new object assigned to the field.</returns>
         [PublicAPI]
         public static Object ObjectField(string label, Object currentTarget, Type objType,
             bool allowSceneObjects)

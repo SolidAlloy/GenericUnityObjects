@@ -9,6 +9,10 @@
 
     internal static class ObjectSelectorExtensions
     {
+        /// <summary>
+        /// This extension method is an alternative of <see cref="ObjectSelector.Show"/> that accepts a generic type
+        /// and draws it correctly.
+        /// </summary>
         public static void ShowGeneric(this ObjectSelector this_, Object obj, Object objectBeingEdited, Type requiredType, bool allowSceneObjects, string niceTypeName)
         {
             this_.m_ObjectSelectorReceiver = null;

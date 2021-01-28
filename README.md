@@ -245,3 +245,11 @@ You can also disable custom editors completely by defining the `DISABLE_GENERIC_
 Unity can't handle object fields for generic objects properly. For example, it will show ``GenericBehaviour`1`` instead of `GenericBehaviour<int>`, and will not list assets when you want to choose a generic ScriptableObject.
 
 The plugin uses custom ObjectField() methods for fields of generic objects. You can also use it in your custom editor. **GenericObjectDrawer** class overloads of EditorGUI.ObjectField and EditorGUILayout.ObjectField that support generic objects.
+
+## Contributing
+
+First-of-all, thank you for considering contributing to the project!
+
+It may be useful to enable additional debug logs during development. They will let you know if the plugin processes generic types as expected, how much time it takes, etc. You can do it by defining `GENERIC_UNITY_OBJECTS_DEBUG` in the project.
+
+There is a number of unit tests, they run pretty fast, but they only cover the `GenerationDatabase` class for now. Integration tests, on the other hand, cover most of the code but they take some time to run, so it's recommended that you run only the ones that affect a part of the code you changed. It's also better to run them in an empty project where only the GenericUnityObjects plugin is installed.

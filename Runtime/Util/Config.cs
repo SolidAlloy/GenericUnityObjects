@@ -1,5 +1,8 @@
 ﻿namespace GenericUnityObjects.Util
 {
+    /// <summary>
+    /// Holder of constant values used by multiple classes in the plugin.
+    /// </summary>
     internal static class Config
     {
         public const string MenuItemsAssemblyName = "GeneratedMenuItems";

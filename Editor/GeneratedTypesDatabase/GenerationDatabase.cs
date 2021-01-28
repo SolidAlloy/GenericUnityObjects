@@ -11,6 +11,22 @@
     using Util;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A database that holds references to generic types in the project and concrete classes generated for them.
+    /// </summary>
+    /// <typeparam name="TUnityObject">
+    /// Type derived from <see cref="UnityEngine.Object"/>. Currently supports only
+    /// <see cref="GenericScriptableObject"/> and <see cref="MonoBehaviour"/>.
+    /// </typeparam>
+    /// <remarks>
+    /// The database utilizes two dictionaries: [Argument, List{GenericType}] and [GenericType, List{Argument[]}].
+    /// This is done for the fast lookup of both argument and generic type. Dictionaries are interconnected with help of pools.
+    /// It means that the same Argument object is located in both databases. If it is updated in one database,
+    /// it is automatically updated in the second one.
+    /// Both ArgumentInfo and GenericTypeInfo fields are not readonly and can be changed. To avoid losing reference to
+    /// the object when its field is changed, the class removes the object from the database, changes it, then puts it back.
+    /// This allows changing objects while keeping them in the database.
+    /// </remarks>
     internal abstract partial class GenerationDatabase<TUnityObject> :
         EditorOnlySingletonSO<GenerationDatabase<TUnityObject>>,
         ISerializationCallbackReceiver,
@@ -21,13 +37,6 @@
         private FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
         private Pool<ArgumentInfo> _argumentsPool;
         private Pool<GenericTypeInfo> _genericTypesPool;
-
-        [SerializeField] private ArgumentInfo[] _genericArgumentKeys;
-        [SerializeField] private GenericTypeCollection[] _genericTypeValues;
-        [SerializeField] private GenericTypeInfo[] _genericTypeKeys;
-        [SerializeField] private ConcreteClassCollection[] _genericArgumentValues;
-
-        private bool _shouldSetDirty;
 
         public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
 

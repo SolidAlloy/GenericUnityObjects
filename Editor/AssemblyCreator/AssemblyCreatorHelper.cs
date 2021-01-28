@@ -9,6 +9,9 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 
+    /// <summary>
+    /// A storage for methods and properties used by multiple AssemblyCreator-related classes.
+    /// </summary>
     internal static class AssemblyCreatorHelper
     {
         private static ConstructorInfo _addComponentMenuConstructor;

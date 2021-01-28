@@ -7,6 +7,9 @@
 
     public static class EditorGUILayoutHelper
     {
+        /// <summary>
+        /// Version of <see cref="EditorGUILayout.ObjectField"/> that accepts only a generic type and draws it correctly.
+        /// </summary>
         public static Object GenericObjectField(string label, Object oldTarget, Type objType, bool allowSceneObjects)
         {
             EditorGUILayout.s_LastRect = EditorGUILayout.GetControlRect(

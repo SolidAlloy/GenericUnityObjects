@@ -17,8 +17,9 @@
         private static string _fileName;
 
         /// <summary>
-        /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the
-        /// <see cref="UnityEditor.MenuItem"/> attribute. Use it in classes that derive from <see cref="GenericSOCreator"/>.
+        /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the <see cref="UnityEditor.MenuItem"/>
+        /// attribute. A class derived from <see cref="GenericSOCreator"/> is generated automatically in a separate DLL
+        /// and is filled with methods that call CreateAsset with different parameters.
         /// </summary>
         /// <param name="genericTypeWithoutArgs">The type of <see cref="GenericScriptableObject"/> to create.</param>
         /// <param name="fileName">Name for an asset.</param>
@@ -43,9 +44,7 @@
             {
                 Type genericSOType;
                 (genericSOType, _fileName) = PersistentStorage.GetGenericSODetails();
-
-                bool success = ScriptableObjectsDatabase.TryGetConcreteType(genericSOType, out _concreteType);
-                Assert.IsTrue(success);
+                _concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
 
                 EditorApplication.update += CreateAssetInteractively;
             }
@@ -76,8 +75,8 @@
         private static void CreateAssetInteractively()
         {
             // If CreateAssetInteractively is called too early, editor styles are not initialized yet and throw
-            // NullReference exception. It usually takes one frame to initialize them, so it's not an expensive action
-            // to catch the exception and proceed to create the asset in the next frame.
+            // NullReference exception. It usually takes one frame to initialize them, so it's not expensive to catch
+            // the exception once and proceed to create the asset in the next frame.
             try
             {
                 var _ = EditorStyles.toolbar;
@@ -95,7 +94,10 @@
             }
             catch (NullReferenceException)
             {
-                Debug.LogError($"{nameof(CreateAssetInteractively)} was most likely called too early. Add it to EditorApplication.delayCall instead.");
+                Debug.LogError(
+                    $"{nameof(CreateAssetInteractively)} was most likely called too early. " +
+                    "Add it to EditorApplication.delayCall instead.");
+
                 throw;
             }
 

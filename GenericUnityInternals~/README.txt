@@ -1,0 +1,3 @@
+Projects in this solution contain calls to Unity internal methods. They are highlighted as errors but upon building the project, those errors will be ignored.
+After building a project, the DLL file will be copied over to the parent folder of GenericUnityInternals~, so you will be able to use the updated DLL in Unity after building it.
+Projects a built with help of OpenSesame. Check it out https://github.com/mob-sakai/OpenSesame

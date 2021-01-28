@@ -9,6 +9,11 @@
     using UnityEditor;
     using Util;
 
+    /// <summary>
+    /// Gathers types that inherit from <see cref="GenericScriptableObject"/> and have
+    /// <see cref="CreateGenericAssetMenuAttribute"/>, then generates a class with methods marked as
+    /// <see cref="MenuItemMethod"/> so that they appear in the Assets/Create menu.
+    /// </summary>
     public static class MenuItemsChecker
     {
         private const string AssemblyName = Config.MenuItemsAssemblyName;

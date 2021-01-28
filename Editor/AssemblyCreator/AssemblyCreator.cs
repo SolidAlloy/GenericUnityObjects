@@ -4,6 +4,9 @@
     using Util;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A class responsible for emitting and saving assemblies.
+    /// </summary>
     internal static class AssemblyCreator
     {
         // AssemblyGUID is needed to name concrete classes uniquely. This is required to correctly filter types in object fields.

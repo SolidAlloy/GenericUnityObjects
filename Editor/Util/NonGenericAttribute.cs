@@ -1,8 +1,13 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
+    using GenericUnityObjects.Util;
     using TypeReferences;
 
+    /// <summary>
+    /// This attribute is applied to <see cref="TypeReferenceWithBaseTypes"/> so that they show only the types that
+    /// are relevant to user. It filters out generic types, as well as setting a number of properties to preset values.
+    /// </summary>
     internal class NonGenericAttribute : InheritsAttribute
     {
         private static readonly string[] _additionalAssemblies = { "Assembly-CSharp" };

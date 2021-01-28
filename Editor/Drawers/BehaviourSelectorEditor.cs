@@ -1,7 +1,8 @@
-﻿namespace GenericUnityObjects.Editor.MonoBehaviours
+﻿namespace GenericUnityObjects.Editor
 {
     using System.Linq;
     using GenericUnityObjects.Util;
+    using MonoBehaviours;
     using SolidUtilities.Editor.Helpers;
     using SolidUtilities.Extensions;
     using SolidUtilities.Helpers;

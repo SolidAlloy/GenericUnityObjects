@@ -46,6 +46,10 @@
         /// </summary>
         /// <typeparam name="T">Type derived from ScriptableObject.</typeparam>
         /// <returns>Instance of <typeparamref name="T"/>>.</returns>
+        /// <exception cref="NotSupportedException">
+        /// If an asset with such generic arguments was not created through the Assets/Create menu yet, and is
+        /// instantiated in an IL2CPP build.
+        /// </exception>
         [PublicAPI, Pure]
         public static new T CreateInstance<T>()
             where T : ScriptableObject

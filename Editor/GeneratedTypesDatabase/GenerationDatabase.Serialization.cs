@@ -11,6 +11,13 @@
     internal abstract partial class GenerationDatabase<TUnityObject>
         where TUnityObject : Object
     {
+        [SerializeField] private ArgumentInfo[] _genericArgumentKeys;
+        [SerializeField] private GenericTypeCollection[] _genericTypeValues;
+        [SerializeField] private GenericTypeInfo[] _genericTypeKeys;
+        [SerializeField] private ConcreteClassCollection[] _genericArgumentValues;
+
+        private bool _shouldSetDirty;
+
         public void OnAfterDeserialize()
         {
             InitializeArgumentGenericTypesDict();

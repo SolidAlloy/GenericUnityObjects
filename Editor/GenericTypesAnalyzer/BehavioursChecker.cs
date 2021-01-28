@@ -8,6 +8,11 @@
     using UnityEngine.Assertions;
     using Util;
 
+    /// <summary>
+    /// Checks if any generic MonoBehaviour types were changed, removed, or updated, and regenerates DLLs if needed.
+    /// Most of the work is done in the parent type. This class contains only methods where a task needs to be done
+    /// differently for MonoBehaviour compared to ScriptableObject.
+    /// </summary>
     internal class BehavioursChecker : GenericTypesChecker<MonoBehaviour>
     {
         protected override bool AddNewGenericTypes(GenericTypeInfo[] genericTypes)

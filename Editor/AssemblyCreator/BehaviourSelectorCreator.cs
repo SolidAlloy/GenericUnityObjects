@@ -5,8 +5,14 @@
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
 
+    /// <summary>
+    /// Emits and saves an assembly of a concrete class that inherits from <see cref="BehaviourSelector"/>.
+    /// </summary>
     internal static class BehaviourSelectorCreator
     {
+        /// <summary>
+        /// Not supposed to be used directly. Instead, use <see cref="AssemblyCreator.CreateSelectorAssembly"/>.
+        /// </summary>
         public static void CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs, string assemblyGUID)
         {
             string className = $"ClassSelector_{assemblyGUID}";
@@ -17,7 +23,7 @@
             TypeBuilder typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, typeof(BehaviourSelector));
 
             CreateBehaviourTypeProperty(typeBuilder, genericBehaviourWithoutArgs);
-            string componentName = "Scripts/" + TypeUtility.GetShortNameWithBrackets(genericBehaviourWithoutArgs);
+            string componentName = "Scripts/" + TypeUtility.GetNiceNameOfGenericTypeDefinition(genericBehaviourWithoutArgs);
             AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
 
             typeBuilder.CreateType();

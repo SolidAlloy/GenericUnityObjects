@@ -4,6 +4,9 @@
     using System.Text;
     using UnityEditor;
 
+    /// <summary>
+    /// A class responsible for importing a generated DLL with appropriate settings.
+    /// </summary>
     internal static class AssemblyGeneration
     {
         public static void ImportAssemblyAsset(string assemblyPath, string assemblyGUID, bool editorOnly = false)
@@ -27,6 +30,8 @@
             AssetDatabase.ImportAsset($"{assemblyPath}.mdb");
         }
 
+        // Sometimes, we need to know GUID of a future DLL before we start creating and importing it.
+        // That's why it's a separate method.
         public static string GetUniqueGUID()
         {
             GUID newGUID;

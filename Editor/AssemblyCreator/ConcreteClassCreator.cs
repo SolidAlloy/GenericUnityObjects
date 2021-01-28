@@ -7,8 +7,14 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// Emits and saves an assembly of a concrete class that inherits from a specific generic UnityEngine.Object
+    /// </summary>
     internal static class ConcreteClassCreator
     {
+        /// <summary>
+        /// Not supposed to be used directly. Instead, use <see cref="AssemblyCreator.CreateConcreteClass{TObject}"/>.
+        /// </summary>
         public static void CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs, string assemblyGUID)
             where TObject : Object
         {
@@ -21,7 +27,7 @@
 
             if (typeof(TObject) == typeof(MonoBehaviour))
             {
-                string componentName = $"Scripts/{TypeUtility.GetGenericTypeNameWithBrackets(genericTypeWithArgs)}";
+                string componentName = $"Scripts/{TypeUtility.GetNiceNameOfGenericType(genericTypeWithArgs)}";
                 AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
             }
 

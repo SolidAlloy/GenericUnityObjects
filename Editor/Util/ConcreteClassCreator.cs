@@ -10,17 +10,35 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// A class responsible for generation on concrete class assemblies. It also adds created concrete classes to database.
+    /// </summary>
+    /// <typeparam name="TObject"> A type derived from <see cref="UnityEngine.Object"/>. </typeparam>
     internal static class ConcreteClassCreator<TObject>
         where TObject : Object
     {
+        /// <summary>
+        /// Creates a new concrete class assembly, adds it to the database, and adds a task to update behaviour icon
+        /// if the generic type is MonoBehaviour.
+        /// </summary>
+        /// <param name="genericTypeWithoutArgs">Generic type definition of a type that has to be created.</param>
+        /// <param name="argumentTypes">Generic arguments that a concrete class has to use.</param>
         public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
+
             if (typeof(TObject) == typeof(MonoBehaviour))
                 BehaviourIconSetter.AddAssemblyForIconChange(assemblyGUID);
+
             AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
         }
 
+        /// <summary>
+        /// Updates a concrete class assembly in a way that already created assets don't lose a reference to it.
+        /// </summary>
+        /// <param name="genericType">Generic type definition of a type that has to be updated.</param>
+        /// <param name="argumentTypes">Generic arguments that a concrete class has to use.</param>
+        /// <param name="concreteClass">A reference to the concrete class that has to be updated.</param>
         public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
         {
             string newAssemblyName;
@@ -61,7 +79,7 @@
 
             string assemblyGUID;
 
-            using (new DisabledAssetDatabase(null))
+            using (new DisabledAssetDatabase(true))
             {
                 assemblyGUID = AssemblyGeneration.GetUniqueGUID();
                 CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName, assemblyGUID);

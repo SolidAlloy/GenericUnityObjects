@@ -6,11 +6,16 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
-    internal struct ObjectFieldHelper
+    /// <summary>
+    /// When drawing ObjectField, there are things that need to be done differently for <see cref="Type"/> and <see cref="SerializedProperty"/>.
+    /// This helper encapsulates such parts of the code so that the main method contains the same logic for Type and SerializedProperty.
+    /// </summary>
+    internal readonly struct ObjectFieldHelper
     {
+        public readonly Type ObjType;
+        
         private static readonly GUIContent _cachedContent = new GUIContent();
 
-        public readonly Type ObjType;
         private readonly SerializedProperty _property;
 
         public ObjectFieldHelper(Type type)

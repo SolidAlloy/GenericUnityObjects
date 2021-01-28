@@ -5,6 +5,9 @@
     using UnityEngine;
     using Util;
 
+    /// <summary>
+    /// A class that accumulates methods that allow working with a generic type.
+    /// </summary>
     internal static class GenericTypeHelper
     {
         public static Type GetGenericType(SerializedProperty property)
@@ -13,7 +16,7 @@
             return genericType;
         }
 
-        public static string GetNiceTypeName(Type genericType) => TypeUtility.GetGenericTypeNameWithBrackets(genericType);
+        public static string GetNiceTypeName(Type genericType) => TypeUtility.GetNiceNameOfGenericType(genericType);
 
         public static Type GetConcreteType(Type genericType)
         {

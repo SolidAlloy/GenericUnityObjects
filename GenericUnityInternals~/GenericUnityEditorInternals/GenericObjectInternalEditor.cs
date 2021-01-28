@@ -5,6 +5,10 @@
     using UnityEditor;
     using Util;
 
+    /// <summary>
+    /// An extension of Editor that changes name of <see cref="GenericScriptableObject"/> assets in the Inspector header.
+    /// For all other assets, it draws header like before.
+    /// </summary>
     public class GenericObjectInternalEditor : Editor
     {
         private static readonly Dictionary<UnityEngine.Object, string> _targetTitlesCache = new Dictionary<UnityEngine.Object, string>();
@@ -50,7 +54,7 @@
             if (_typeNamesCache.TryGetValue(genericType, out string typeName))
                 return typeName;
 
-            typeName = TypeUtility.GetGenericTypeNameWithBrackets(genericType);
+            typeName = TypeUtility.GetNiceNameOfGenericType(genericType);
             _typeNamesCache.Add(genericType, typeName);
             return typeName;
         }

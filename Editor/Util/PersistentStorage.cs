@@ -11,7 +11,7 @@
 
     /// <summary>
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
-    /// creation, but also for MenuItem methods creation and Usage Example installation.
+    /// creation, but also for the MenuItem methods creation and performing actions on next domain reload.
     /// </summary>
     internal class PersistentStorage : EditorOnlySingletonSO<PersistentStorage>, ICanBeInitialized
     {

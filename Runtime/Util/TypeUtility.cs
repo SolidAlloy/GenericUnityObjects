@@ -39,9 +39,9 @@
             $"{typeFullName}, {assemblyName}";
 
         /// <summary>
-        /// Gets the type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>.
+        /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>.
         /// </summary>
-        public static string GetShortNameWithBrackets(Type genericTypeWithoutArgs)
+        public static string GetNiceNameOfGenericTypeDefinition(Type genericTypeWithoutArgs)
         {
             Type[] genericArgs = genericTypeWithoutArgs.GetGenericArguments();
             string typeNameWithoutBrackets = genericTypeWithoutArgs.Name.StripGenericSuffix();
@@ -50,9 +50,9 @@
         }
 
         /// <summary>
-        /// Gets the type name for nice representation of the type. It looks like this: ClassName&lt;int,TestArg>.
+        /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;int,TestArg>.
         /// </summary>
-        public static string GetGenericTypeNameWithBrackets(Type genericTypeWithArgs)
+        public static string GetNiceNameOfGenericType(Type genericTypeWithArgs)
         {
             string typeNameWithoutSuffix = genericTypeWithArgs.Name.StripGenericSuffix();
 

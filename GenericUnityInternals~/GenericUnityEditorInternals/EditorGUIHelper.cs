@@ -8,11 +8,18 @@
 
     public static class EditorGUIHelper
     {
+        /// <summary>
+        /// Version of <see cref="EditorGUI.ObjectField"/> that accepts only a generic type and draws it correctly.
+        /// </summary>
+        [PublicAPI]
         public static Object GenericObjectField(Rect position, GUIContent label, Object currentTarget, Type objType, bool allowSceneObjects)
         {
             return ObjectFieldInternal(position, label, currentTarget, allowSceneObjects, new ObjectFieldHelper(objType));
         }
 
+        /// <summary>
+        /// Version of <see cref="EditorGUI.ObjectField"/> that accepts only a generic type and draws it correctly.
+        /// </summary>
         [PublicAPI]
         public static void GenericObjectField(Rect position, SerializedProperty property)
         {

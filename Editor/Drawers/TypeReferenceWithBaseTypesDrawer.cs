@@ -1,19 +1,19 @@
-﻿namespace GenericUnityObjects.Editor.Util
+﻿namespace GenericUnityObjects.Editor
 {
     using System;
     using GenericUnityObjects.Util;
-    using TypeReferences;
     using TypeReferences.Editor.Drawers;
     using TypeReferences.Editor.Util;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using Util;
     using TypeCache = TypeReferences.Editor.Util.TypeCache;
 
     [CustomPropertyDrawer(typeof(TypeReferenceWithBaseTypes))]
     internal class TypeReferenceWithBaseTypesDrawer : TypeReferencePropertyDrawer
     {
-        private static readonly string[] _additionalAssemblies = { "Assembly-CSharp" };
+        private static readonly NonGenericAttribute _attribute = new NonGenericAttribute(null);
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -37,7 +37,8 @@
                 baseTypes[i] = baseType;
             }
 
-            return new NonGenericAttribute(baseTypes);
+            _attribute.BaseTypes = baseTypes;
+            return _attribute;
         }
 
         private void DrawTypeReferenceField(Rect position, SerializedProperty property)

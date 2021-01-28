@@ -6,10 +6,15 @@
     using UnityEngine;
     using UnityEngine.Assertions;
 
+    /// <summary>
+    /// Parent class to all Generic MonoBehaviour selectors. It is a component that is added to game objects and allows
+    /// to choose generic arguments to add the actual generic component.
+    /// </summary>
     public abstract class BehaviourSelector : MonoBehaviour
     {
         [SerializeField] internal TypeReferenceWithBaseTypes[] TypeRefs;
 
+        // This field is overriden by individual selectors and represents a generic type definition of a generic MonoBehaviour.
         public abstract Type GenericBehaviourType { get; }
 
         private void Reset()

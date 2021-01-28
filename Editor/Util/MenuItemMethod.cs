@@ -31,7 +31,7 @@
 
             _typeName = TypeUtility.GetTypeNameAndAssembly(Type);
             _fileName = fileName ?? $"New {Type.Name}";
-            _menuName = menuName ?? TypeUtility.GetShortNameWithBrackets(Type);
+            _menuName = menuName ?? TypeUtility.GetNiceNameOfGenericTypeDefinition(Type);
             _order = order;
         }
 

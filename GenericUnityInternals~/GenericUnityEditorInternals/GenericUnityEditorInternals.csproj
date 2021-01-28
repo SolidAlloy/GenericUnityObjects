@@ -58,7 +58,6 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="AssemblyInfo.cs" />
         <Compile Include="EditorGUIHelper.cs" />
         <Compile Include="EditorGUILayoutHelper.cs" />
         <Compile Include="GenericMonoImporterInspector.cs" />

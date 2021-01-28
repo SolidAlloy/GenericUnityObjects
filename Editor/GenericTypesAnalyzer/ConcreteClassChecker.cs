@@ -6,6 +6,10 @@
     using Util;
     using Object = UnityEngine.Object;
 
+    /// <summary>
+    /// Methods from this class are called by other checkers to update concrete class assemblies.
+    /// </summary>
+    /// <typeparam name="TObject"> A type derived from <see cref="UnityEngine.Object"/>. </typeparam>
     internal class ConcreteClassChecker<TObject>
         where TObject : Object
     {

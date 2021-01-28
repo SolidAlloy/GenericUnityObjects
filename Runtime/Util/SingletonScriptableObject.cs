@@ -7,7 +7,6 @@
 
     /// <summary>
     /// Abstract class for making reload-proof singletons out of ScriptableObjects
-    /// Returns the asset created in the Assets/Resources folder, or null if there is none.
     /// </summary>
     /// <typeparam name="T">Singleton type.</typeparam>
     internal abstract class SingletonScriptableObject<T> : SingletonScriptableObject
