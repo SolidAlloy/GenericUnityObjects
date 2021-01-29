@@ -174,23 +174,6 @@
 
         public override string ToString() => _typeNameAndAssembly;
 
-        private bool TypeCannotHaveGUID()
-        {
-            int charAfterWhiteSpace = _typeNameAndAssembly.IndexOf(' ') + 1;
-
-            string assemblyName = _typeNameAndAssembly.Substring(
-                charAfterWhiteSpace,
-                _typeNameAndAssembly.Length - charAfterWhiteSpace);
-
-            return assemblyName == "mscorlib"
-                || assemblyName == "netstandard"
-                || assemblyName.StartsWith("System.")
-                || assemblyName.StartsWith("Microsoft.")
-                || assemblyName.StartsWith("Unity.")
-                || assemblyName.StartsWith("UnityEngine.")
-                || assemblyName.StartsWith("UnityEditor.");
-        }
-
         private void UpdateGUIDIfNeeded<TObject>()
             where TObject : Object
         {
@@ -219,6 +202,23 @@
                     $"{nameof(UpdateGUIDIfNeeded)} method doesn't know of this inheritor " +
                     $"of {nameof(TypeInfo)} yet: {GetType()}.");
             }
+        }
+
+        private bool TypeCannotHaveGUID()
+        {
+            int charAfterWhiteSpace = _typeNameAndAssembly.IndexOf(' ') + 1;
+
+            string assemblyName = _typeNameAndAssembly.Substring(
+                charAfterWhiteSpace,
+                _typeNameAndAssembly.Length - charAfterWhiteSpace);
+
+            return assemblyName == "mscorlib"
+                   || assemblyName == "netstandard"
+                   || assemblyName.StartsWith("System.")
+                   || assemblyName.StartsWith("Microsoft.")
+                   || assemblyName.StartsWith("Unity.")
+                   || assemblyName.StartsWith("UnityEngine.")
+                   || assemblyName.StartsWith("UnityEditor.");
         }
 
         private bool TypeAtGUIDIsSame()

@@ -17,6 +17,8 @@
         private BehaviourSelector _targetSelector;
         private string _genericTypeNameWithoutSuffix;
         private string[] _argumentNames;
+        private bool _triggerDropdown;
+        private string[] _genericArgNames;
 
         private void OnEnable()
         {
@@ -28,6 +30,14 @@
             _contentCache = new ContentCache();
             _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
             _argumentNames = new string[_targetSelector.TypeRefs.Length];
+
+            if (targetSelector.JustBeenAdded && _targetSelector.TypeRefs.Length == 1)
+            {
+                _targetSelector.TypeRefs[0].TriggerDropdownImmediately = true;
+                targetSelector.JustBeenAdded = false;
+            }
+
+            _genericArgNames = TypeUtility.GetNiceArgsOfGenericTypeDefinition(_targetSelector.GenericBehaviourType);
         }
 
         public override void OnInspectorGUI()
@@ -36,8 +46,14 @@
             {
                 EditorGUILayout.PropertyField(
                     _typesArray.GetArrayElementAtIndex(i),
-                    _contentCache.GetItem($"Type Parameter #{(i+1).ToString()}"),
+                    _contentCache.GetItem(_genericArgNames[i]),
                     null);
+            }
+
+            if (_triggerDropdown)
+            {
+                // trigger dropdown
+                _triggerDropdown = false;
             }
 
             if ( ! GUILayout.Button(GetButtonName()))

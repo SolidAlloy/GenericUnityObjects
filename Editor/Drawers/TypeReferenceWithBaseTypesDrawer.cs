@@ -2,6 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Util;
+    using MonoBehaviours;
     using TypeReferences.Editor.Drawers;
     using TypeReferences.Editor.Util;
     using UnityEditor;
@@ -58,14 +59,45 @@
 
             var dropdownDrawer = new TypeDropdownDrawer(selectedType, typeOptionsAttribute, fieldInfo?.DeclaringType);
 
-            var fieldDrawer = new TypeFieldDrawer(
-                serializedTypeRef,
-                position,
-                dropdownDrawer,
-                typeOptionsAttribute.ShortName,
-                typeOptionsAttribute.UseBuiltInNames);
+            var triggerDropdownProp = property.FindPropertyRelative(nameof(TypeReferenceWithBaseTypes.TriggerDropdownImmediately));
+            TypeFieldDrawer fieldDrawer;
+
+            if (triggerDropdownProp.boolValue)
+            {
+                triggerDropdownProp.boolValue = false;
+                property.serializedObject.ApplyModifiedProperties();
+
+                fieldDrawer = new TypeFieldDrawer(
+                    serializedTypeRef,
+                    position,
+                    dropdownDrawer,
+                    typeOptionsAttribute.ShortName,
+                    typeOptionsAttribute.UseBuiltInNames,
+                    type => OnTypeSelected(type, property),
+                    true);
+            }
+            else
+            {
+                fieldDrawer = new TypeFieldDrawer(
+                    serializedTypeRef,
+                    position,
+                    dropdownDrawer,
+                    typeOptionsAttribute.ShortName,
+                    typeOptionsAttribute.UseBuiltInNames);
+            }
 
             fieldDrawer.Draw();
+        }
+
+        private void OnTypeSelected(Type type, SerializedProperty property)
+        {
+            var targetSelector = (BehaviourSelector) property.serializedObject.targetObject;
+
+            GenericBehaviourCreator.AddComponent(
+                targetSelector.GetType(),
+                targetSelector.gameObject,
+                targetSelector.GenericBehaviourType,
+                new[] { type });
         }
     }
 }

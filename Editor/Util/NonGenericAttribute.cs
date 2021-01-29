@@ -21,7 +21,7 @@
 
             // When type has inheritance constraints, there's usually only a few types available, so expanding all
             // folders will look nice.
-            if (baseTypes.Length != 0)
+            if (baseTypes != null && baseTypes.Length != 0)
                 ExpandAllFolders = true;
         }
 

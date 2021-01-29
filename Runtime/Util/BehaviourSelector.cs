@@ -12,6 +12,7 @@
     /// </summary>
     public abstract class BehaviourSelector : MonoBehaviour
     {
+        [SerializeField] internal bool JustBeenAdded;
         [SerializeField] internal TypeReferenceWithBaseTypes[] TypeRefs;
 
         // This field is overriden by individual selectors and represents a generic type definition of a generic MonoBehaviour.
@@ -19,6 +20,8 @@
 
         private void Reset()
         {
+            JustBeenAdded = true;
+
             Assert.IsTrue(GenericBehaviourType.IsGenericTypeDefinition);
 
             int argsNum = GenericBehaviourType.GetGenericArguments().Length;

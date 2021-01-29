@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Util
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using JetBrains.Annotations;
     using SolidUtilities.Extensions;
@@ -43,10 +44,15 @@
         /// </summary>
         public static string GetNiceNameOfGenericTypeDefinition(Type genericTypeWithoutArgs)
         {
-            Type[] genericArgs = genericTypeWithoutArgs.GetGenericArguments();
             string typeNameWithoutBrackets = genericTypeWithoutArgs.Name.StripGenericSuffix();
-            var argumentNames = genericArgs.Select(argument => argument.Name);
+            var argumentNames = GetNiceArgsOfGenericTypeDefinition(genericTypeWithoutArgs);
             return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";
+        }
+
+        public static string[] GetNiceArgsOfGenericTypeDefinition(Type genericTypeWithoutArgs)
+        {
+            Type[] genericArgs = genericTypeWithoutArgs.GetGenericArguments();
+            return genericArgs.Select(argument => argument.Name).ToArray();
         }
 
         /// <summary>

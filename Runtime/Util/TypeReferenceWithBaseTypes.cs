@@ -11,5 +11,6 @@
     internal class TypeReferenceWithBaseTypes : TypeReference
     {
         public string[] BaseTypeNames;
+        public bool TriggerDropdownImmediately;
     }
 }
