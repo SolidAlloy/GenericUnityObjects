@@ -3,6 +3,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using GenericUnityObjects.Util;
+    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
@@ -18,6 +19,10 @@
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
         private static void AnalyzeGenericTypes()
         {
+#if GENERIC_UNITY_OBJECTS_DEBUG
+            using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
+#endif
+
             bool behavioursNeedDatabaseRefresh;
             bool scriptableObjectsNeedDatabaseRefresh;
 
