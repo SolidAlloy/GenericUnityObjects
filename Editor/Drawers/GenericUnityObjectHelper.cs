@@ -4,7 +4,6 @@
     using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
     /// <summary>

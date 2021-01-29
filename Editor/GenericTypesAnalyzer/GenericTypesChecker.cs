@@ -27,7 +27,7 @@
             var oldGenericTypes = GenerationDatabase<TObject>.GenericTypes;
             var newGenericTypes = TypeCache.GetTypesDerivedFrom<TObject>()
                 .Where(type => type.IsGenericType && ! type.IsAbstract)
-                .Select(type => new GenericTypeInfo(type))
+                .Select(GenericTypeInfo.Instantiate<TObject>)
                 .ToArray();
 
             int oldGenericTypesLength = oldGenericTypes.Length;

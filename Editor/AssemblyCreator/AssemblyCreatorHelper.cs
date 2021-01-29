@@ -27,8 +27,6 @@
                         null,
                         new[] { typeof(string) },
                         null);
-
-                    Assert.IsNotNull(_addComponentMenuConstructor);
                 }
 
                 return _addComponentMenuConstructor;
@@ -49,8 +47,6 @@
                         null,
                         new[] { typeof(RuntimeTypeHandle) },
                         null);
-
-                    Assert.IsNotNull(_getTypeFromHandle);
                 }
 
                 return _getTypeFromHandle;

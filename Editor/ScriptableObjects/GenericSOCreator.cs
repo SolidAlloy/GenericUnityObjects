@@ -6,7 +6,6 @@
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
     using UnityEditor;
-    using UnityEditor.Callbacks;
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;

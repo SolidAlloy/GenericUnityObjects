@@ -17,8 +17,7 @@
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            Assert.IsNotNull(label);
-            Assert.IsFalse(label == GUIContent.none);
+            Assert.IsFalse(label is null || label == GUIContent.none);
             position = EditorGUI.PrefixLabel(position, label);
             DrawTypeReferenceField(position, property);
         }

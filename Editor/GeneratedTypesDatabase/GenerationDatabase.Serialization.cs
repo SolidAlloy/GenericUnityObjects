@@ -29,9 +29,6 @@
             if (_genericArgumentKeys != null)
                 throw new InvalidOperationException("The asset is already initialized.");
 
-            if (! typeof(GenericTypeInfo).IsSerializable)
-                throw new SerializationException($"Cannot initialize a database with {typeof(GenericTypeInfo)} because the type is not serializable.");
-
             _argumentGenericTypesDict = new FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>>();
             _argumentsPool = new Pool<ArgumentInfo>();
             _genericTypeArgumentsDict = new FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>>();

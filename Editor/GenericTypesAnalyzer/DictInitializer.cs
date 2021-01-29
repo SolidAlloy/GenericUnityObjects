@@ -26,7 +26,7 @@
             {
                 var concreteClasses = GenerationDatabase<TObject>.GetConcreteClasses(behaviourInfo);
 
-                Type behaviourType = behaviourInfo.RetrieveType<TObject>();
+                Type behaviourType = behaviourInfo.RetrieveType<TObject>(false);
 
                 var concreteClassesDict = new Dictionary<Type[], Type>(concreteClasses.Length, default(TypeArrayComparer));
 

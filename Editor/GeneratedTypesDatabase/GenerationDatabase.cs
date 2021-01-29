@@ -46,6 +46,10 @@
 
         public GenericTypeInfo[] InstanceGenericTypes => _genericTypeArgumentsDict.KeysCollection;
 
+        [CanBeNull]
+        public static string GetCachedGenericTypeGUID(string typeNameAndAssembly)
+            => Instance._genericTypesPool.GetGUID(typeNameAndAssembly);
+
         public static void AddGenericType(GenericTypeInfo genericTypeInfo)
         {
             Instance.AddGenericTypeImpl(genericTypeInfo);
@@ -60,7 +64,7 @@
 
         public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID)
         {
-            var genericTypeInfo = new GenericTypeInfo(genericTypeWithoutArgs);
+            var genericTypeInfo = GenericTypeInfo.Instantiate<TUnityObject>(genericTypeWithoutArgs);
 
             int genericArgsLength = genericArgs.Length;
             var arguments = new ArgumentInfo[genericArgsLength];

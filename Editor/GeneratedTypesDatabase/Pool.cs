@@ -2,14 +2,18 @@
 {
     using System;
     using System.Collections.Generic;
+    using JetBrains.Annotations;
 
     internal class Pool<T>
+        where T : TypeInfo
     {
         private readonly Dictionary<T, T> _dict;
+        private readonly Dictionary<string, string> _typeNameGUIDDict;
 
         public Pool(int capacity = 0)
         {
             _dict = new Dictionary<T, T>(capacity);
+            _typeNameGUIDDict = new Dictionary<string, string>(capacity);
         }
 
         public T GetOrAdd(T item)
@@ -17,7 +21,8 @@
             if (_dict.TryGetValue(item, out T existingItem))
                 return existingItem;
 
-            _dict[item] = item;
+            _dict.Add(item, item);
+            _typeNameGUIDDict.Add(item.TypeNameAndAssembly, item.GUID);
             return item;
         }
 
@@ -25,8 +30,11 @@
         {
             foreach (T item in items)
             {
-                if (! _dict.ContainsKey(item))
-                    _dict.Add(item, item);
+                if (_dict.ContainsKey(item))
+                    continue;
+
+                _dict.Add(item, item);
+                _typeNameGUIDDict.Add(item.TypeNameAndAssembly, item.GUID);
             }
         }
 
@@ -36,11 +44,20 @@
             {
                 item = existingItem;
                 _dict.Remove(item);
+                _typeNameGUIDDict.Remove(item.TypeNameAndAssembly);
             }
 
             changeItem(item);
 
-            _dict[item] = item;
+            _dict.Add(item, item);
+            _typeNameGUIDDict.Add(item.TypeNameAndAssembly, item.GUID);
+        }
+
+        [CanBeNull]
+        public string GetGUID(string typeNameAndAssembly)
+        {
+            _typeNameGUIDDict.TryGetValue(typeNameAndAssembly, out string guid);
+            return guid;
         }
     }
 }

@@ -33,8 +33,20 @@
             _guid = typeGUID ?? GetClassGUID(type);
         }
 
+        protected TypeInfo(Type type, string typeNameAndAssembly, string typeGUID)
+        {
+            Type = type;
+            _typeNameAndAssembly = typeNameAndAssembly;
+            _guid = typeGUID ?? GetClassGUID(type);
+        }
+
         private string GetClassGUID(Type type)
         {
+            string guid = GenerationDatabase<MonoBehaviour>.GetCachedGenericTypeGUID(_typeNameAndAssembly);
+
+            if (guid != null)
+                return guid;
+
             if (TypeCannotHaveGUID())
                 return string.Empty;
 
@@ -56,7 +68,7 @@
             }
         }
 
-        public bool RetrieveType<TObject>(out Type type, out bool retrievedFromGUID)
+        public bool RetrieveType<TObject>(out Type type, out bool retrievedFromGUID, bool updateGUID = true)
             where TObject : Object
         {
             retrievedFromGUID = false;
@@ -71,8 +83,10 @@
 
             if (Type != null)
             {
+                if (updateGUID)
+                    UpdateGUIDIfNeeded<TObject>();
+
                 type = Type;
-                UpdateGUIDIfNeeded<TObject>();
                 return true;
             }
 
@@ -89,10 +103,18 @@
             return Type != null;
         }
 
-        public Type RetrieveType<TObject>()
+        /// <summary> Retrieves type stored in this <see cref="TypeInfo"/> instance. </summary>
+        /// <param name="updateGUID">
+        /// Whether to try updating GUID if the type was found using typeNameAndAssembly. It is strongly not
+        /// recommended to use. The only case when it can be to false is after all generic types are updated, to
+        /// improve performance. See <see cref="DictInitializer{TObject}"/>. /
+        /// </param>
+        /// <typeparam name="TObject"> Type derived from <see cref="UnityEngine.Object"/>. </typeparam>
+        /// <returns> A retrieved type or <c>null</c>, if the type was not found by typeNameAndAssembly or GUID. </returns>
+        public Type RetrieveType<TObject>(bool updateGUID = true)
             where TObject : Object
         {
-            RetrieveType<TObject>(out Type type, out bool _);
+            RetrieveType<TObject>(out Type type, out bool _, updateGUID);
             return type;
         }
 
@@ -106,27 +128,21 @@
 
         public bool Equals(TypeInfo p)
         {
-            // If parameter is null, return false.
             if (ReferenceEquals(p, null))
             {
                 return false;
             }
 
-            // Optimization for a common success case.
             if (ReferenceEquals(this, p))
             {
                 return true;
             }
 
-            // If run-time types are not exactly the same, return false.
             if (this.GetType() != p.GetType())
             {
                 return false;
             }
 
-            // Return true if the fields match.
-            // Note that the base class is not invoked because it is
-            // System.Object, which defines Equals as reference equality.
             return TypeNameAndAssembly == p.TypeNameAndAssembly && _guid == p._guid;
         }
 
@@ -184,7 +200,7 @@
             if (TypeAtGUIDIsSame())
                 return;
 
-            string newGUID = AssetSearcher.GetClassGUID(Type); //
+            string newGUID = AssetSearcher.GetClassGUID(Type);
 
             if (string.IsNullOrEmpty(newGUID) || GUID == newGUID)
                 return;
@@ -199,14 +215,14 @@
             }
             else
             {
-                throw new TypeLoadException($"{nameof(UpdateGUIDIfNeeded)} method doesn't know of this inheritor of {nameof(TypeInfo)} yet: {GetType()}.");
+                throw new TypeLoadException(
+                    $"{nameof(UpdateGUIDIfNeeded)} method doesn't know of this inheritor " +
+                    $"of {nameof(TypeInfo)} yet: {GetType()}.");
             }
         }
 
         private bool TypeAtGUIDIsSame()
         {
-            // Check if asset at guid contains the same type
-            // If it doesn't contain the same type or no type at all, search GUID of the type elsewhere
             string path = AssetDatabase.GUIDToAssetPath(GUID);
             if (path.Length == 0)
                 return false;

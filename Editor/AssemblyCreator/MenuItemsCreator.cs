@@ -31,8 +31,6 @@
                         null,
                         new[] { typeof(Type), typeof(string) },
                         null);
-
-                    Assert.IsNotNull(_createAsset);
                 }
 
                 return _createAsset;
@@ -67,8 +65,6 @@
                         null,
                         new[] { typeof(string) },
                         null);
-
-                    Assert.IsNotNull(_menuItemConstructor);
                 }
 
                 return _menuItemConstructor;

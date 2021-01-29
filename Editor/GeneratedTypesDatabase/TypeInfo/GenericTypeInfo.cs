@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using GenericUnityObjects.Util;
     using NUnit.Framework;
     using SolidUtilities.Helpers;
     using UnityEngine;
@@ -29,11 +30,24 @@
             _argNames = argNames;
         }
 
-        public GenericTypeInfo(Type type, string typeGUID = null)
-            : base(type, typeGUID)
+        private GenericTypeInfo(Type type, string typeNameAndAssembly, string guid)
+            : base(type, typeNameAndAssembly, guid)
         {
+            // Assert can be expensive when called many times, and there may be hundreds of GenericTypeInfos in
+            // a large project that are constructed after each domain reload.
+#if GENERIC_UNITY_OBJECTS_DEBUG
             Assert.IsTrue(type.IsGenericTypeDefinition);
+#endif
+
             _argNames = type.GetGenericArguments().Select(argType => argType.Name).ToArray();
+        }
+
+        public static GenericTypeInfo Instantiate<TObject>(Type type)
+            where TObject : UnityEngine.Object
+        {
+            string typeNameAndAssembly = TypeUtility.GetTypeNameAndAssembly(type);
+            string guid = GenerationDatabase<TObject>.GetCachedGenericTypeGUID(typeNameAndAssembly);
+            return new GenericTypeInfo(type, typeNameAndAssembly, guid);
         }
 
         public void UpdateArgNames(string[] newNames) => _argNames = newNames;
