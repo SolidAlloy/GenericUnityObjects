@@ -67,19 +67,19 @@ namespace GenericUnityObjects.ScriptableObject_Example.Editor
 
         private static void CreateStats(Warriors warriors)
         {
-            var heavyArcher = GenericScriptableObject.CreateInstanceStrict<WarriorStats<Archer>>();
+            var heavyArcher = GenericScriptableObject.CreateInstance<WarriorStats<Archer>>();
             heavyArcher.Damage = 65;
             heavyArcher.Health = 600;
 
-            var lightArcher = GenericScriptableObject.CreateInstanceStrict<WarriorStats<Archer>>();
+            var lightArcher = GenericScriptableObject.CreateInstance<WarriorStats<Archer>>();
             lightArcher.Damage = 85;
             lightArcher.Health = 450;
 
-            var defaultBerserker = GenericScriptableObject.CreateInstanceStrict<WarriorStats<Berserker>>();
+            var defaultBerserker = GenericScriptableObject.CreateInstance<WarriorStats<Berserker>>();
             defaultBerserker.Damage = 80;
             defaultBerserker.Health = 1000;
 
-            var defaultKnight = GenericScriptableObject.CreateInstanceStrict<WarriorStats<Knight>>();
+            var defaultKnight = GenericScriptableObject.CreateInstance<WarriorStats<Knight>>();
             defaultKnight.Damage = 100;
             defaultKnight.Health = 900;
 
