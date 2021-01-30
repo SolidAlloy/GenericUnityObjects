@@ -1,5 +1,5 @@
 # Generic UnityEngine.Objects
-[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-scriptable-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-scriptable-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericScriptableObjects/blob/main/LICENSE) ![Unity: 2020.2](https://img.shields.io/badge/unity-2020.2-yellow) ![.NET 4.x](https://img.shields.io/badge/.NET-4.x-9cf)
+[![openupm](https://img.shields.io/npm/v/com.solidalloy.generic-unity-objects?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.solidalloy.generic-unity-objects/) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/SolidAlloy/GenericUnityObjects/blob/main/LICENSE) ![Unity: 2020.2](https://img.shields.io/badge/unity-2020.2-yellow) ![.NET 4.x](https://img.shields.io/badge/.NET-4.x-9cf)
 
 This package allows to create and use generic ScriptableObjects and MonoBehaviours in Unity3D. Although generic serializable classes are now supported by Unity 2020, generic ScriptableObject and MonoBehaviour are not yet, and this plugin allows to overcome this limitation.
 
