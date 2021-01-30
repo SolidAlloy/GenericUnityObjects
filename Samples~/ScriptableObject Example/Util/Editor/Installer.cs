@@ -99,19 +99,19 @@ namespace GenericUnityObjects.ScriptableObject_Example.Editor
         {
             const string relationshipsFolder = "Relationships";
 
-            var arnetGeltull = GenericScriptableObject.CreateInstanceStrict<WarriorsRelationship<Archer, Berserker>>();
+            var arnetGeltull = GenericScriptableObject.CreateInstance<WarriorsRelationship<Archer, Berserker>>();
             arnetGeltull.Relationship = RelationshipType.Neutral;
             arnetGeltull.FirstWarrior = warriors.Arnet;
             arnetGeltull.SecondWarrior = warriors.Geltull;
             AssetDatabase.CreateAsset(arnetGeltull, $"{_scriptableObjectSampleFolder}/{relationshipsFolder}/Arnet - Geltull.asset");
 
-            var edunFulchard = GenericScriptableObject.CreateInstanceStrict<WarriorsRelationship<Archer, Knight>>();
+            var edunFulchard = GenericScriptableObject.CreateInstance<WarriorsRelationship<Archer, Knight>>();
             edunFulchard.Relationship = RelationshipType.Friendly;
             edunFulchard.FirstWarrior = warriors.Edun;
             edunFulchard.SecondWarrior = warriors.Fulchard;
             AssetDatabase.CreateAsset(edunFulchard, $"{_scriptableObjectSampleFolder}/{relationshipsFolder}/Edun - Fulchard.asset");
 
-            var geltullFulchard = GenericScriptableObject.CreateInstanceStrict<WarriorsRelationship<Berserker, Knight>>();
+            var geltullFulchard = GenericScriptableObject.CreateInstance<WarriorsRelationship<Berserker, Knight>>();
             geltullFulchard.Relationship = RelationshipType.Aggressive;
             geltullFulchard.FirstWarrior = warriors.Geltull;
             geltullFulchard.SecondWarrior = warriors.Fulchard;
