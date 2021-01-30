@@ -102,7 +102,7 @@ public class WarriorStats<TClass> : GenericScriptableObject
 
 Now you can create assets:
 
-![Asset Creation GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableObjects/main/.asset-creation.gif)
+![Asset Creation GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.asset-creation.gif)
 
 When you create an asset with certain generic arguments for the first time, a short compile dialog will show up. This is an expected behavior because the plugin needs to generate a non-generic class that derives from the generic class with the arguments you've chosen. Once the class is generated, a usual asset creation dialog will appear, where you will be prompted to enter the name of your new asset.
 
@@ -161,7 +161,7 @@ Note that the `Serializable` attribute is needed for a generic class to be seria
 
 Once the script is saved, you will be able to add a generic component through the **Add Component** button:
 
-![Add Component GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericScriptableObjects/main/.add-component.gif)
+![Add Component GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.add-component.gif)
 
 #### Creating an instance at runtime
 
