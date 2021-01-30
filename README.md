@@ -12,7 +12,7 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 
 ## How To Install
 
-#### OpenUPM
+### OpenUPM
 
 Once you have the OpenUPM cli, run the following command:
 
@@ -42,7 +42,7 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
 
 
 
-#### Git URL
+### Git URL
 
 Project supports Unity Package Manager. To install it as a Git package do the following:
 
@@ -57,7 +57,7 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 
 ## Generic ScriptableObject Usage
 
-#### Implementing a generic ScriptableObject
+### Implementing a generic ScriptableObject
 
 To create a generic ScriptableObject, you need to derive the class from `GenericScriptableObject`:
 
@@ -83,7 +83,7 @@ If you use Unity 2020, you need to specify the `Serializable` attribute explicit
 
 In this example, there is only one generic argument, but you can use as many as you want.
 
-#### CreateGenericAssetMenu attribute
+### CreateGenericAssetMenu attribute
 
 Now, to be able to create assets from the context menu, you can add the `[CreateGenericAssetMenu]` attribute to the class. It has all the same optional properties as the [[CreateAssetMenu]](https://docs.unity3d.com/ScriptReference/CreateAssetMenuAttribute.html) attribute: FileName, MenuName, Order.
 
@@ -108,7 +108,7 @@ When you create an asset with certain generic arguments for the first time, a sh
 
 The type selection pop-up is powered by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity).
 
-#### Creating an instance at runtime
+### Creating an instance at runtime
 
 A generic ScriptableObject instance can be created at runtime. The CreateInstance method looks very similar, you just need pass a generic type instead:
 
@@ -141,7 +141,7 @@ public class WarriorStats<TClass> : GenericScriptableObject
 
 ## Generic MonoBehaviour Usage
 
-#### Implementing a generic MonoBehaviour
+### Implementing a generic MonoBehaviour
 
 Unlike generic ScriptableObjects, Generic MonoBehaviour can inherit directly from MonoBehaviour:
 
@@ -163,7 +163,7 @@ Once the script is saved, you will be able to add a generic component through th
 
 ![Add Component GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.add-component.gif)
 
-#### Creating an instance at runtime
+### Creating an instance at runtime
 
 A generic MonoBehaviour component can be manipulated at runtime. The method names are the same, only "Component" part is replaced with "GenericComponent":
 
@@ -178,7 +178,7 @@ var knightsGroupComponent = gameObject.GetGenericComponent(typeof(Unit<Knight>))
 
 ## Common
 
-#### Referencing a generic UnityEngine.Object
+### Referencing a generic UnityEngine.Object
 
 You can create a serialized field for a generic ScriptableObject or MonoBehaviour just like for the usual one:
 
@@ -195,7 +195,7 @@ You will get an object field in the inspector:
 
 ![Object Field](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.object-field.png)
 
-#### File Naming
+### File Naming
 
 The file name of a generic UnityEngine.Object must contain the name of the type (e.g. "WarriorStats" in `WarriorStats<TClass>`). Suffixes are up to you:
 
@@ -234,13 +234,13 @@ Otherwise, when a concrete class is generated, it cannot access the constructor 
 
 ## Custom Editors
 
-#### MonoScript field
+### MonoScript field
 
 By default, inspector shows incorrect script in the ***Script*** field of generic objects. To draw the MonoScript field correctly, the plugin uses a custom editor for MonoBehaviour and GenericScriptableObject types. If you need to implement your own custom editor but still want to see the correct ***Script*** field, use the GenericUnityObjectHelper class. Instantiate a helper in `OnEnable()`, then draw the ***Script*** field inside `OnInspectorGUI()` with the `DrawMonoScript(property)` method.
 
 You can also disable custom editors completely by defining the `DISABLE_GENERIC_OBJECT_EDITOR` directive.
 
-#### Object field
+### Object field
 
 Unity can't handle object fields for generic objects properly. For example, it will show ``GenericBehaviour`1`` instead of `GenericBehaviour<int>`, and will not list assets when you want to choose a generic ScriptableObject.
 
