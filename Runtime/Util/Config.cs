@@ -7,7 +7,7 @@
     {
         public const string MenuItemsAssemblyName = "GeneratedMenuItems";
 
-        public const string MainFolderPath = "Assets/GenericUnityObjects";
+        public const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
         public const string ResourcesPath = MainFolderPath + "/Resources";
         public const string EditorResourcesPath = MainFolderPath + "/EditorResources";
         public const string AssembliesDirPath = MainFolderPath + "/Assemblies";
