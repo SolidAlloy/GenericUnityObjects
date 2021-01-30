@@ -244,7 +244,7 @@ You can also disable custom editors completely by defining the `DISABLE_GENERIC_
 
 Unity can't handle object fields for generic objects properly. For example, it will show ``GenericBehaviour`1`` instead of `GenericBehaviour<int>`, and will not list assets when you want to choose a generic ScriptableObject.
 
-The plugin uses custom ObjectField() methods for fields of generic objects. You can also use it in your custom editor. **GenericObjectDrawer** class overloads of EditorGUI.ObjectField and EditorGUILayout.ObjectField that support generic objects.
+The plugin uses custom ObjectField() methods for fields of generic objects to fix those issues. You can also use it in your custom editor. **GenericObjectDrawer** class has overloads of EditorGUI.ObjectField and EditorGUILayout.ObjectField that support generic objects.
 
 ## Contributing
 
