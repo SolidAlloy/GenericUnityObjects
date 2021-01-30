@@ -2,7 +2,6 @@
 {
     using System;
     using SolidUtilities.Editor.Extensions;
-    using TypeReferences;
     using TypeReferences.Editor.TypeDropdown;
     using Util;
 

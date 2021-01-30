@@ -25,6 +25,14 @@
                 ExpandAllFolders = true;
         }
 
+        public void ChangeBaseTypes(Type[] baseTypes)
+        {
+            BaseTypes = baseTypes;
+
+            if (baseTypes != null && baseTypes.Length != 0)
+                ExpandAllFolders = true;
+        }
+
         internal override bool MatchesRequirements(Type type)
         {
             return base.MatchesRequirements(type) && ! type.IsGenericTypeDefinition;

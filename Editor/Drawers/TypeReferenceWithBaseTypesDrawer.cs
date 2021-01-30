@@ -16,32 +16,20 @@
     {
         private static readonly NonGenericAttribute _attribute = new NonGenericAttribute(null);
 
+        public void TriggerDropdownImmediately(Rect position, SerializedProperty property, GUIContent label)
+        {
+            position = EditorGUI.PrefixLabel(position, label);
+            DrawTypeReferenceField(position, property, true);
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Assert.IsFalse(label is null || label == GUIContent.none);
             position = EditorGUI.PrefixLabel(position, label);
-            DrawTypeReferenceField(position, property);
+            DrawTypeReferenceField(position, property, false);
         }
 
-        private static NonGenericAttribute GetAttribute(SerializedProperty property)
-        {
-            SerializedProperty baseTypesProperty =
-                property.FindPropertyRelative(nameof(TypeReferenceWithBaseTypes.BaseTypeNames));
-
-            var baseTypes = new Type[baseTypesProperty.arraySize];
-
-            for (int i = 0; i < baseTypesProperty.arraySize; i++)
-            {
-                SerializedProperty typeRefProperty = baseTypesProperty.GetArrayElementAtIndex(i);
-                Type baseType = TypeCache.GetType(typeRefProperty.stringValue);
-                baseTypes[i] = baseType;
-            }
-
-            _attribute.BaseTypes = baseTypes;
-            return _attribute;
-        }
-
-        private void DrawTypeReferenceField(Rect position, SerializedProperty property)
+        private void DrawTypeReferenceField(Rect position, SerializedProperty property, bool triggerDropdownImmediately)
         {
             NonGenericAttribute typeOptionsAttribute = GetAttribute(property);
 
@@ -59,32 +47,25 @@
 
             var dropdownDrawer = new TypeDropdownDrawer(selectedType, typeOptionsAttribute, fieldInfo?.DeclaringType);
 
-            var triggerDropdownProp = property.FindPropertyRelative(nameof(TypeReferenceWithBaseTypes.TriggerDropdownImmediately));
-            TypeFieldDrawer fieldDrawer;
+            Action<Type> onTypeSelected;
 
-            if (triggerDropdownProp.boolValue)
+            if (triggerDropdownImmediately)
             {
-                triggerDropdownProp.boolValue = false;
-                property.serializedObject.ApplyModifiedProperties();
-
-                fieldDrawer = new TypeFieldDrawer(
-                    serializedTypeRef,
-                    position,
-                    dropdownDrawer,
-                    typeOptionsAttribute.ShortName,
-                    typeOptionsAttribute.UseBuiltInNames,
-                    type => OnTypeSelected(type, property),
-                    true);
+                onTypeSelected = type => OnTypeSelected(type, property);
             }
             else
             {
-                fieldDrawer = new TypeFieldDrawer(
-                    serializedTypeRef,
-                    position,
-                    dropdownDrawer,
-                    typeOptionsAttribute.ShortName,
-                    typeOptionsAttribute.UseBuiltInNames);
+                onTypeSelected = null;
             }
+
+            var fieldDrawer = new TypeFieldDrawer(
+                serializedTypeRef,
+                position,
+                dropdownDrawer,
+                typeOptionsAttribute.ShortName,
+                typeOptionsAttribute.UseBuiltInNames,
+                onTypeSelected,
+                triggerDropdownImmediately);
 
             fieldDrawer.Draw();
         }
@@ -98,6 +79,24 @@
                 targetSelector.gameObject,
                 targetSelector.GenericBehaviourType,
                 new[] { type });
+        }
+
+        private static NonGenericAttribute GetAttribute(SerializedProperty property)
+        {
+            SerializedProperty baseTypesProperty =
+                property.FindPropertyRelative(nameof(TypeReferenceWithBaseTypes.BaseTypeNames));
+
+            var baseTypes = new Type[baseTypesProperty.arraySize];
+
+            for (int i = 0; i < baseTypesProperty.arraySize; i++)
+            {
+                SerializedProperty typeRefProperty = baseTypesProperty.GetArrayElementAtIndex(i);
+                Type baseType = TypeCache.GetType(typeRefProperty.stringValue);
+                baseTypes[i] = baseType;
+            }
+
+            _attribute.ChangeBaseTypes(baseTypes);
+            return _attribute;
         }
     }
 }

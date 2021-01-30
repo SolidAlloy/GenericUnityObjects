@@ -17,8 +17,8 @@
         private BehaviourSelector _targetSelector;
         private string _genericTypeNameWithoutSuffix;
         private string[] _argumentNames;
-        private bool _triggerDropdown;
         private string[] _genericArgNames;
+        private TypeReferenceWithBaseTypesDrawer _drawer;
 
         private void OnEnable()
         {
@@ -30,30 +30,27 @@
             _contentCache = new ContentCache();
             _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
             _argumentNames = new string[_targetSelector.TypeRefs.Length];
-
-            if (targetSelector.JustBeenAdded && _targetSelector.TypeRefs.Length == 1)
-            {
-                _targetSelector.TypeRefs[0].TriggerDropdownImmediately = true;
-                targetSelector.JustBeenAdded = false;
-            }
-
             _genericArgNames = TypeUtility.GetNiceArgsOfGenericTypeDefinition(_targetSelector.GenericBehaviourType);
+            _drawer = new TypeReferenceWithBaseTypesDrawer();
         }
 
         public override void OnInspectorGUI()
         {
             for (int i = 0; i < _typesArray.arraySize; i++)
             {
-                EditorGUILayout.PropertyField(
-                    _typesArray.GetArrayElementAtIndex(i),
-                    _contentCache.GetItem(_genericArgNames[i]),
-                    null);
-            }
+                SerializedProperty prop = _typesArray.GetArrayElementAtIndex(i);
+                GUIContent label = _contentCache.GetItem(_genericArgNames[i]);
+                Rect propertyRect = EditorGUILayout.GetControlRect(true, _drawer.GetPropertyHeight(prop, label));
 
-            if (_triggerDropdown)
-            {
-                // trigger dropdown
-                _triggerDropdown = false;
+                if (_targetSelector.JustBeenAdded && _targetSelector.TypeRefs.Length == 1)
+                {
+                    _targetSelector.JustBeenAdded = false;
+                    _drawer.TriggerDropdownImmediately(propertyRect, prop, label);
+                }
+                else
+                {
+                    _drawer.OnGUI(propertyRect, prop, label);
+                }
             }
 
             if ( ! GUILayout.Button(GetButtonName()))
