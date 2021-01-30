@@ -210,25 +210,25 @@ This way the plugin will be able to detect a class name change.
 
 There are a few limitations that cannot be overcome, unfortunately.
 
-##### If a GenericScriptableObject with specific generic arguments has not been created through the Assets/Create menu yet, you can instantiate it at runtime, but cannot create an asset out of it.
+#### If a GenericScriptableObject with specific generic arguments has not been created through the Assets/Create menu yet, you can instantiate it at runtime, but cannot create an asset out of it.
 
 Let's say you have a GenericScriptableObject class called `GenericSO<T>`, and you created a `GenericSO<int>` asset through the **Assets/Create** menu. Then, in a script, you call `GenericScriptableObject.CreateInstance<GenericSO<int>>()` and `GenericScriptableObject.CreateInstance<GenericSO<bool>>()`. Both instances will be created just fine. However, `AssetDatabase.CreateAsset<GenericSO<int>>()` will be successful, but an asset created with `AssetDatabase.CreateAsset<GenericSO<bool>>>()` will start showing "Missing Mono Script" after assemblies recompilation.
 
 When you create a GenericScriptableObject asset with new sequence of generic arguments, a concrete class is generated to support this specific sequence. But if you create an instance with new sequence of generic arguments at runtime, the new concrete class cannot be generated without recompilation of the assembly, so it is emitted and will be destroyed after the program quits.
 
-##### If a generic MonoBehaviour with specific generic arguments has not been added as component through the Add Component button yet, you can add it in play mode, but not in edit mode.
+#### If a generic MonoBehaviour with specific generic arguments has not been added as component through the Add Component button yet, you can add it in play mode, but not in edit mode.
 
 The principle is the same as with GenericScriptableObjects. Let's say you have a MonoBehaviour class called `GenericBehaviour<T>`, and have already added a `GenericBehaviour<int>` component through the **Add Component** button. In **Play Mode**, both calls will be fine: `gameObject.AddGenericComponent<GenericBehaviour<int>>()` and `gameObject.AddGenericComponent<GenericBehaviour<bool>>()`. But in Edit Mode, `gameObject.AddGenericComponent<GenericBehaviour<bool>>()` will produce a component that will start showing "Missing Mono Script" after recompilation.
 
-##### If a generic UnityEngine.Object with specific generic arguments has not been created/added through Editor UI, it cannot be instantiated in IL2CPP builds.
+#### If a generic UnityEngine.Object with specific generic arguments has not been created/added through Editor UI, it cannot be instantiated in IL2CPP builds.
 
 If you've created an asset of `GenericSO<int>` through the **Assets/Create** menu once, a supporting concrete class has already been generated, so you can instantiate `GenericSO<int>` in IL2CPP build. But `GenericScriptableObject.CreateInstance<GenericSO<bool>>()` will throw `NotSupportedException` because an underlying concrete class was not generated in Editor, and IL2CPP doesn't support [Reflection.Emit](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit) to generate classes dynamically.
 
-##### Using a generic class as a generic argument is prohibited (e.g. `GenericBehaviour<AnotherClass<int>>`).
+#### Using a generic class as a generic argument is prohibited (e.g. `GenericBehaviour<AnotherClass<int>>`).
 
 In theory, it can be implemented, but it will add more complexity to the system and is used so rarely that I decided not to add such a feature.
 
-##### Generic UnityEngine.Object cannot be internal
+#### Generic UnityEngine.Object cannot be internal.
 
 Otherwise, when a concrete class is generated, it cannot access the constructor of the internal generic class. [IgnoreAccessCheckTo](https://www.strathweb.com/2018/10/no-internalvisibleto-no-problem-bypassing-c-visibility-rules-with-roslyn/) should work but in Unity it doesn't for some reason. You will be able to create assets and add components of internal generic types, and see their fields in the inspector just fine, but every time you instantiate a generic UnityEngine.Object, an error will show up in the Console.
 
