@@ -18,16 +18,17 @@
         /// </summary>
         /// <param name="rect">Rectangle of the object field.</param>
         /// <param name="property">Property that references a <see cref="UnityEngine.Object"/>.</param>
+        /// <param name="label">Label in front of the field, or <c>null</c> if no label should be set.</param>
         [PublicAPI]
-        public static void ObjectField(Rect rect, SerializedProperty property)
+        public static void ObjectField(Rect rect, SerializedProperty property, GUIContent label = null)
         {
             if (property.type.Contains("`"))
             {
-                EditorGUIHelper.GenericObjectField(rect, property);
+                EditorGUIHelper.GenericObjectField(rect, property, label);
             }
             else
             {
-                EditorGUI.PropertyField(rect, property);
+                EditorGUI.PropertyField(rect, property, label);
             }
         }
 

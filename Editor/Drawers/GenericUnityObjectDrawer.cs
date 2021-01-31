@@ -18,7 +18,7 @@
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            GenericObjectDrawer.ObjectField(position, property);
+            GenericObjectDrawer.ObjectField(position, property, label);
         }
     }
 }

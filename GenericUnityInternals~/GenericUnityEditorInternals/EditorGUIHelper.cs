@@ -21,33 +21,35 @@
         /// Version of <see cref="EditorGUI.ObjectField"/> that accepts only a generic type and draws it correctly.
         /// </summary>
         [PublicAPI]
-        public static void GenericObjectField(Rect position, SerializedProperty property)
+        public static void GenericObjectField(Rect position, SerializedProperty property, GUIContent label = null)
         {
-            GUIContent label = EditorGUI.BeginProperty(position, null, property);
+            GUIContent propertyLabel = EditorGUI.BeginProperty(position, label, property);
 
-            ObjectFieldInternal(position, property, label);
+            ObjectFieldInternal(position, property, label == null ? null : propertyLabel);
 
             EditorGUI.EndProperty();
         }
 
-        private static void ObjectFieldInternal(Rect position, SerializedProperty property, GUIContent label)
+        private static void ObjectFieldInternal(Rect position, SerializedProperty property, [CanBeNull] GUIContent label)
         {
             Object objectBeingEdited = property.serializedObject.targetObject;
 
             // Allow scene objects if the object being edited is NOT persistent
             bool allowSceneObjects = ! (objectBeingEdited == null || EditorUtility.IsPersistent(objectBeingEdited));
 
-            property.objectReferenceValue = ObjectFieldInternal(position, label, property.objectReferenceValue, 
+            property.objectReferenceValue = ObjectFieldInternal(position, label, property.objectReferenceValue,
                 allowSceneObjects, new ObjectFieldHelper(property));
         }
 
-        private static Object ObjectFieldInternal(Rect position, GUIContent label, Object currentTarget, 
+        private static Object ObjectFieldInternal(Rect position, [CanBeNull] GUIContent label, Object currentTarget,
             bool allowSceneObjects, ObjectFieldHelper helper)
         {
             const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
 
             int id = GUIUtility.GetControlID(EditorGUI.s_PPtrHash, FocusType.Keyboard, position);
-            position = EditorGUI.PrefixLabel(position, id, label);
+
+            if (label != null)
+                position = EditorGUI.PrefixLabel(position, id, label);
 
             Event evt = Event.current;
             EventType eventType;
