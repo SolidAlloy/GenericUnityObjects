@@ -61,7 +61,7 @@
         <Compile Include="EditorGUIHelper.cs" />
         <Compile Include="EditorGUILayoutHelper.cs" />
         <Compile Include="GenericMonoImporterInspector.cs" />
-        <Compile Include="GenericObjectInternalEditor.cs" />
+        <Compile Include="GenericHeaderEditor.cs" />
         <Compile Include="GenericTypeHelper.cs" />
         <Compile Include="ObjectFieldHelper.cs" />
         <Compile Include="ObjectSelectorExtensions.cs" />

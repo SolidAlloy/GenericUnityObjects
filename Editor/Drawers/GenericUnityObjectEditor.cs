@@ -15,7 +15,7 @@
     internal class GenericScriptableObjectEditor : GenericUnityObjectEditor { }
 #endif
 
-    internal class GenericUnityObjectEditor : GenericObjectInternalEditor
+    internal class GenericUnityObjectEditor : GenericHeaderEditor
     {
         private GenericUnityObjectHelper _helper;
 
