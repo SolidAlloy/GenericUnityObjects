@@ -23,7 +23,7 @@
             TypeBuilder typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, typeof(BehaviourSelector));
 
             CreateBehaviourTypeProperty(typeBuilder, genericBehaviourWithoutArgs);
-            string componentName = "Scripts/" + TypeUtility.GetNiceNameOfGenericTypeDefinition(genericBehaviourWithoutArgs);
+            string componentName = "Scripts/" + TypeUtility.GetNiceNameOfGenericTypeDefinition(genericBehaviourWithoutArgs, true);
             AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
 
             typeBuilder.CreateType();

@@ -175,7 +175,6 @@
             return (string) getActiveFolderPath.Invoke(null, null);
         }
 
-
         public static void TriggerAssetCreation(Type typeToSet)
         {
             EditorApplication.ExecuteMenuItem($"Assets/Create/{DefaultGenericClassName}1<T>");
