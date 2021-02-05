@@ -3,7 +3,6 @@
     using System;
     using System.Linq;
     using GenericUnityObjects.Util;
-    using NUnit.Framework;
     using SolidUtilities.Helpers;
     using UnityEngine;
 

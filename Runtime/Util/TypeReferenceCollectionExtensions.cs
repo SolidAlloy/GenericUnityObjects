@@ -1,8 +1,6 @@
 ﻿namespace GenericUnityObjects.Util
 {
     using System;
-    using System.Linq;
-    using TypeReferences;
 
     internal static class TypeReferenceCollectionExtensions
     {

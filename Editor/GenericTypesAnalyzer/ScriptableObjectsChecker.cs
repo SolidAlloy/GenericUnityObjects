@@ -2,7 +2,6 @@
 {
     using System;
     using GeneratedTypesDatabase;
-    using SolidUtilities.Extensions;
 
     /// <summary>
     /// Checks if any generic <see cref="GenericScriptableObject"/> types were changed, removed, or updated, and

@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
     using GenericUnityObjects.Util;
-    using UnityEngine;
 
     /// <summary>
     /// Completely identical to <see cref="SingletonScriptableObject{T}"/> except that assets are saved to

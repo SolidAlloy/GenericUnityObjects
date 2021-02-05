@@ -92,7 +92,6 @@
             AssertThatSelectorIsUpdated(TestHelper.DefaultGenericClassName, "T");
         }
 
-
         [UnityTest]
         public IEnumerator Selector_is_updated_when_type_name_changes_but_script_name_and_guid_does_not()
         {

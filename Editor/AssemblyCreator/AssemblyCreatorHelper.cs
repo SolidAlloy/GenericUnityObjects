@@ -7,7 +7,6 @@
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
     using UnityEngine;
-    using UnityEngine.Assertions;
 
     /// <summary>
     /// A storage for methods and properties used by multiple AssemblyCreator-related classes.

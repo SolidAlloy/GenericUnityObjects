@@ -3,9 +3,7 @@
     using System;
     using GenericUnityObjects.Util;
     using UnityEditor;
-    using UnityEditor.Callbacks;
     using UnityEngine;
-    using UnityEngine.Assertions;
     using Util;
     using Object = UnityEngine.Object;
 
