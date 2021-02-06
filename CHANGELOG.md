@@ -1,3 +1,17 @@
+# [2.2.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.1.0...2.2.0) (2021-02-06)
+
+
+### Bug Fixes
+
+* Added back using statements that are required with GENERIC_UNITY_OBJECTS_DEBUG ([4c287e5](https://github.com/SolidAlloy/GenericUnityObjects/commit/4c287e544e0f775ee04bfd0caa92868ba4418431))
+* Allowed label to be null for generic object field ([cb10ff3](https://github.com/SolidAlloy/GenericUnityObjects/commit/cb10ff3c83492967058bd0e354a130a7cbdf559b))
+* Fixed the missing dependency caused by SolidUtilities update ([7aced0c](https://github.com/SolidAlloy/GenericUnityObjects/commit/7aced0c644518c3250d5fb9523847795847ce75a))
+
+
+### Features
+
+* Started adding components to the component menu by their full namespace path ([9133ccf](https://github.com/SolidAlloy/GenericUnityObjects/commit/9133ccfbb71313fd66a523b9793a50b8168ffe4b))
+
 # [2.1.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.0.1...2.1.0) (2021-01-30)
 
 
