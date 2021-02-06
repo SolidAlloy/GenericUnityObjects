@@ -51,7 +51,29 @@
             return true;
         }
 
-        protected override void UpdateGenericTypeName(GenericTypeInfo genericType, Type newType)
+        protected override bool AdditionalTypeInfoCheck(GenericTypeInfo oldType, GenericTypeInfo newType)
+        {
+            var oldBehaviour = (BehaviourInfo) oldType;
+            var newBehaviour = (BehaviourInfo) newType;
+
+            bool foundMatching = false;
+
+            if (oldBehaviour.ComponentName != newBehaviour.ComponentName)
+            {
+                UpdateBehaviourComponentName(oldBehaviour, newBehaviour.ComponentName);
+                foundMatching = true;
+            }
+
+            if (oldBehaviour.Order != newBehaviour.Order)
+            {
+                UpdateBehaviourOrder(oldBehaviour, newBehaviour.Order);
+                foundMatching = true;
+            }
+
+            return foundMatching;
+        }
+
+        protected override void UpdateGenericTypeNameAndArgs(GenericTypeInfo genericType, Type newType)
         {
             UpdateGenericTypeName(genericType, newType,
                 () => UpdateSelectorAssembly(genericType.AssemblyGUID, newType));
@@ -67,6 +89,33 @@
             {
                 AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType, selectorAssemblyGUID);
             }
+        }
+
+        private void UpdateBehaviourComponentName(BehaviourInfo behaviour, string newComponentName)
+        {
+            DebugUtility.Log($"Behaviour component name updated: {behaviour.ComponentName} => {newComponentName}");
+
+            // Update database before operating on assemblies
+            BehavioursGenerationDatabase.UpdateComponentName(behaviour, newComponentName);
+
+            UpdateAssemblies(behaviour);
+        }
+
+        private void UpdateBehaviourOrder(BehaviourInfo behaviour, int newOrder)
+        {
+            DebugUtility.Log($"Behaviour order updated: {behaviour.Order} => {newOrder}");
+
+            // Update database before operating on assemblies
+            BehavioursGenerationDatabase.UpdateOrder(behaviour, newOrder);
+
+            UpdateAssemblies(behaviour);
+        }
+
+        private void UpdateAssemblies(BehaviourInfo behaviour)
+        {
+            var concreteClasses = BehavioursGenerationDatabase.GetConcreteClasses(behaviour);
+            UpdateSelectorAssembly(behaviour.AssemblyGUID, behaviour.Type);
+            _concreteClassChecker.UpdateConcreteClassesAssemblies(behaviour.Type, concreteClasses);
         }
     }
 }

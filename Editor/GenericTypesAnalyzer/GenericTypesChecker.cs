@@ -18,7 +18,7 @@
     internal abstract class GenericTypesChecker<TObject>
         where TObject : Object
     {
-        private readonly ConcreteClassChecker<TObject> _concreteClassChecker;
+        protected readonly ConcreteClassChecker<TObject> _concreteClassChecker;
 
         protected GenericTypesChecker() => _concreteClassChecker = new ConcreteClassChecker<TObject>(this);
 
@@ -81,17 +81,17 @@
                     if (typeNamesDontMatch)
                     {
                         needsAssetDatabaseRefresh = true;
-                        UpdateGenericTypeName(oldType, newType.Type);
+                        UpdateGenericTypeNameAndArgs(oldType, newType.Type);
                         foundMatching = true;
                     }
-
-                    // If type names don't match, the old type name and arguments have already been updated,
-                    // so no need to check them twice.
-                    if ( ! (typeNamesDontMatch || newType.ArgNames.SequenceEqual(oldType.ArgNames)))
+                    else if ( ! newType.ArgNames.SequenceEqual(oldType.ArgNames))
                     {
                         needsAssetDatabaseRefresh |= UpdateGenericTypeArgNames(oldType, newType.ArgNames, newType.Type);
                         foundMatching = true;
                     }
+
+                    if (AdditionalTypeInfoCheck(oldType, newType))
+                        foundMatching = true;
 
                     if (foundMatching)
                     {
@@ -113,6 +113,7 @@
 
             return RemoveGenericTypes(oldTypesOnly);
         }
+
 
         private static bool ActualTypesMatch(GenericTypeInfo oldTypeInfo, GenericTypeInfo newTypeInfo)
         {
@@ -145,7 +146,7 @@
                 {
                     if (retrievedFromGUID)
                     {
-                        UpdateGenericTypeName(genericTypeInfo, genericType);
+                        UpdateGenericTypeNameAndArgs(genericTypeInfo, genericType);
                     }
                 }
                 else
@@ -159,7 +160,7 @@
             }
         }
 
-        protected abstract void UpdateGenericTypeName(GenericTypeInfo genericType, Type newType);
+        protected abstract void UpdateGenericTypeNameAndArgs(GenericTypeInfo genericType, Type newType);
 
         protected virtual bool AddNewGenericTypes(GenericTypeInfo[] genericTypes)
         {

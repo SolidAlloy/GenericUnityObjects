@@ -24,7 +24,7 @@
                     _addComponentMenuConstructor = typeof(AddComponentMenu).GetConstructor(
                         BindingFlags.Public | BindingFlags.Instance,
                         null,
-                        new[] { typeof(string) },
+                        new[] { typeof(string), typeof(int) },
                         null);
                 }
 
@@ -72,10 +72,43 @@
             return assemblyBuilder.DefineDynamicModule($"{generatedAssemblyName}.dll", true);
         }
 
-        public static void AddComponentMenuAttribute(TypeBuilder typeBuilder, string componentName)
+        public static void AddComponentMenuAttribute(TypeBuilder typeBuilder, Type genericType)
         {
-            var attributeBuilder = new CustomAttributeBuilder(AddComponentMenuConstructor, new object[] { componentName });
+            (string componentName, int order) = AssemblyCreatorHelper.GetComponentMenu(genericType);
+            var attributeBuilder = new CustomAttributeBuilder(AddComponentMenuConstructor, new object[] { componentName, order });
             typeBuilder.SetCustomAttribute(attributeBuilder);
+        }
+
+        public static (string componentName, int order) GetComponentMenu(Type type)
+        {
+            string componentName;
+            int order;
+
+            // BehaviourInfo already contains values of AddComponentMenu, but passing those values here would require
+            // changing a lot of parameters in other methods, so we are okay with fetching them again.
+            var addComponentAttr = type.GetCustomAttribute<AddComponentMenu>();
+
+            if (addComponentAttr == null)
+            {
+                componentName = $"Scripts/{TypeUtility.GetNiceNameOfGenericType(type, true)}";
+                order = 0;
+                return (componentName, order);
+            }
+
+            componentName = addComponentAttr.componentMenu;
+            order = addComponentAttr.componentOrder;
+
+            if ( ! componentName.StartsWith("Scripts/"))
+            {
+                componentName = $"Scripts/{componentName}";
+            }
+
+            if ( ! componentName.Contains("<"))
+            {
+                componentName = $"{componentName}{TypeUtility.GetNiceArgsOfGenericType(type)}";
+            }
+
+            return (componentName, order);
         }
     }
 }

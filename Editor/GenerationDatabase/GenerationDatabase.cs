@@ -36,7 +36,7 @@
         private FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
         private FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
         private Pool<ArgumentInfo> _argumentsPool;
-        private Pool<GenericTypeInfo> _genericTypesPool;
+        protected Pool<GenericTypeInfo> _genericTypesPool;
 
         public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
 
@@ -300,7 +300,7 @@
             });
         }
 
-        private void TemporarilyRemovingGenericType(GenericTypeInfo genericTypeInfo, Action updateType)
+        protected void TemporarilyRemovingGenericType(GenericTypeInfo genericTypeInfo, Action updateType)
         {
             _genericTypeArgumentsDict.UpdateKey(genericTypeInfo, updateType);
             EditorUtility.SetDirty(this);

@@ -4,6 +4,7 @@
     using System.Reflection;
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
+    using UnityEngine;
 
     /// <summary>
     /// Emits and saves an assembly of a concrete class that inherits from <see cref="BehaviourSelector"/>.
@@ -23,8 +24,7 @@
             TypeBuilder typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, typeof(BehaviourSelector));
 
             CreateBehaviourTypeProperty(typeBuilder, genericBehaviourWithoutArgs);
-            string componentName = "Scripts/" + TypeUtility.GetNiceNameOfGenericTypeDefinition(genericBehaviourWithoutArgs, true);
-            AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
+            AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, genericBehaviourWithoutArgs);
 
             typeBuilder.CreateType();
 

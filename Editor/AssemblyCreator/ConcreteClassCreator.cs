@@ -27,8 +27,7 @@
 
             if (typeof(TObject) == typeof(MonoBehaviour))
             {
-                string componentName = $"Scripts/{TypeUtility.GetNiceNameOfGenericType(genericTypeWithArgs, true)}";
-                AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, componentName);
+                AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, genericTypeWithArgs);
             }
 
             typeBuilder.CreateType();

@@ -16,7 +16,12 @@
             return false;
         }
 
-        protected override void UpdateGenericTypeName(GenericTypeInfo genericType, Type newType)
+        protected override bool AdditionalTypeInfoCheck(GenericTypeInfo oldType, GenericTypeInfo newType)
+        {
+            return false;
+        }
+
+        protected override void UpdateGenericTypeNameAndArgs(GenericTypeInfo genericType, Type newType)
         {
             // Use default implementation
             UpdateGenericTypeName(genericType, newType, null);

@@ -30,7 +30,7 @@
             _contentCache = new ContentCache();
             _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
             _argumentNames = new string[_targetSelector.TypeRefs.Length];
-            _genericArgNames = TypeUtility.GetNiceArgsOfGenericTypeDefinition(_targetSelector.GenericBehaviourType);
+            _genericArgNames = TypeUtility.GetNiceArgsOfGenericType(_targetSelector.GenericBehaviourType);
             _drawer = new TypeReferenceWithBaseTypesDrawer();
         }
 

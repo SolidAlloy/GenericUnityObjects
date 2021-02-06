@@ -53,6 +53,22 @@
             _typeNameGUIDDict.Add(item.TypeNameAndAssembly, item.GUID);
         }
 
+        public void ChangeItem<TChildType>(ref TChildType item, Action<TChildType> changeItem)
+            where TChildType : T
+        {
+            if (_dict.TryGetValue(item, out T existingItem))
+            {
+                item = (TChildType)existingItem;
+                _dict.Remove(item);
+                _typeNameGUIDDict.Remove(item.TypeNameAndAssembly);
+            }
+
+            changeItem(item);
+
+            _dict.Add(item, item);
+            _typeNameGUIDDict.Add(item.TypeNameAndAssembly, item.GUID);
+        }
+
         [CanBeNull]
         public string GetGUID(string typeNameAndAssembly)
         {

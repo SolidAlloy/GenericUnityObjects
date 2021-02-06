@@ -3,6 +3,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using GenericUnityObjects.Util;
+    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;

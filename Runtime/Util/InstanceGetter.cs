@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
     using JetBrains.Annotations;
     using UnityEditor;
     using UnityEngine;
@@ -46,7 +47,8 @@
             if ( ! type.IsGenericType)
                 return type;
 
-            Type actualType = TypeUtility.GetEmptyTypeDerivedFrom(type);
+            Type actualType = TypeCache.GetTypesDerivedFrom(type)
+                .First(childType => childType.BaseType == type && ! childType.IsGenericTypeDefinition);
 
             if (actualType == null)
                 throw new ArgumentException($"Generic type {type} doesn't have an underlying concrete type. Please create one.");

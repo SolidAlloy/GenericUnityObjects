@@ -6,8 +6,12 @@
     using SolidUtilities.Helpers;
     using UnityEngine;
 
+#if GENERIC_UNITY_OBJECTS_DEBUG
+    using UnityEngine.Assertions;
+#endif
+
     [Serializable]
-    internal class GenericTypeInfo : TypeInfo
+    internal class GenericTypeInfo : TypeInfo, IEquatable<GenericTypeInfo>
     {
         private static readonly ArrayEqualityComparer<string> _stringArrayComparer = new ArrayEqualityComparer<string>();
 
@@ -29,7 +33,7 @@
             _argNames = argNames;
         }
 
-        private GenericTypeInfo(Type type, string typeNameAndAssembly, string guid)
+        protected GenericTypeInfo(Type type, string typeNameAndAssembly, string guid)
             : base(type, typeNameAndAssembly, guid)
         {
             // Assert can be expensive when called many times, and there may be hundreds of GenericTypeInfos in
@@ -46,7 +50,15 @@
         {
             string typeNameAndAssembly = TypeUtility.GetTypeNameAndAssembly(type);
             string guid = GenerationDatabase<TObject>.GetCachedGenericTypeGUID(typeNameAndAssembly);
-            return new GenericTypeInfo(type, typeNameAndAssembly, guid);
+
+            if (typeof(TObject) == typeof(MonoBehaviour))
+            {
+                return new BehaviourInfo(type, typeNameAndAssembly, guid);
+            }
+            else
+            {
+                return new GenericTypeInfo(type, typeNameAndAssembly, guid);
+            }
         }
 
         public void UpdateArgNames(string[] newNames) => _argNames = newNames;
