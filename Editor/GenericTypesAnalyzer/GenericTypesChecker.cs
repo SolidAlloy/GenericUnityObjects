@@ -114,6 +114,7 @@
             return RemoveGenericTypes(oldTypesOnly);
         }
 
+        protected abstract bool AdditionalTypeInfoCheck(GenericTypeInfo oldType, GenericTypeInfo newType);
 
         private static bool ActualTypesMatch(GenericTypeInfo oldTypeInfo, GenericTypeInfo newTypeInfo)
         {

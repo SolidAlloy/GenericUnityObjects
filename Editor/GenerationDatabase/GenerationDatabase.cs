@@ -33,9 +33,9 @@
         ICanBeInitialized
         where TUnityObject : Object
     {
-        private FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
-        private FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
-        private Pool<ArgumentInfo> _argumentsPool;
+        protected FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
+        protected FastIterationDictionary<GenericTypeInfo, List<ConcreteClass>> _genericTypeArgumentsDict;
+        protected Pool<ArgumentInfo> _argumentsPool;
         protected Pool<GenericTypeInfo> _genericTypesPool;
 
         public static ArgumentInfo[] Arguments => Instance.InstanceArguments;

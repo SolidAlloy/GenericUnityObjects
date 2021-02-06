@@ -60,7 +60,7 @@
 
             if (oldBehaviour.ComponentName != newBehaviour.ComponentName)
             {
-                UpdateBehaviourComponentName(oldBehaviour, newBehaviour.ComponentName);
+                UpdateBehaviourComponentName(oldBehaviour, newBehaviour.ComponentName); //
                 foundMatching = true;
             }
 
@@ -114,7 +114,10 @@
         private void UpdateAssemblies(BehaviourInfo behaviour)
         {
             var concreteClasses = BehavioursGenerationDatabase.GetConcreteClasses(behaviour);
-            UpdateSelectorAssembly(behaviour.AssemblyGUID, behaviour.Type);
+
+            var type = behaviour.RetrieveType<MonoBehaviour>();
+
+            UpdateSelectorAssembly(behaviour.AssemblyGUID, type);
             _concreteClassChecker.UpdateConcreteClassesAssemblies(behaviour.Type, concreteClasses);
         }
     }

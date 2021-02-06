@@ -30,11 +30,8 @@
         {
             var addComponentAttr = type.GetCustomAttribute<AddComponentMenu>();
 
-            if (addComponentAttr is null)
-                return;
-
-            _componentName = addComponentAttr.componentMenu;
-            _order = addComponentAttr.componentOrder;
+            _componentName = addComponentAttr?.componentMenu ?? string.Empty;
+            _order = addComponentAttr?.componentOrder ?? 0;
         }
 
         public void UpdateComponentName(string newName) => _componentName = newName;
