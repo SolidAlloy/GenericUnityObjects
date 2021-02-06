@@ -1,10 +1,14 @@
-﻿namespace GenericUnityObjects.Editor.Util
+﻿#if GENERIC_UNITY_OBJECTS_DEBUG
+namespace GenericUnityObjects.Editor.Util
 {
     using System.Collections.Generic;
     using System.Linq;
     using UnityEditor;
-    using UnityEditor.Compilation;
     using Debug = UnityEngine.Debug;
+
+
+    using UnityEditor.Compilation;
+
 
     /// <summary>
     /// Logs how many assemblies were compiled. It may be useful to check that only the assemblies you expect to be
@@ -17,12 +21,10 @@
 
         static CompilationChecker()
         {
-#if GENERIC_UNITY_OBJECTS_DEBUG
             CompilationPipeline.compilationStarted += OnCompilationStarted;
             CompilationPipeline.compilationFinished += OnCompilationFinished;
             CompilationPipeline.assemblyCompilationStarted += OnAssemblyCompilationStarted;
             _assemblies = new List<string>();
-#endif
         }
 
         private static void OnCompilationStarted(object context)
@@ -45,3 +47,4 @@
         }
     }
 }
+#endif

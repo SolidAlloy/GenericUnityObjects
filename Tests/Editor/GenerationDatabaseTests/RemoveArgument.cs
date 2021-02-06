@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
 
     internal partial class GenerationDatabaseTests

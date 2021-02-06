@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Util
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using JetBrains.Annotations;
     using SolidUtilities.Extensions;
@@ -42,9 +41,12 @@
         /// <summary>
         /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>.
         /// </summary>
-        public static string GetNiceNameOfGenericTypeDefinition(Type genericTypeWithoutArgs)
+        public static string GetNiceNameOfGenericTypeDefinition(Type genericTypeWithoutArgs, bool fullName = false)
         {
-            string typeNameWithoutBrackets = genericTypeWithoutArgs.Name.StripGenericSuffix();
+            string typeNameWithoutBrackets = fullName
+                ? genericTypeWithoutArgs.FullName.StripGenericSuffix().Replace('.', '/')
+                : genericTypeWithoutArgs.Name.StripGenericSuffix();
+
             var argumentNames = GetNiceArgsOfGenericTypeDefinition(genericTypeWithoutArgs);
             return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";
         }
@@ -58,14 +60,16 @@
         /// <summary>
         /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;int,TestArg>.
         /// </summary>
-        public static string GetNiceNameOfGenericType(Type genericTypeWithArgs)
+        public static string GetNiceNameOfGenericType(Type genericTypeWithArgs, bool fullName = false)
         {
-            string typeNameWithoutSuffix = genericTypeWithArgs.Name.StripGenericSuffix();
+            string typeNameWithoutSuffix = fullName
+                ? genericTypeWithArgs.FullName.StripGenericSuffix().Replace('.', '/')
+                : genericTypeWithArgs.Name.StripGenericSuffix();
 
             var argumentNames = genericTypeWithArgs.GetGenericArguments()
                 .Select(argument => argument.FullName)
-                .Select(fullName => fullName.ReplaceWithBuiltInName())
-                .Select(fullName => fullName.GetSubstringAfterLast('.'));
+                .Select(argFullName => argFullName.ReplaceWithBuiltInName())
+                .Select(argFullName => argFullName.GetSubstringAfterLast('.'));
 
             return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }

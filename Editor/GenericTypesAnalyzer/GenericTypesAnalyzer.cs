@@ -3,11 +3,14 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
     using Util;
+
+#if GENERIC_UNITY_OBJECTS_DEBUG
+    using SolidUtilities.Helpers;
+#endif
 
     /// <summary>
     /// A class that gathers all changes related to generic types and generates/updates/removes DLLs based on the changes.

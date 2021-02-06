@@ -3,9 +3,12 @@
     using System;
     using System.Linq;
     using GenericUnityObjects.Util;
-    using NUnit.Framework;
     using SolidUtilities.Helpers;
     using UnityEngine;
+
+#if GENERIC_UNITY_OBJECTS_DEBUG
+    using UnityEngine.Assertions;
+#endif
 
     [Serializable]
     internal class GenericTypeInfo : TypeInfo

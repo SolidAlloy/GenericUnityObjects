@@ -15,8 +15,7 @@
         private const string ZeroWarnings = "ZeroWarnings";
         private const string SkipDefaultAssetCreation = "SkipDefaultAssetCreation";
         private const string NewTypeName = "NewName";
-        private static readonly Type DefaultArgumentType = typeof(int);
-
+        private static readonly Type _defaultArgumentType = typeof(int);
 
         // UnitySetUp is required because SetUp runs each time after domain reload which is unwanted for UnityTest methods.
         [UnitySetUp, UsedImplicitly]
@@ -36,7 +35,7 @@
             yield return new WaitForDomainReload();
 
             TestHelper.OpenTestingFolder();
-            TestHelper.TriggerAssetCreation(DefaultArgumentType);
+            TestHelper.TriggerAssetCreation(_defaultArgumentType);
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -66,13 +65,13 @@
         [Test, Category(ZeroWarnings)]
         public void Concrete_class_dll_is_added_when_concrete_class_is_instantiated_for_the_first_time()
         {
-            Assert.That(File.Exists($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}1_{DefaultArgumentType.Name}.dll"));
+            Assert.That(File.Exists($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}1_{_defaultArgumentType.Name}.dll"));
         }
 
         [Test, Category(ZeroWarnings)]
         public void Assembly_does_not_reload_when_concrete_class_is_instantiated_for_the_second_time()
         {
-            TestHelper.TriggerAssetCreation(DefaultArgumentType);
+            TestHelper.TriggerAssetCreation(_defaultArgumentType);
 
             Assert.IsFalse(EditorApplication.isCompiling);
 
@@ -97,7 +96,7 @@
             yield return new WaitForDomainReload();
 
             TestHelper.OpenTestingFolder();
-            TestHelper.TriggerAssetCreation(DefaultArgumentType);
+            TestHelper.TriggerAssetCreation(_defaultArgumentType);
 
             yield return new WaitForDomainReload();
             yield return null;
@@ -117,7 +116,7 @@
             yield return new WaitForDomainReload();
 
             Type genericType = TestHelper.GetTestType($"{NewTypeName}`1");
-            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, DefaultArgumentType);
+            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, _defaultArgumentType);
         }
 
         [UnityTest]
@@ -129,7 +128,7 @@
             yield return null;
 
             Type genericType = TestHelper.GetTestType($"{TestHelper.DefaultGenericClassName}1`1");
-            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, DefaultArgumentType);
+            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, _defaultArgumentType);
         }
 
         [UnityTest]
@@ -142,7 +141,7 @@
             yield return new WaitForDomainReload();
 
             Type genericType = TestHelper.GetTestType($"{NewTypeName}`1");
-            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, DefaultArgumentType);
+            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, _defaultArgumentType);
         }
 
         [UnityTest]
@@ -157,7 +156,7 @@
             yield return new WaitForDomainReload();
 
             Type genericType = TestHelper.GetTestType($"{TestHelper.DefaultGenericClassName}1`1");
-            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, DefaultArgumentType);
+            TestHelper.ScriptableObject.AssertThatConcreteClassIsUpdated(genericType, _defaultArgumentType);
         }
 
         [UnityTest]
@@ -169,7 +168,7 @@
             yield return null;
             yield return new WaitForDomainReload();
 
-            TestHelper.ScriptableObject.AssertThatConcreteClassIsRemoved(DefaultArgumentType.Name);
+            TestHelper.ScriptableObject.AssertThatConcreteClassIsRemoved(_defaultArgumentType.Name);
         }
 
         [UnityTest]
@@ -182,7 +181,7 @@
             yield return null;
             yield return new WaitForDomainReload();
 
-            TestHelper.ScriptableObject.AssertThatConcreteClassChanged(NewTypeName, DefaultArgumentType);
+            TestHelper.ScriptableObject.AssertThatConcreteClassChanged(NewTypeName, _defaultArgumentType);
         }
 
         private static bool ShouldSkipDefaultAssetCreation()

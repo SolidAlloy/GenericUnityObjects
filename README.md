@@ -234,6 +234,12 @@ Otherwise, when a concrete class is generated, it cannot access the constructor 
 
 ## Custom Editors
 
+### Generic class in the inspector header
+
+When creating a custom editor for a generic ScriptableObject, the first thing you might notice is that it doesn't show a correct generic class in the header. To make it show the correct generic type, you need to add a reference to **GenericUnityEditorInternals.dll** and derive your custom editor from `GenericHeaderEditor`. The header will be displayed correctly then:
+
+![Object Field](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.generic-header.png)
+
 ### MonoScript field
 
 By default, inspector shows incorrect script in the ***Script*** field of generic objects. To draw the MonoScript field correctly, the plugin uses a custom editor for MonoBehaviour and GenericScriptableObject types. If you need to implement your own custom editor but still want to see the correct ***Script*** field, use the GenericUnityObjectHelper class. Instantiate a helper in `OnEnable()`, then draw the ***Script*** field inside `OnInspectorGUI()` with the `DrawMonoScript(property)` method.
