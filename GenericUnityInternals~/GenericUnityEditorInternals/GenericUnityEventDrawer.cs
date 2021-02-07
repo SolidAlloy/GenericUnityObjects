@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using UnityEditor;
     using UnityEditorInternal;
@@ -107,13 +108,13 @@
                         Object instance = listenerTarget.objectReferenceValue;
 
                         if (instance != null)
-                            instanceString = instance.GetType().Name;
+                            instanceString = ComponentInfo.GetTypeName(instance, true);
 
                         buttonLabel.Append($"<Missing {instanceString}.{methodName.stringValue}>");
                     }
                     else
                     {
-                        buttonLabel.Append(GetTypeName(listenerTarget));
+                        buttonLabel.Append(ComponentInfo.GetTypeName(listenerTarget.objectReferenceValue, true));
 
                         if ( ! string.IsNullOrEmpty(methodName.stringValue))
                         {
@@ -130,8 +131,7 @@
 
                 if (GUI.Button(functionRect, buttonContent, EditorStyles.popup))
                 {
-                    UnityEventDrawer
-                        .BuildPopupList(listenerTarget.objectReferenceValue, m_DummyEvent, pListener)
+                    BuildPopupList(listenerTarget.objectReferenceValue, m_DummyEvent, pListener)
                         .DropDown(functionRect);
                 }
 
@@ -139,11 +139,6 @@
             }
 
             GUI.backgroundColor = backgroundColor;
-        }
-
-        private string GetTypeName(SerializedProperty target)
-        {
-            return target.objectReferenceValue.GetType().Name;
         }
 
         private static GenericMenu BuildPopupList(Object target, UnityEventBase dummyEvent, SerializedProperty listener)
@@ -167,24 +162,6 @@
 
             menu.AddSeparator(string.Empty);
 
-            /*
-
-            GeneratePopUpForType(menu, targetToUse, false, listener, delegateArgumentsTypes);
-            if (targetToUse is GameObject)
-            {
-                Component[] comps = (targetToUse as GameObject).GetComponents<Component>();
-                var duplicateNames = comps.Where(c => c != null).Select(c => c.GetType().Name).GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
-                foreach (Component comp in comps)
-                {
-                    if (comp == null)
-                        continue;
-
-                    GeneratePopUpForType(menu, comp, duplicateNames.Contains(comp.GetType().Name), listener, delegateArgumentsTypes);
-                }
-            }
-
-            return menu;*/
-
             // figure out the signature of this delegate...
             // The property at this stage points to the 'container' and has the field name
             var delegateArgumentsTypes = dummyEvent
@@ -203,51 +180,46 @@
 
             foreach (Component component in gameObject.GetComponents<Component>())
             {
-                if (component != null)
-                {
-                    var componentName = new ComponentInfo(component);
+                if (component == null)
+                    continue;
 
-                    GeneratePopUpForType(menu, component,
-                        componentName.HasDuplicate, listener, delegateArgumentsTypes);
-                }
+                GeneratePopUpForType(new ComponentInfo(component), menu, listener, delegateArgumentsTypes);
             }
 
             return menu;
         }
 
-        private static void GeneratePopUpForType(GenericMenu menu, Object target, bool useFullTargetName,
-            SerializedProperty listener, Type[] delegateArgumentsTypes)
+        private static void GeneratePopUpForType(ComponentInfo componentInfo, GenericMenu menu, SerializedProperty listener, Type[] delegateArgumentsTypes)
         {
             var methods = new List<UnityEventDrawer.ValidMethodMap>();
-            string targetName = useFullTargetName ? target.GetType().FullName : target.GetType().Name;
             bool didAddDynamic = false;
 
             // skip 'void' event defined on the GUI as we have a void prebuilt type!
             if ( delegateArgumentsTypes.Length != 0)
             {
-                UnityEventDrawer.GetMethodsForTargetAndMode(target, delegateArgumentsTypes, methods,
+                UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, delegateArgumentsTypes, methods,
                     PersistentListenerMode.EventDefined);
 
                 if (methods.Count > 0)
                 {
-                    menu.AddDisabledItem(new GUIContent(targetName + "/Dynamic " + string.Join(", ",
+                    menu.AddDisabledItem(new GUIContent(componentInfo.Name + "/Dynamic " + string.Join(", ",
                         delegateArgumentsTypes
                         .Select(argumentType => UnityEventDrawer.GetTypeName(argumentType))
                         .ToArray())));
 
-                    UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, targetName);
+                    UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, componentInfo.Name);
                     didAddDynamic = true;
                 }
             }
 
             methods.Clear();
 
-            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(float) }, methods, PersistentListenerMode.Float);
-            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(int) }, methods, PersistentListenerMode.Int);
-            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(string) }, methods, PersistentListenerMode.String);
-            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(bool) }, methods, PersistentListenerMode.Bool);
-            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(Object) }, methods, PersistentListenerMode.Object);
-            UnityEventDrawer.GetMethodsForTargetAndMode(target, Array.Empty<Type>(), methods, PersistentListenerMode.Void);
+            UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(float) }, methods, PersistentListenerMode.Float);
+            UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(int) }, methods, PersistentListenerMode.Int);
+            UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(string) }, methods, PersistentListenerMode.String);
+            UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(bool) }, methods, PersistentListenerMode.Bool);
+            UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(Object) }, methods, PersistentListenerMode.Object);
+            UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, Array.Empty<Type>(), methods, PersistentListenerMode.Void);
 
             if (methods.Count == 0)
                 return;
@@ -255,34 +227,57 @@
             if (didAddDynamic)
             {
                 // AddSeperator doesn't seem to work for sub-menus, so we have to use this workaround instead of a proper separator for now.
-                menu.AddItem(new GUIContent(targetName + "/ "), false, null);
+                menu.AddItem(new GUIContent(componentInfo.Name + "/ "), false, null);
             }
 
             if (delegateArgumentsTypes.Length != 0)
             {
-                menu.AddDisabledItem(new GUIContent(targetName + "/Static Parameters"));
+                menu.AddDisabledItem(new GUIContent(componentInfo.Name + "/Static Parameters"));
             }
 
-            UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, targetName);
+            UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, componentInfo.Name);
         }
 
         private readonly struct ComponentInfo
         {
+            private static readonly Dictionary<Type, string> _typeNameCache = new Dictionary<Type, string>();
             private static readonly HashSet<string> _names = new HashSet<string>();
 
-            public readonly bool HasDuplicate;
+            public readonly Component Component;
             public readonly string Name;
 
             public ComponentInfo(Component component)
             {
-                Name = component.GetType().Name; // TODO: replace with method
-                HasDuplicate = _names.Contains(Name);
-
-                if ( ! HasDuplicate)
-                    _names.Add(Name);
+                Component = component;
+                Name = GetTypeName(Component, false);
             }
 
             public static void ClearNames() => _names.Clear();
+
+            public static string GetTypeName(Object component, bool onlyShort)
+            {
+                Type componentType = component.GetType();
+
+                if ( ! _typeNameCache.TryGetValue(componentType, out string shortName))
+                {
+                    var componentAttribute = componentType.GetCustomAttribute<AddComponentMenu>();
+                    
+                    shortName = componentAttribute == null
+                        ? componentType.Name :
+                        componentAttribute.componentMenu.Split('/').Last();
+
+                    _typeNameCache.Add(componentType, shortName);
+                }
+
+                if (onlyShort)
+                    return shortName;
+
+                if (_names.Contains(shortName))
+                    return $"{componentType.Namespace}.{shortName}";
+
+                _names.Add(shortName);
+                return shortName;
+            }
         }
     }
 }
