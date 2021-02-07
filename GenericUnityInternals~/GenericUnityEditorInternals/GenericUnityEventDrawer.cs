@@ -1,6 +1,8 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using UnityEditor;
     using UnityEditorInternal;
@@ -111,7 +113,7 @@
                     }
                     else
                     {
-                        buttonLabel.Append(listenerTarget.objectReferenceValue.GetType().Name);
+                        buttonLabel.Append(GetTypeName(listenerTarget));
 
                         if ( ! string.IsNullOrEmpty(methodName.stringValue))
                         {
@@ -137,6 +139,150 @@
             }
 
             GUI.backgroundColor = backgroundColor;
+        }
+
+        private string GetTypeName(SerializedProperty target)
+        {
+            return target.objectReferenceValue.GetType().Name;
+        }
+
+        private static GenericMenu BuildPopupList(Object target, UnityEventBase dummyEvent, SerializedProperty listener)
+        {
+            // special case for components... we want all the game objects targets there!
+            Object targetToUse = target is Component comp ? comp.gameObject : target;
+
+            // find the current event target...
+            SerializedProperty methodName = listener.FindPropertyRelative(kMethodNamePath);
+
+            GenericMenu menu = new GenericMenu();
+
+            menu.AddItem(
+                new GUIContent(kNoFunctionString),
+                string.IsNullOrEmpty(methodName.stringValue),
+                UnityEventDrawer.ClearEventFunction,
+                new UnityEventDrawer.UnityEventFunction(listener, null, null, PersistentListenerMode.EventDefined));
+
+            if (targetToUse == null)
+                return menu;
+
+            menu.AddSeparator(string.Empty);
+
+            /*
+
+            GeneratePopUpForType(menu, targetToUse, false, listener, delegateArgumentsTypes);
+            if (targetToUse is GameObject)
+            {
+                Component[] comps = (targetToUse as GameObject).GetComponents<Component>();
+                var duplicateNames = comps.Where(c => c != null).Select(c => c.GetType().Name).GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+                foreach (Component comp in comps)
+                {
+                    if (comp == null)
+                        continue;
+
+                    GeneratePopUpForType(menu, comp, duplicateNames.Contains(comp.GetType().Name), listener, delegateArgumentsTypes);
+                }
+            }
+
+            return menu;*/
+
+            // figure out the signature of this delegate...
+            // The property at this stage points to the 'container' and has the field name
+            var delegateArgumentsTypes = dummyEvent
+                .GetType()
+                .GetMethod("Invoke")
+                ?.GetParameters()
+                .Select(parameter => parameter.ParameterType)
+                .ToArray();
+
+            UnityEventDrawer.GeneratePopUpForType(menu, targetToUse, false, listener, delegateArgumentsTypes);
+
+            if ( ! (targetToUse is GameObject gameObject))
+                return menu;
+
+            ComponentInfo.ClearNames();
+
+            foreach (Component component in gameObject.GetComponents<Component>())
+            {
+                if (component != null)
+                {
+                    var componentName = new ComponentInfo(component);
+
+                    GeneratePopUpForType(menu, component,
+                        componentName.HasDuplicate, listener, delegateArgumentsTypes);
+                }
+            }
+
+            return menu;
+        }
+
+        private static void GeneratePopUpForType(GenericMenu menu, Object target, bool useFullTargetName,
+            SerializedProperty listener, Type[] delegateArgumentsTypes)
+        {
+            var methods = new List<UnityEventDrawer.ValidMethodMap>();
+            string targetName = useFullTargetName ? target.GetType().FullName : target.GetType().Name;
+            bool didAddDynamic = false;
+
+            // skip 'void' event defined on the GUI as we have a void prebuilt type!
+            if ( delegateArgumentsTypes.Length != 0)
+            {
+                UnityEventDrawer.GetMethodsForTargetAndMode(target, delegateArgumentsTypes, methods,
+                    PersistentListenerMode.EventDefined);
+
+                if (methods.Count > 0)
+                {
+                    menu.AddDisabledItem(new GUIContent(targetName + "/Dynamic " + string.Join(", ",
+                        delegateArgumentsTypes
+                        .Select(argumentType => UnityEventDrawer.GetTypeName(argumentType))
+                        .ToArray())));
+
+                    UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, targetName);
+                    didAddDynamic = true;
+                }
+            }
+
+            methods.Clear();
+
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(float) }, methods, PersistentListenerMode.Float);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(int) }, methods, PersistentListenerMode.Int);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(string) }, methods, PersistentListenerMode.String);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(bool) }, methods, PersistentListenerMode.Bool);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new[] { typeof(Object) }, methods, PersistentListenerMode.Object);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, Array.Empty<Type>(), methods, PersistentListenerMode.Void);
+
+            if (methods.Count == 0)
+                return;
+
+            if (didAddDynamic)
+            {
+                // AddSeperator doesn't seem to work for sub-menus, so we have to use this workaround instead of a proper separator for now.
+                menu.AddItem(new GUIContent(targetName + "/ "), false, null);
+            }
+
+            if (delegateArgumentsTypes.Length != 0)
+            {
+                menu.AddDisabledItem(new GUIContent(targetName + "/Static Parameters"));
+            }
+
+            UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, targetName);
+        }
+
+        private readonly struct ComponentInfo
+        {
+            private static readonly HashSet<string> _names = new HashSet<string>();
+
+            public readonly bool HasDuplicate;
+            public readonly string Name;
+
+            public ComponentInfo(Component component)
+            {
+                Name = component.GetType().Name; // TODO: replace with method
+                HasDuplicate = _names.Contains(Name);
+
+                if ( ! HasDuplicate)
+                    _names.Add(Name);
+            }
+
+            public static void ClearNames() => _names.Clear();
         }
     }
 }
