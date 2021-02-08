@@ -1,3 +1,16 @@
+# [2.3.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.2.0...2.3.0) (2021-02-08)
+
+
+### Bug Fixes
+
+* Fixed missing method signatures in GenericUnityEditorInternals ([37795f5](https://github.com/SolidAlloy/GenericUnityObjects/commit/37795f555401e326f945a950f286df76fd26b9c8))
+
+
+### Features
+
+* Made generic components show up correctly in UnityEvent UI. ([da223f2](https://github.com/SolidAlloy/GenericUnityObjects/commit/da223f2dd08b1fe105b6c13ed25d3a53157b3e17))
+* Made Odin show generic classes correctly in the UnityEvent UI. ([b5ce462](https://github.com/SolidAlloy/GenericUnityObjects/commit/b5ce462f510db3147e6b9df28bda5936b6d223d8))
+
 # [2.2.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.1.0...2.2.0) (2021-02-06)
 
 
