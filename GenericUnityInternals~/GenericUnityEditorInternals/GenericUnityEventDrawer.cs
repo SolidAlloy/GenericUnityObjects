@@ -6,19 +6,39 @@
     using System.Reflection;
     using System.Text;
     using UnityEditor;
+    using UnityEditor.Callbacks;
     using UnityEditorInternal;
     using UnityEngine;
     using UnityEngine.Events;
     using Object = UnityEngine.Object;
 
+    [CustomPropertyDrawer(typeof(UnityEventBase), true)]
     public class GenericUnityEventDrawer : UnityEventDrawer
     {
+        [DidReloadScripts]
+        private static void ReplaceDefaultDrawer()
+        {
+            if (ScriptAttributeUtility.s_DrawerTypeForType == null)
+            {
+                ScriptAttributeUtility.BuildDrawerTypeForTypeDictionary();
+            }
+
+            var keySet = new ScriptAttributeUtility.DrawerKeySet
+                {
+                    type = typeof(UnityEventBase),
+                    drawer = typeof(GenericUnityEventDrawer)
+                };
+
+            ScriptAttributeUtility.s_DrawerTypeForType[typeof(UnityEventBase)] = keySet;
+        }
+
+        // Default implementation, only GetType().Name is replaced with ComponentInfo.GetTypeName()
         protected override void DrawEvent(Rect rect, int index, bool isActive, bool isFocused)
         {
             SerializedProperty pListener = m_ListenersArray.GetArrayElementAtIndex(index);
 
             rect.y++;
-            Rect[] subRects = GetRowRects(rect);
+            var subRects = GetRowRects(rect);
             Rect enabledRect = subRects[0];
             Rect goRect = subRects[1];
             Rect functionRect = subRects[2];
@@ -141,6 +161,7 @@
             GUI.backgroundColor = backgroundColor;
         }
 
+        // Default implementation, only GetType().Name is replaced with ComponentInfo.GetTypeName()
         private static GenericMenu BuildPopupList(Object target, UnityEventBase dummyEvent, SerializedProperty listener)
         {
             // special case for components... we want all the game objects targets there!
@@ -149,7 +170,7 @@
             // find the current event target...
             SerializedProperty methodName = listener.FindPropertyRelative(kMethodNamePath);
 
-            GenericMenu menu = new GenericMenu();
+            var menu = new GenericMenu();
 
             menu.AddItem(
                 new GUIContent(kNoFunctionString),
@@ -189,6 +210,7 @@
             return menu;
         }
 
+        // Default implementation, only some method parameters are replaced with the ComponentInfo struct.
         private static void GeneratePopUpForType(ComponentInfo componentInfo, GenericMenu menu, SerializedProperty listener, Type[] delegateArgumentsTypes)
         {
             var methods = new List<UnityEventDrawer.ValidMethodMap>();
@@ -238,6 +260,7 @@
             UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, componentInfo.Name);
         }
 
+        // A struct responsible for obtaining the correct component name and keeping cache of generated names
         private readonly struct ComponentInfo
         {
             private static readonly Dictionary<Type, string> _typeNameCache = new Dictionary<Type, string>();
@@ -261,7 +284,7 @@
                 if ( ! _typeNameCache.TryGetValue(componentType, out string shortName))
                 {
                     var componentAttribute = componentType.GetCustomAttribute<AddComponentMenu>();
-                    
+
                     shortName = componentAttribute == null
                         ? componentType.Name :
                         componentAttribute.componentMenu.Split('/').Last();
