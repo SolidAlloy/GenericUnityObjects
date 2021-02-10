@@ -1,6 +1,8 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObjects
 {
     using System;
+    using System.Linq;
+    using GenericUnityObjects.Util;
     using SelectionWindow;
     using UnityEditor;
 
@@ -10,11 +12,17 @@
     internal abstract class TypeSelectionWindow : EditorWindow
     {
         /// <summary>Creates and shows the <see cref="TypeSelectionWindow"/>.</summary>
-        /// <param name="genericParamConstraints">Array of constraints for each generic argument.</param>
+        /// <param name="genericTypeWithoutArgs">Generic type definition (i.e. without concrete generic arguments).</param>
         /// <param name="onTypesSelected">The action to do when all the types are chosen.</param>
-        public static void Create(Type[][] genericParamConstraints, Action<Type[]> onTypesSelected)
+        public static void Create(Type genericTypeWithoutArgs, Action<Type[]> onTypesSelected)
         {
             TypeSelectionWindow window;
+
+            var genericParamConstraints = genericTypeWithoutArgs.GetGenericArguments()
+                .Select(type => type.GetGenericParameterConstraints())
+                .ToArray();
+
+            var genericArgNames = TypeUtility.GetNiceArgsOfGenericTypeDefinition(genericTypeWithoutArgs);
 
             if (genericParamConstraints.Length == 1)
             {
@@ -25,11 +33,11 @@
                 window = CreateInstance<MultipleTypeSelectionWindow>();
             }
 
-            window.OnCreate(onTypesSelected, genericParamConstraints);
+            window.OnCreate(onTypesSelected, genericArgNames, genericParamConstraints);
             SetupAndShow(window);
         }
 
-        protected abstract void OnCreate(Action<Type[]> onTypesSelected, Type[][] genericParamConstraints);
+        protected abstract void OnCreate(Action<Type[]> onTypesSelected, string[] genericArgNames, Type[][] genericParamConstraints);
 
         protected abstract void OnGUI();
 

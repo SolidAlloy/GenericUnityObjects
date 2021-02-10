@@ -17,7 +17,7 @@
         private Type[] _genericParamConstraints;
         private DropdownWindow _dropdownWindow;
 
-        protected override void OnCreate(Action<Type[]> onTypeSelected, Type[][] genericParamConstraints)
+        protected override void OnCreate(Action<Type[]> onTypeSelected, string[] genericArgNames, Type[][] genericParamConstraints)
         {
             OnTypeSelected = onTypeSelected;
             _genericParamConstraints = genericParamConstraints[0];
@@ -34,23 +34,12 @@
 
             var typeOptionsAttribute = new NonGenericAttribute(_genericParamConstraints);
             var dropdownDrawer = new CenteredTypeDropdownDrawer(null, typeOptionsAttribute, null);
-            _dropdownWindow = dropdownDrawer.Draw(type => OnTypeSelected(new[] { type }));
-
-            _dropdownWindow.OnClose += () =>
+            _dropdownWindow = dropdownDrawer.Draw(type =>
             {
-                try { Close(); }
-                catch (NullReferenceException) { }
-            };
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-
-            // I caught a bug_ where _dropdownWindow was destroyed before OneTypeSelectionWindow for some reason,
-            // hence the null check.
-            if (_dropdownWindow != null)
-                _dropdownWindow.OnClose -= Close;
+                _dropdownWindow.Close();
+                Close();
+                OnTypeSelected(new[] { type });
+            });
         }
     }
 }

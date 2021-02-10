@@ -27,11 +27,9 @@
         {
             Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
 
-            var constraints = genericTypeWithoutArgs.GetGenericArguments()
-                .Select(type => type.GetGenericParameterConstraints())
-                .ToArray();
 
-            TypeSelectionWindow.Create(constraints, genericArgs =>
+
+            TypeSelectionWindow.Create(genericTypeWithoutArgs, genericArgs =>
             {
                 CreateAsset(genericTypeWithoutArgs, genericArgs, fileName);
             });
