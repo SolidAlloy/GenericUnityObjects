@@ -33,7 +33,7 @@
 
             string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, genericTypeInfo.AssemblyGUID);
-            BehaviourIconSetter.AddAssemblyForIconChange(genericTypeInfo.AssemblyGUID);
+            IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, genericTypeInfo.AssemblyGUID, false);
             base.AddNewGenericType(genericTypeInfo);
         }
 
@@ -47,7 +47,7 @@
         {
             base.UpdateGenericTypeArgNames(genericType, newArgNames, newType);
             UpdateSelectorAssembly(genericType.AssemblyGUID, newType);
-            BehaviourIconSetter.AddAssemblyForIconChange(genericType.AssemblyGUID);
+            IconSetter.AddAssemblyForIconChange(genericType.GUID, genericType.AssemblyGUID, false);
             return true;
         }
 

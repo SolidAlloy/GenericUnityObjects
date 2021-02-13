@@ -155,7 +155,7 @@
                 }
 
                 var concreteClasses = GenerationDatabase<TObject>.GetConcreteClassesByArgument(genericTypeInfo, argument);
-                _concreteClassChecker.UpdateConcreteClassesAssemblies(genericType, concreteClasses);
+                _concreteClassChecker.UpdateConcreteClassesAssemblies(genericType, concreteClasses, genericTypeInfo.GUID);
             }
         }
 
@@ -203,7 +203,7 @@
             GenerationDatabase<TObject>.UpdateGenericType(genericType, newType);
             additionalGenericTypeUpdate?.Invoke();
 
-            _concreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses);
+            _concreteClassChecker.UpdateConcreteClassesAssemblies(newType, concreteClasses, genericType.GUID);
         }
 
         private bool RemoveGenericTypes(IEnumerable<GenericTypeInfo> genericTypes)
