@@ -4,14 +4,14 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{9C80D148-E76D-44E7-87A1-7A59579519E8}</ProjectGuid>
+        <ProjectGuid>{B02F9AC3-C24A-4578-B743-FD8E9287EBD1}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>GenericUnityObjects.UnityEditorInternals</RootNamespace>
+        <RootNamespace>OdinInternals</RootNamespace>
+        <AssemblyName>OdinInternals</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <_OutputCopyLocation>..\..\</_OutputCopyLocation>
-        <LangVersion>8</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,7 +22,6 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <AssemblyName>Unity.InternalAPIEditorBridgeDev.003</AssemblyName>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,41 +31,40 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <AssemblyName>GenericUnityEditorInternals</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Sirenix.OdinInspector.Editor">
+          <HintPath>..\..\..\..\Assets\Plugins\Sirenix\Assemblies\Sirenix.OdinInspector.Editor.dll</HintPath>
+        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Xml" />
-        <Reference Include="UnityEngine.CoreModule">
-            <HintPath>C:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+        <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEditor.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEditor.CoreModule">
-            <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
+        <Reference Include="UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.IMGUIModule">
-            <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
+        <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
+          <Aliases>NonSplit</Aliases>
         </Reference>
-        <Reference Include="GenericUnityObjects">
-            <HintPath>..\..\..\..\Library\ScriptAssemblies\GenericUnityObjects.dll</HintPath>
+        <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
-        <Reference Include="SolidUtilities">
-            <HintPath>..\..\..\..\Library\ScriptAssemblies\SolidUtilities.dll</HintPath>
-        </Reference>
-        <Reference Include="SolidUtilities.Editor">
-            <HintPath>..\..\..\..\Library\ScriptAssemblies\SolidUtilities.Editor.dll</HintPath>
+        <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>c:\Program Files\Unity Editors\2020.2.2f1\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="EditorGUIHelper.cs" />
-        <Compile Include="EditorGUILayoutHelper.cs" />
-        <Compile Include="GenericMonoImporterInspector.cs" />
-        <Compile Include="GenericHeaderEditor.cs" />
-        <Compile Include="GenericTypeHelper.cs" />
-        <Compile Include="GenericUnityEventDrawer.cs" />
-        <Compile Include="ObjectFieldHelper.cs" />
-        <Compile Include="ObjectSelectorExtensions.cs" />
+        <Compile Include="GenericUnityEventDrawer`1.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\GenericUnityEditorInternals\GenericUnityEditorInternals.csproj">
+        <Project>{9c80d148-e76d-44e7-87a1-7a59579519e8}</Project>
+        <Name>GenericUnityEditorInternals</Name>
+      </ProjectReference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="OpenSesame.Net.Compilers.Toolset" Version="3.7.0">
@@ -84,7 +82,7 @@
     -->
     <Target Name="AfterBuild">
         <ItemGroup> <_FilesToCopy Include="$(OutputPath)$(AssemblyName).dll" /> </ItemGroup>
-        <Copy SourceFiles="@(_FilesToCopy)" DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)%(RecursiveDir)GenericUnityEditorInternals%(Extension)')" />
+        <Copy SourceFiles="@(_FilesToCopy)" DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)%(RecursiveDir)$(AssemblyName)%(Extension)')" />
     </Target>
 
 </Project>

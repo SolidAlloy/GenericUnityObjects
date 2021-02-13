@@ -54,7 +54,7 @@
 
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as ConcreteClass);
+            return Equals(obj as ConcreteClass);
         }
 
         // Can't make the fields readonly because Unity will not serialize them. Should be careful with not changing them instead.

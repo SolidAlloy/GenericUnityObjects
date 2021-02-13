@@ -43,9 +43,22 @@
             EditorUtility.SetDirty(Instance);
         }
 
+        private static bool _skipEvent;
+
+        public static void SkipAfterAssemblyGenerationEvent() => _skipEvent = true;
+
         [DidReloadScripts((int)DidReloadScriptsOrder.AfterAssemblyGeneration)]
         private static void OnScriptsReload()
         {
+            // Skip event is set by IconSetter when some DLL icons are set. Domain reload cannot be forced but it
+            // happens on the second frame after the recompilation, before an asset is created, so it cancels the asset
+            // creation. When asset is created on next domain reload, everything is OK.
+            if (_skipEvent)
+            {
+                _skipEvent = false;
+                return;
+            }
+
             try
             {
                 Instance._afterReloadEvent.Invoke();

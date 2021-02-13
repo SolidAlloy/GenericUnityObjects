@@ -18,20 +18,20 @@
         public ConcreteClassChecker(GenericTypesChecker<TObject> genericTypesChecker)
             => _genericTypesChecker = genericTypesChecker;
 
-        public void UpdateConcreteClassesAssemblies(Type behaviourType, ConcreteClass[] concreteClasses)
+        public void UpdateConcreteClassesAssemblies(Type behaviourType, ConcreteClass[] concreteClasses, string genericTypeGUID)
         {
             foreach (ConcreteClass concreteClass in concreteClasses)
             {
-                UpdateConcreteClassAssembly(behaviourType, concreteClass);
+                UpdateConcreteClassAssembly(behaviourType, concreteClass, genericTypeGUID);
             }
         }
 
-        private void UpdateConcreteClassAssembly(Type genericType, ConcreteClass concreteClass)
+        private void UpdateConcreteClassAssembly(Type genericType, ConcreteClass concreteClass, string genericTypeGUID)
         {
             if ( ! GetArgumentTypes(concreteClass, out Type[] argumentTypes))
                 return;
 
-            ConcreteClassCreator<TObject>.UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass);
+            ConcreteClassCreator<TObject>.UpdateConcreteClassAssembly(genericType, argumentTypes, concreteClass, genericTypeGUID);
 
             // 'ConcreteClass_ade148c5c4a7ea64bb9a635005ef6220' is missing the class attribute 'ExtensionOfNativeClass'!
             LogHelper.RemoveLogEntriesByMode(LogModes.EditorErrors);

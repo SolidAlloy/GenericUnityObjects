@@ -26,11 +26,11 @@
         public static void CreateConcreteClass(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
+            var genericTypeInfo = GenericTypeInfo.Instantiate<TObject>(genericTypeWithoutArgs);
 
-            if (typeof(TObject) == typeof(MonoBehaviour))
-                BehaviourIconSetter.AddAssemblyForIconChange(assemblyGUID);
+            IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, assemblyGUID, typeof(TObject) == typeof(GenericScriptableObject));
 
-            AddToDatabase(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+            AddToDatabase(genericTypeInfo, argumentTypes, assemblyGUID);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@
         /// <param name="genericType">Generic type definition of a type that has to be updated.</param>
         /// <param name="argumentTypes">Generic arguments that a concrete class has to use.</param>
         /// <param name="concreteClass">A reference to the concrete class that has to be updated.</param>
-        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass)
+        public static void UpdateConcreteClassAssembly(Type genericType, Type[] argumentTypes, ConcreteClass concreteClass, string genericTypeGUID)
         {
             string newAssemblyName;
 
@@ -57,9 +57,10 @@
                 CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
             }
 
-            if (typeof(TObject) == typeof(MonoBehaviour))
-                BehaviourIconSetter.AddAssemblyForIconChange(concreteClass.AssemblyGUID);
+            IconSetter.AddAssemblyForIconChange(genericTypeGUID, concreteClass.AssemblyGUID, typeof(TObject) == typeof(GenericScriptableObject));
         }
+
+
 
         private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
             string newAssemblyName, string assemblyGUID)
@@ -67,9 +68,9 @@
             AssemblyCreator.CreateConcreteClass<TObject>(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), assemblyGUID);
         }
 
-        private static void AddToDatabase(Type genericTypeWithoutArgs, Type[] argumentTypes, string assemblyGUID)
+        private static void AddToDatabase(GenericTypeInfo genericTypeInfo, Type[] argumentTypes, string assemblyGUID)
         {
-            GenerationDatabase<TObject>.AddConcreteClass(genericTypeWithoutArgs, argumentTypes, assemblyGUID);
+            GenerationDatabase<TObject>.AddConcreteClass(genericTypeInfo, argumentTypes, assemblyGUID);
         }
 
         private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)

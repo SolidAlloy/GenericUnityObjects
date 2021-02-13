@@ -62,10 +62,8 @@
             EditorUtility.SetDirty(this);
         }
 
-        public static void AddConcreteClass(Type genericTypeWithoutArgs, Type[] genericArgs, string assemblyGUID)
+        public static void AddConcreteClass(GenericTypeInfo genericTypeInfo, Type[] genericArgs, string assemblyGUID)
         {
-            var genericTypeInfo = GenericTypeInfo.Instantiate<TUnityObject>(genericTypeWithoutArgs);
-
             int genericArgsLength = genericArgs.Length;
             var arguments = new ArgumentInfo[genericArgsLength];
 
