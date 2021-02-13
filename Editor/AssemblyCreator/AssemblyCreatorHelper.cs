@@ -74,7 +74,7 @@
 
         public static void AddComponentMenuAttribute(TypeBuilder typeBuilder, Type genericType)
         {
-            (string componentName, int order) = AssemblyCreatorHelper.GetComponentMenu(genericType);
+            (string componentName, int order) = GetComponentMenu(genericType);
             var attributeBuilder = new CustomAttributeBuilder(AddComponentMenuConstructor, new object[] { componentName, order });
             typeBuilder.SetCustomAttribute(attributeBuilder);
         }

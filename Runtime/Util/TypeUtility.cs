@@ -38,6 +38,20 @@
         public static string GetTypeNameAndAssembly(string typeFullName, string assemblyName) =>
             $"{typeFullName}, {assemblyName}";
 
+        public static string GetNiceNameOfGenericType(Type genericType, bool fullName = false)
+        {
+            return genericType.IsGenericTypeDefinition
+                ? GetNiceNameOfGenericTypeDefinition(genericType, fullName)
+                : GetNiceNameOfGenericTypeWithArgs(genericType, fullName);
+        }
+
+        public static string[] GetNiceArgsOfGenericType(Type genericType)
+        {
+            return genericType.IsGenericTypeDefinition
+                ? GetNiceArgsOfGenericTypeDefinition(genericType)
+                : GetNiceArgsOfGenericTypeWithArgs(genericType);
+        }
+
         /// <summary>
         /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;T1,T2>.
         /// </summary>
@@ -49,6 +63,20 @@
 
             var argumentNames = GetNiceArgsOfGenericTypeDefinition(genericTypeWithoutArgs);
             return $"{typeNameWithoutBrackets}<{string.Join(",", argumentNames)}>";
+        }
+
+        /// <summary>
+        /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;int,TestArg>.
+        /// </summary>
+        private static string GetNiceNameOfGenericTypeWithArgs(Type genericTypeWithArgs, bool fullName)
+        {
+            string typeNameWithoutSuffix = fullName
+                ? genericTypeWithArgs.FullName.StripGenericSuffix().Replace('.', '/')
+                : genericTypeWithArgs.Name.StripGenericSuffix();
+
+            var argumentNames = GetNiceArgsOfGenericTypeWithArgs(genericTypeWithArgs);
+
+            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
         }
 
         private static string[] GetNiceArgsOfGenericTypeDefinition(Type genericTypeWithoutArgs)
@@ -64,34 +92,6 @@
                 .Select(argFullName => argFullName.ReplaceWithBuiltInName())
                 .Select(argFullName => argFullName.GetSubstringAfterLast('.'))
                 .ToArray();
-        }
-
-        /// <summary>
-        /// Gets a type name for nice representation of the type. It looks like this: ClassName&lt;int,TestArg>.
-        /// </summary>
-        private static string GetNiceNameOfGenericTypeWithArgs(Type genericTypeWithArgs, bool fullName)
-        {
-            string typeNameWithoutSuffix = fullName
-                ? genericTypeWithArgs.FullName.StripGenericSuffix().Replace('.', '/')
-                : genericTypeWithArgs.Name.StripGenericSuffix();
-
-            var argumentNames = GetNiceArgsOfGenericTypeDefinition(genericTypeWithArgs);
-
-            return $"{typeNameWithoutSuffix}<{string.Join(",", argumentNames)}>";
-        }
-
-        public static string GetNiceNameOfGenericType(Type genericType, bool fullName = false)
-        {
-            return genericType.IsGenericTypeDefinition
-                ? GetNiceNameOfGenericTypeDefinition(genericType, fullName)
-                : GetNiceNameOfGenericTypeWithArgs(genericType, fullName);
-        }
-
-        public static string[] GetNiceArgsOfGenericType(Type genericType)
-        {
-            return genericType.IsGenericTypeDefinition
-                ? GetNiceArgsOfGenericTypeDefinition(genericType)
-                : GetNiceArgsOfGenericTypeWithArgs(genericType);
         }
     }
 }

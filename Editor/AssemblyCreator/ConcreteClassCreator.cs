@@ -3,7 +3,6 @@
     using System;
     using System.Reflection;
     using System.Reflection.Emit;
-    using GenericUnityObjects.Util;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
