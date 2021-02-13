@@ -22,7 +22,7 @@
                 .Select(type => type.GetGenericParameterConstraints())
                 .ToArray();
 
-            var genericArgNames = TypeUtility.GetNiceArgsOfGenericTypeDefinition(genericTypeWithoutArgs);
+            var genericArgNames = TypeUtility.GetNiceArgsOfGenericType(genericTypeWithoutArgs);
 
             if (genericParamConstraints.Length == 1)
             {

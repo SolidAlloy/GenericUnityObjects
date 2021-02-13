@@ -20,6 +20,11 @@
             return new Collection<T>(list);
         }
 
+        public static implicit operator Collection<T>(T[] array)
+        {
+            return new Collection<T>(array);
+        }
+
         public static implicit operator T[] (Collection<T> collection) =>
             collection._array;
 
