@@ -6,9 +6,22 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 **What you can do with it:**
 
 - Implement generic classes that inherit from ScriptableObject or MonoBehaviour (e.g. `class GenericBehaviour<T> : MonoBehaviour { }`).
+
 - Create assets/components from a context menu and choose the generic argument type in the process.
+
 - Create object fields for generic UnityEngine.Objects and assigned created assets/components to those fields.
+
 - Instantiate generic UnityEngine.Objects from scripts (but see the limitations.)
+
+  
+
+## Requirements
+
+- Unity 2020.2 or higher
+
+- .NET 4.x
+
+  
 
 ## How To Install
 
@@ -52,8 +65,6 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 4. Do the same with two more packages:
    - https://github.com/SolidAlloy/ClassTypeReference-for-Unity.git
    - https://github.com/SolidAlloy/GenericUnityObjects.git
-
-
 
 ## Generic ScriptableObject Usage
 
