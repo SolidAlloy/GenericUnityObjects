@@ -1,3 +1,18 @@
+# [2.4.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.3.0...2.4.0) (2021-02-15)
+
+
+### Bug Fixes
+
+* Fixed a few errors in the unit tests ([58663ce](https://github.com/SolidAlloy/GenericUnityObjects/commit/58663ce2fc8fd8c1f10249b824d2f6a7379228fd))
+* Fixed built-in types not being replaced when displaying generic type name ([f539141](https://github.com/SolidAlloy/GenericUnityObjects/commit/f539141fda421540481ba4cb6f21723b5d88772c))
+* Fixed interactive renaming of a scriptable object stopping immediately ([f29f6e0](https://github.com/SolidAlloy/GenericUnityObjects/commit/f29f6e0ece574bb9775049e95c3a07eafd291286))
+* Started updating asset title if it was renamed. ([066308f](https://github.com/SolidAlloy/GenericUnityObjects/commit/066308fe908f30b1d3a0d389a1eebd20a7e0e95a))
+
+
+### Features
+
+* Made generated DLLs respect the custom icons set in generic scripts ([17b9073](https://github.com/SolidAlloy/GenericUnityObjects/commit/17b907357855b9c7f4a15021e9dfd97d88684c03))
+
 # [2.3.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.2.0...2.3.0) (2021-02-08)
 
 
