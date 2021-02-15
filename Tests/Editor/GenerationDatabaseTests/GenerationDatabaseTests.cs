@@ -22,7 +22,7 @@
             _database = ScriptableObject.CreateInstance<BehavioursGenerationDatabase>();
             _database.Initialize();
 
-            _genericType = new GenericTypeInfo("genericTypeName", "genericTypeGUID", new[] { "genericArg" });
+            _genericType = new BehaviourInfo("genericTypeName", "genericTypeGUID", new[] { "genericArg" });
             _firstArg = new ArgumentInfo("firstArgumentName", "firstArgumentGUID");
             _secondArg = new ArgumentInfo("secondArgumentName", "secondArgumentGUID");
             _firstSecondArgs = new[] { _firstArg, _secondArg };

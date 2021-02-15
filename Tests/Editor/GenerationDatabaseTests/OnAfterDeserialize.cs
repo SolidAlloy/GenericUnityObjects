@@ -19,7 +19,7 @@
             public void BeforeAllTests()
             {
                 FieldInfo getterField = typeof(EditorOnlySingletonSO<GenerationDatabase<MonoBehaviour>>)
-                    .GetField("Getter", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                    .GetField("_getter", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
                 Assert.IsNotNull(getterField);
 
