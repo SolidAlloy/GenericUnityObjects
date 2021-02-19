@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.1...2.4.2) (2021-02-19)
+
+
+### Bug Fixes
+
+* Replaced the broken dependency dll ([4623aef](https://github.com/SolidAlloy/GenericUnityObjects/commit/4623aef2783fe3ae99dba5f8eb99bee2c277394b))
+
 ## [2.4.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.0...2.4.1) (2021-02-19)
 
 
