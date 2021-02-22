@@ -1,3 +1,10 @@
+## [2.4.4](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.3...2.4.4) (2021-02-22)
+
+
+### Bug Fixes
+
+* Fixed compilation error on build in TypeCache.GetTypesDerivedFrom() ([e6a3653](https://github.com/SolidAlloy/GenericUnityObjects/commit/e6a3653e99f5f4fa86e06f0e69d743be73fb72cf))
+
 ## [2.4.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.2...2.4.3) (2021-02-20)
 
 
