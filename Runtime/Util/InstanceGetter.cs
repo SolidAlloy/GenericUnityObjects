@@ -4,8 +4,11 @@
     using System.IO;
     using System.Linq;
     using JetBrains.Annotations;
-    using UnityEditor;
     using UnityEngine;
+
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 
     internal class InstanceGetter<T>
         where T : ScriptableObject, ICanBeInitialized
@@ -47,13 +50,22 @@
             if ( ! type.IsGenericType)
                 return type;
 
-            Type actualType = TypeCache.GetTypesDerivedFrom(type)
-                .First(childType => childType.BaseType == type && ! childType.IsGenericTypeDefinition);
+            Type actualType = GetChildType(type);
 
             if (actualType == null)
                 throw new ArgumentException($"Generic type {type} doesn't have an underlying concrete type. Please create one.");
 
             return actualType;
+        }
+
+        private static Type GetChildType(Type type)
+        {
+#if UNITY_EDITOR
+            return TypeCache.GetTypesDerivedFrom(type)
+#else
+            return type.Assembly.GetTypes()
+#endif
+                .FirstOrDefault(childType => childType.BaseType == type && ! childType.IsGenericTypeDefinition);
         }
 
         private T CreateAsset()
