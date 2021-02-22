@@ -1,3 +1,10 @@
+## [2.4.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.2...2.4.3) (2021-02-20)
+
+
+### Bug Fixes
+
+* Added constraints to test assembly definitions ([4ae82a0](https://github.com/SolidAlloy/GenericUnityObjects/commit/4ae82a03251590e2a09275af5f20ae455f85004e))
+
 ## [2.4.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.1...2.4.2) (2021-02-19)
 
 
