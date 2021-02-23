@@ -16,7 +16,14 @@
             return genericType;
         }
 
-        public static string GetNiceTypeName(Type genericType) => TypeUtility.GetNiceNameOfGenericType(genericType);
+        public static string GetNiceTypeName(ObjectFieldHelper fieldHelper)
+        {
+            Type type = fieldHelper.CurrentTarget is null
+                ? fieldHelper.ObjType
+                : fieldHelper.CurrentTarget.GetType().BaseType;
+
+            return TypeUtility.GetNiceNameOfGenericType(type);
+        }
 
         public static Type GetConcreteType(Type genericType)
         {

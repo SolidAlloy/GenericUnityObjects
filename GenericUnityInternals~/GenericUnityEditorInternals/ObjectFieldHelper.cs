@@ -13,14 +13,16 @@
     internal readonly struct ObjectFieldHelper
     {
         public readonly Type ObjType;
+        public readonly Object CurrentTarget;
         
         private static readonly GUIContent _cachedContent = new GUIContent();
 
         private readonly SerializedProperty _property;
 
-        public ObjectFieldHelper(Type type)
+        public ObjectFieldHelper(Object currentTarget, Type type)
         {
             ObjType = type;
+            CurrentTarget = currentTarget;
             _property = null;
         }
 
@@ -28,6 +30,7 @@
         {
             _property = property;
             ObjType = GenericTypeHelper.GetGenericType(property);
+            CurrentTarget = property.objectReferenceValue;
         }
 
         public Object ValidateObjectFieldAssignment(Object[] references, EditorGUI.ObjectFieldValidatorOptions options)

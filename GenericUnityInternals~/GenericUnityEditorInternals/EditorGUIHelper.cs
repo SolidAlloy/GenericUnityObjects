@@ -14,7 +14,7 @@
         [PublicAPI]
         public static Object GenericObjectField(Rect position, GUIContent label, Object currentTarget, Type objType, bool allowSceneObjects)
         {
-            return ObjectFieldInternal(position, label, currentTarget, allowSceneObjects, new ObjectFieldHelper(objType));
+            return ObjectFieldInternal(position, label, currentTarget, allowSceneObjects, new ObjectFieldHelper(currentTarget, objType));
         }
 
         /// <summary>
@@ -67,7 +67,7 @@
             // Has to be this small to fit inside a single line height ObjectField
             using var _ = new EditorGUIUtility.IconSizeScope(new Vector2(12f, 12f));
 
-            string niceTypeName = GenericTypeHelper.GetNiceTypeName(helper.ObjType);
+            string niceTypeName = GenericTypeHelper.GetNiceTypeName(helper);
 
             Object newTarget = currentTarget;
 
