@@ -1,3 +1,10 @@
+## [2.4.5](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.4...2.4.5) (2021-02-23)
+
+
+### Bug Fixes
+
+* If a child type object is assigned to a generic object field that requires a parent type, the child type will be shown instead of parent ([1b0d432](https://github.com/SolidAlloy/GenericUnityObjects/commit/1b0d432f6a50af9fba14ea66644f65672d7001a2))
+
 ## [2.4.4](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.3...2.4.4) (2021-02-22)
 
 
