@@ -32,10 +32,10 @@
                 return;
             }
 
-            EditorGUI.BeginChangeCheck();
             serializedObject.UpdateIfRequiredOrScript();
 
             SerializedProperty iterator = serializedObject.GetIterator();
+
             for (bool enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false)
             {
                 if (iterator.propertyPath == "m_Script")
@@ -49,7 +49,6 @@
             }
 
             serializedObject.ApplyModifiedProperties();
-            EditorGUI.EndChangeCheck();
         }
 
         private void DrawMissingScript()

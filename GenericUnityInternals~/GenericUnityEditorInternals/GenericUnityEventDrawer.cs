@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using SolidUtilities.Editor.Helpers;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEditorInternal;
@@ -18,18 +19,7 @@
         [DidReloadScripts]
         private static void ReplaceDefaultDrawer()
         {
-            if (ScriptAttributeUtility.s_DrawerTypeForType == null)
-            {
-                ScriptAttributeUtility.BuildDrawerTypeForTypeDictionary();
-            }
-
-            var keySet = new ScriptAttributeUtility.DrawerKeySet
-                {
-                    type = typeof(UnityEventBase),
-                    drawer = typeof(GenericUnityEventDrawer)
-                };
-
-            ScriptAttributeUtility.s_DrawerTypeForType[typeof(UnityEventBase)] = keySet;
+            DrawerReplacer.ReplaceDefaultDrawer<UnityEventBase, GenericUnityEventDrawer>();
         }
 
         // Default implementation, only GetType().Name is replaced with ComponentInfo.GetTypeName()

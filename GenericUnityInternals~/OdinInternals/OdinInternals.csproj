@@ -33,6 +33,12 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="GenericUnityObjects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\..\..\Library\ScriptAssemblies\GenericUnityObjects.dll</HintPath>
+        </Reference>
+        <Reference Include="GenericUnityObjects.Editor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\..\..\Library\ScriptAssemblies\GenericUnityObjects.Editor.dll</HintPath>
+        </Reference>
         <Reference Include="Sirenix.OdinInspector.Editor">
           <HintPath>..\..\..\..\Assets\Plugins\Sirenix\Assemblies\Sirenix.OdinInspector.Editor.dll</HintPath>
         </Reference>
@@ -58,6 +64,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="GenericUnityEventDrawer`1.cs" />
+        <Compile Include="OdinGenericUnityObjectDrawer`1.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
