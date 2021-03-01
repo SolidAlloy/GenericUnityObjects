@@ -1,3 +1,10 @@
+## [2.4.6](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.5...2.4.6) (2021-03-01)
+
+
+### Bug Fixes
+
+* Made GenericUnityObjectDrawer override the default behaviour of Odin ([ec518fd](https://github.com/SolidAlloy/GenericUnityObjects/commit/ec518fd3bd7273418b24d01dfd073c9e2d85e871))
+
 ## [2.4.5](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.4...2.4.5) (2021-02-23)
 
 
