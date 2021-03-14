@@ -14,16 +14,35 @@
     // less specialized the GenericUnityObjectDrawer. Because of this, we need a class derived from UnityPropertyDrawer
     // to force Odin to draw generic UnityEngine Objects with our drawer.
 
-    [DrawerPriority(1.0, 0.0, 0.45)]
     [UsedImplicitly]
-    internal class GenericScriptableObjectDrawer : OdinGenericUnityObjectDrawer<GenericScriptableObject> { }
+    internal class MonoBehaviourDrawer<T> : UnityPropertyDrawer<GenericUnityObjectDrawer, T>
+        where T : MonoBehaviour
+    {
+        protected override void Initialize()
+        {
+            base.Initialize();
+            delayApplyValueUntilRepaint = true;
+            drawer = new GenericUnityObjectDrawer();
 
-    [DrawerPriority(1.0, 0.0, 0.45)]
+            if (UnityPropertyHandlerUtility.IsAvailable)
+                propertyHandler = UnityPropertyHandlerUtility.CreatePropertyHandler(drawer);
+        }
+
+        protected override void DrawPropertyLayout(GUIContent label)
+        {
+            if (Property.Tree.GetUnityPropertyForPath(Property.Path, out FieldInfo _) == null)
+            {
+                CallNextDrawer(label);
+                return;
+            }
+
+            base.DrawPropertyLayout(label);
+        }
+    }
+
     [UsedImplicitly]
-    internal class GenericMonobehaviourDrawer : OdinGenericUnityObjectDrawer<MonoBehaviour> { }
-
-    internal class OdinGenericUnityObjectDrawer<T> : UnityPropertyDrawer<GenericUnityObjectDrawer, T>
-        where T : Object
+    internal class GenericSODrawer<T> : UnityPropertyDrawer<GenericUnityObjectDrawer, T>
+        where T : GenericScriptableObject
     {
         protected override void Initialize()
         {
