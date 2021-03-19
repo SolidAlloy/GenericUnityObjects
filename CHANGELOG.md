@@ -1,3 +1,10 @@
+## [2.4.7](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.6...2.4.7) (2021-03-19)
+
+
+### Bug Fixes
+
+* Fixed custom Odin drawers drawing non-generic scriptable objects ([4b892e4](https://github.com/SolidAlloy/GenericUnityObjects/commit/4b892e462963b79c0f01cc4f4216c639e869ebd3))
+
 ## [2.4.6](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.5...2.4.6) (2021-03-01)
 
 
