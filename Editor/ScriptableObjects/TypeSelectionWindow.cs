@@ -10,7 +10,7 @@
     /// <summary>
     /// A window where you can choose the generic argument types for a <see cref="GenericScriptableObject"/> asset.
     /// </summary>
-    internal abstract class TypeSelectionWindow
+    internal static class TypeSelectionWindow
     {
         /// <summary>Creates and shows the <see cref="TypeSelectionWindow"/>.</summary>
         /// <param name="genericTypeWithoutArgs">Generic type definition (i.e. without concrete generic arguments).</param>

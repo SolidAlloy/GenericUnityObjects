@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using Editor.ScriptableObjects;
     using Editor.ScriptableObjects.SelectionWindow;
     using NUnit.Framework;
     using SolidUtilities.Editor.Helpers;
@@ -178,12 +179,13 @@
         public static void TriggerAssetCreation(Type typeToSet)
         {
             EditorApplication.ExecuteMenuItem($"Assets/Create/{DefaultGenericClassName}1<T>");
+            GenericSOCreator.CreateAsset(GetDefaultGenericType(), new[] { typeToSet }, $"New {DefaultGenericClassName}1`1");
+        }
 
-            Assert.IsTrue(EditorWindow.HasOpenInstances<OneTypeSelectionWindow>());
-
-            var selectionWindow = EditorWindow.GetWindow<OneTypeSelectionWindow>();
-
-            selectionWindow.OnTypeSelected(new[] { typeToSet });
+        private static Type GetDefaultGenericType()
+        {
+            var csharpAssembly = Assembly.Load("Assembly-CSharp");
+            return csharpAssembly.GetType($"{DefaultGenericClassName}1`1");
         }
 
         public static void FinishInteractiveCreation()
