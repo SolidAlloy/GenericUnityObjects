@@ -51,7 +51,7 @@
             }
         }
 
-        private static void CreateAsset(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
+        public static void CreateAsset(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
         {
             Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
 
