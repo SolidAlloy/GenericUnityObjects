@@ -1,3 +1,12 @@
+## [2.4.8](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.7...2.4.8) (2021-03-23)
+
+
+### Bug Fixes
+
+* Adjusted integration tests to the new OneTypeSelectionWindow class ([dd317ab](https://github.com/SolidAlloy/GenericUnityObjects/commit/dd317ab123cbc99353ef5e0bae62fca99bc63ef3))
+* Made OnTypeSelectionWindow a POCO that instantiates dropdown window as a popup ([200b34e](https://github.com/SolidAlloy/GenericUnityObjects/commit/200b34ee9500502f4141ee8320f14594829337ef))
+* Updated the Type References dependency ([24178a5](https://github.com/SolidAlloy/GenericUnityObjects/commit/24178a574c5317a34a232ae6922384b06b795992))
+
 ## [2.4.7](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.6...2.4.7) (2021-03-19)
 
 
