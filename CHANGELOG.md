@@ -1,3 +1,10 @@
+## [2.4.9](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.8...2.4.9) (2021-04-01)
+
+
+### Bug Fixes
+
+* Fixed GUIContent null error when using GenericObjectDrawer.ObjectField with a non-generic UnityEngine.Object instance ([bd71fa6](https://github.com/SolidAlloy/GenericUnityObjects/commit/bd71fa61920babd938535baa3ef31d216c226382))
+
 ## [2.4.8](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.7...2.4.8) (2021-03-23)
 
 
