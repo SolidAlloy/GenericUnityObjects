@@ -48,7 +48,7 @@
         {
             return objType.IsGenericType
                 ? EditorGUIHelper.GenericObjectField(rect, label, currentTarget, objType, allowSceneObjects)
-                : EditorGUI.ObjectField(rect, label, currentTarget, objType, allowSceneObjects);
+                : EditorGUI.ObjectField(rect, label ?? GUIContent.none, currentTarget, objType, allowSceneObjects);
         }
 
         /// <summary>
