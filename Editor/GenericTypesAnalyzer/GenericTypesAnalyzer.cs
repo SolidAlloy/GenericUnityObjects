@@ -22,6 +22,12 @@
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
         private static void AnalyzeGenericTypes()
         {
+            // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
+            // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
+            // to check changes to scripts in this situation, we can safely ignore this domain reload.
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
 #if GENERIC_UNITY_OBJECTS_DEBUG
             using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
 #endif
