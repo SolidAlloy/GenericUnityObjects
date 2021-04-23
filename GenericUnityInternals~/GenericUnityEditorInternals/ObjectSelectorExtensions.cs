@@ -67,7 +67,7 @@
             this_.m_ModalUndoGroup = Undo.GetCurrentGroup();
 
             // Show custom selector if available
-            if (UnityEditor.SearchService.ObjectSelector.HasEngineOverride())
+            if (ObjectSelectorSearch.HasEngineOverride())
             {
                 this_.m_SearchSessionHandler.BeginSession(() =>
                 {
@@ -117,7 +117,7 @@
                     this_.NotifySelectorClosed(false);
                 }
 
-                if (UnityEditor.SearchService.ObjectSelector.SelectObject(searchContext, OnSelectorClosed, OnSelectionChanged))
+                if (ObjectSelectorSearch.SelectObject(searchContext, OnSelectorClosed, OnSelectionChanged))
                     return;
             }
 

@@ -14,7 +14,7 @@
     {
         public readonly Type ObjType;
         public readonly Object CurrentTarget;
-        
+
         private static readonly GUIContent _cachedContent = new GUIContent();
 
         private readonly SerializedProperty _property;
@@ -52,7 +52,7 @@
                 return EditorGUIUtility.TempContent($"None ({niceTypeName})");
 
             _cachedContent.text = $"{obj.name} ({niceTypeName})";
-            _cachedContent.image = EditorGUIUtility.GetSkinnedIcon(AssetPreview.GetMiniThumbnail(obj));
+            _cachedContent.image = AssetPreview.GetMiniThumbnail(obj);
 
             if (_property == null)
                 return _cachedContent;
