@@ -67,7 +67,10 @@
             this_.m_ModalUndoGroup = Undo.GetCurrentGroup();
 
             // Show custom selector if available
-            if (ObjectSelectorSearch.HasEngineOverride())
+
+            // It seems this branch isn't used for generic unity objects, but it causes issues because ObjectSelectorSearch
+            // is named differently in Unity2020 and 2021. Disabling it doesn't seem to break anything.
+            /*if (ObjectSelectorSearch.HasEngineOverride())
             {
                 this_.m_SearchSessionHandler.BeginSession(() =>
                 {
@@ -119,7 +122,7 @@
 
                 if (ObjectSelectorSearch.SelectObject(searchContext, OnSelectorClosed, OnSelectionChanged))
                     return;
-            }
+            }*/
 
             // Freeze to prevent flicker on OSX.
             // Screen will be updated again when calling
