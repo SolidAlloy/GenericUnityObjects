@@ -25,34 +25,13 @@
             if (string.IsNullOrEmpty(genericScriptGUID))
                 return;
 
-            if (TryGetCustomIcon(genericScriptGUID, out Texture2D texture, isScriptableObject))
+            if (IconFinder.TryGetCustomIcon(genericScriptGUID, out Texture2D texture, isScriptableObject))
                 Instance.AddAssembly(assemblyGUID, texture);
-        }
-
-        private static bool TryGetCustomIcon(string genericTypeGUID, out Texture2D customIcon, bool isScriptableObject)
-        {
-            customIcon = null;
-
-            string assetPath = AssetDatabase.GUIDToAssetPath(genericTypeGUID);
-
-            if (string.IsNullOrEmpty(assetPath))
-                return false;
-
-            var monoScript = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
-
-            if (monoScript is null)
-                return false;
-
-            customIcon = AssetPreview.GetMiniThumbnail(monoScript);
-
-            // If generated type inherits from MonoBehaviour, a default script icon must be set, but for scriptable
-            // objects, it is not the case.
-            return ! (isScriptableObject && customIcon.name.Contains("cs Script Icon"));
         }
 
         private void AddAssembly(string guid, Texture2D texture)
         {
-            if ( ! _dict.TryGetValue(texture, out List<string> guids))
+            if ( ! _dict.TryGetValue(texture, out var guids))
             {
                 guids = new List<string>();
                 _dict.Add(texture, guids);
