@@ -2,7 +2,7 @@
 {
     using System;
     using System.IO;
-    using NUnit.Framework;
+    using UnityEngine.Assertions;
     using UnityEditor;
     using UnityEngine;
 
