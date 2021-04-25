@@ -25,9 +25,15 @@
             // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
             // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
             // to check changes to scripts in this situation, we can safely ignore this domain reload.
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-                return;
+            if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
+                UpdateGeneratedAssemblies();
 
+            DictInitializer<MonoBehaviour>.Initialize();
+            DictInitializer<GenericScriptableObject>.Initialize();
+        }
+
+        private static void UpdateGeneratedAssemblies()
+        {
 #if GENERIC_UNITY_OBJECTS_DEBUG
             using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
 #endif
@@ -54,9 +60,6 @@
 
             if (behavioursNeedDatabaseRefresh || scriptableObjectsNeedDatabaseRefresh)
                 AssetDatabase.Refresh();
-
-            DictInitializer<MonoBehaviour>.Initialize();
-            DictInitializer<GenericScriptableObject>.Initialize();
         }
     }
 }
