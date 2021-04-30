@@ -1,3 +1,15 @@
+## [2.4.10](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.9...2.4.10) (2021-04-30)
+
+
+### Bug Fixes
+
+* Fixed custom icons not being set for generated classes in Unity 2021 ([8dde5cb](https://github.com/SolidAlloy/GenericUnityObjects/commit/8dde5cbcce4aefe1836ebe40355b1a196ff8daf1))
+* Fixed generic types databases not being initialized sometimes ([0e65d84](https://github.com/SolidAlloy/GenericUnityObjects/commit/0e65d84a5aafe8fd653ff15317ef152b6fcd2936))
+* Fixed missing type exception when drawing a generic object selector in Unity 2020 ([f301bda](https://github.com/SolidAlloy/GenericUnityObjects/commit/f301bda6d0aca61aac3ea2e3b886532afc808b7b))
+* Fixed MissingMethodException when using Unity 2021 ([5289e7c](https://github.com/SolidAlloy/GenericUnityObjects/commit/5289e7c5c5ffd2069ae3ce6f599d0fc5b69a0dca))
+* Fixed NullReferenceException when entering PlayMode with PlayModeOptions disabled ([fc85fdf](https://github.com/SolidAlloy/GenericUnityObjects/commit/fc85fdf8d39915627eb91f37da15fb15a31e4779))
+* Replaced the wrong using statement in IconFinder ([b48c844](https://github.com/SolidAlloy/GenericUnityObjects/commit/b48c844385c6b4be74906d6f0a1976d32441208a))
+
 ## [2.4.9](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.8...2.4.9) (2021-04-01)
 
 
