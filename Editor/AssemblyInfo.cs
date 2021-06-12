@@ -5,3 +5,4 @@ using GenericUnityObjects.Util;
 [assembly: InternalsVisibleTo("GenericUnityObjects.IntegrationTests")]
 [assembly: InternalsVisibleTo(Config.MenuItemsAssemblyName)]
 [assembly: InternalsVisibleTo("OdinInternals")]
+[assembly: InternalsVisibleTo("GenericScriptableArchitecture.Editor")]
