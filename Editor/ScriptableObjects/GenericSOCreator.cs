@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Cysharp.Threading.Tasks;
     using GenericUnityObjects;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
@@ -12,9 +13,6 @@
 
     internal class GenericSOCreator
     {
-        private static Type _concreteType;
-        private static string _fileName;
-
         /// <summary>
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the <see cref="UnityEditor.MenuItem"/>
         /// attribute. A class derived from <see cref="GenericSOCreator"/> is generated automatically in a separate DLL
@@ -27,78 +25,112 @@
         {
             Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
 
-
-
             TypeSelectionWindow.Create(genericTypeWithoutArgs, genericArgs =>
             {
-                CreateAsset(genericTypeWithoutArgs, genericArgs, fileName);
+                CreateAssetInteractively(genericTypeWithoutArgs, genericArgs, fileName);
             });
         }
 
-        private static void FinishSOCreation()
+        private static void FinishSOCreationInteractively()
         {
-            try
+            async UniTaskVoid CreateAssetImpl()
             {
-                Type genericSOType;
-                (genericSOType, _fileName) = PersistentStorage.GetGenericSODetails();
-                _concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                try
+                {
+                    (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
+                    var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                    await WaitUntilEditorInitialized();
+                    CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
+                }
+                finally
+                {
+                    PersistentStorage.Clear();
+                }
+            }
 
-                EditorApplication.update += CreateAssetInteractively;
-            }
-            finally
-            {
-                PersistentStorage.Clear();
-            }
+            CreateAssetImpl().Forget();
         }
 
-        public static void CreateAsset(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
+        private static void FinishSOCreationAtPath()
         {
-            Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
-
-            if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out _concreteType))
+            async UniTaskVoid CreateAssetImpl()
             {
-                _fileName = fileName;
-                CreateAssetInteractively();
-                return;
+                try
+                {
+                    (Type genericSOType, string path) = PersistentStorage.GetGenericSODetails();
+                    var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                    await WaitUntilEditorInitialized();
+                    CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
+                }
+                finally
+                {
+                    PersistentStorage.Clear();
+                }
             }
 
-            PersistentStorage.SaveForScriptsReload(genericType, fileName);
-            PersistentStorage.ExecuteOnScriptsReload(FinishSOCreation);
-
-            ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
-            AssetDatabase.Refresh();
+            CreateAssetImpl().Forget();
         }
 
-        private static void CreateAssetInteractively()
+        private static async UniTask WaitUntilEditorInitialized()
         {
-            // If CreateAssetInteractively is called too early, editor styles are not initialized yet and throw
-            // NullReference exception. It usually takes one frame to initialize them, so it's not expensive to catch
-            // the exception once and proceed to create the asset in the next frame.
             try
             {
                 var _ = EditorStyles.toolbar;
             }
             catch (NullReferenceException)
             {
-                return;
+                await UniTask.NextFrame();
+            }
+        }
+
+        public static void CreateAssetInteractively(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
+        {
+            Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
+
+            if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out var concreteType))
+            {
+                CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
             }
 
-            var asset = ScriptableObject.CreateInstance(_concreteType);
+            PersistentStorage.SaveForScriptsReload(genericType, fileName);
+            PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationInteractively);
+
+            ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
+            AssetDatabase.Refresh();
+        }
+
+        public static ScriptableObject CreateAssetAtPath(Type genericType, string path)
+        {
+            if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out var concreteType))
+            {
+                return CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
+            }
+
+            PersistentStorage.SaveForScriptsReload(genericType, path);
+            PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationAtPath);
+
+            ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericType.GetGenericTypeDefinition(), genericType.GenericTypeArguments);
+            AssetDatabase.Refresh();
+            return null;
+        }
+
+        private static ScriptableObject CreateAssetFromConcreteType(Type concreteType, Action<ScriptableObject> saveAsset)
+        {
+            var asset = ScriptableObject.CreateInstance(concreteType);
 
             try
             {
-                ProjectWindowUtil.CreateAsset(asset, $"{_fileName}.asset");
+                saveAsset(asset);
+                return asset;
             }
             catch (NullReferenceException)
             {
                 Debug.LogError(
-                    $"{nameof(CreateAssetInteractively)} was most likely called too early. " +
+                    $"{nameof(CreateAssetFromConcreteType)} was most likely called too early. " +
                     "Add it to EditorApplication.delayCall instead.");
 
                 throw;
             }
-
-            EditorApplication.update -= CreateAssetInteractively;
         }
     }
 }

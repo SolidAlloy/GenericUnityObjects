@@ -179,7 +179,7 @@
         public static void TriggerAssetCreation(Type typeToSet)
         {
             EditorApplication.ExecuteMenuItem($"Assets/Create/{DefaultGenericClassName}1<T>");
-            GenericSOCreator.CreateAsset(GetDefaultGenericType(), new[] { typeToSet }, $"New {DefaultGenericClassName}1`1");
+            GenericSOCreator.CreateAssetInteractively(GetDefaultGenericType(), new[] { typeToSet }, $"New {DefaultGenericClassName}1`1");
         }
 
         private static Type GetDefaultGenericType()
