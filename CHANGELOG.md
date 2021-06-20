@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.10...2.5.0) (2021-06-20)
+
+
+### Bug Fixes
+
+* Changed how generic UnityObjects are drawn with Odin ([681eea7](https://github.com/SolidAlloy/GenericUnityObjects/commit/681eea703c4c7a19a036b3fa92c4a2a017880041))
+
+
+### Features
+
+* Added GenericSOCreator.CreateAssetAtPath method ([38ec365](https://github.com/SolidAlloy/GenericUnityObjects/commit/38ec36577b2dd2b15088284b10c957a9609b3f3d))
+
 ## [2.4.10](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.9...2.4.10) (2021-04-30)
 
 
