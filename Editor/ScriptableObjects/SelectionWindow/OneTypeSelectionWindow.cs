@@ -46,7 +46,7 @@
 
         private Vector2 GetCenteredPosition(SelectionTree selectionTree)
         {
-            Vector2 dropdownPosition = EditorDrawHelper.GetMainWindowPosition().center;
+            Vector2 dropdownPosition = EditorGUIUtilityHelper.GetMainWindowPosition().center;
             dropdownPosition.x -= DropdownWindow.CalculateOptimalWidth(selectionTree.SelectionPaths) / 2f;
             return dropdownPosition.RoundUp();
         }

@@ -13,7 +13,6 @@
     internal class BehaviourSelectorEditor : Editor
     {
         private SerializedProperty _typesArray;
-        private ContentCache _contentCache;
         private BehaviourSelector _targetSelector;
         private string _genericTypeNameWithoutSuffix;
         private string[] _argumentNames;
@@ -27,7 +26,6 @@
 
             _targetSelector = targetSelector;
             _typesArray = serializedObject.FindProperty(nameof(BehaviourSelector.TypeRefs));
-            _contentCache = new ContentCache();
             _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
             _argumentNames = new string[_targetSelector.TypeRefs.Length];
             _genericArgNames = TypeUtility.GetNiceArgsOfGenericType(_targetSelector.GenericBehaviourType);
@@ -39,7 +37,7 @@
             for (int i = 0; i < _typesArray.arraySize; i++)
             {
                 SerializedProperty prop = _typesArray.GetArrayElementAtIndex(i);
-                GUIContent label = _contentCache.GetItem(_genericArgNames[i]);
+                GUIContent label = GUIContentHelper.Temp(_genericArgNames[i]);
                 Rect propertyRect = EditorGUILayout.GetControlRect(true, _drawer.GetPropertyHeight(prop, label));
 
                 if (_targetSelector.JustBeenAdded && _targetSelector.TypeRefs.Length == 1)

@@ -21,7 +21,6 @@
 
         private Action<Type[]> _onTypesSelected;
         private SerializedObject _serializedObject;
-        private ContentCache _contentCache;
         private string[] _genericArgNames;
 
         public void OnCreate(Action<Type[]> onTypesSelected, string[] genericArgNames, Type[][] genericParamConstraints)
@@ -41,7 +40,6 @@
             _typeRefs = GetTypeRefs(genericParamConstraints);
             titleContent = new GUIContent("Choose Arguments");
             _serializedObject = new SerializedObject(this);
-            _contentCache = new ContentCache();
         }
 
         private void OnGUI()
@@ -52,7 +50,7 @@
             {
                 EditorGUILayout.PropertyField(
                     typesArray.GetArrayElementAtIndex(i),
-                    _contentCache.GetItem(_genericArgNames[i]));
+                    GUIContentHelper.Temp(_genericArgNames[i]));
             }
 
             if ( ! GUILayout.Button("Create Asset"))
