@@ -26,6 +26,9 @@
 
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
+        [SerializeField] private int _assembliesCount;
+        [SerializeField] private bool _firstCompilation;
+
         public static MenuItemMethod[] MenuItemMethods
         {
             get => Instance._menuItemMethods;
@@ -35,6 +38,19 @@
                 EditorUtility.SetDirty(Instance);
             }
         }
+
+        public static int AssembliesCount
+        {
+            get => Instance._assembliesCount;
+            set
+            {
+                Instance._assembliesCount = value;
+                Instance._firstCompilation = true;
+                EditorUtility.SetDirty(Instance);
+            }
+        }
+
+        public static bool FirstCompilation => Instance._firstCompilation;
 
         [SerializeField] private UnityEvent _afterReloadEvent = new UnityEvent();
 

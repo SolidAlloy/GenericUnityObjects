@@ -1,7 +1,10 @@
 ﻿namespace GenericUnityObjects.Editor
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -22,6 +25,11 @@
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
         private static void AnalyzeGenericTypes()
         {
+            if (CompilationFailedOnEditorStart())
+                return;
+
+            EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
+
             // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
             // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
             // to check changes to scripts in this situation, we can safely ignore this domain reload.
@@ -30,6 +38,26 @@
 
             DictInitializer<MonoBehaviour>.Initialize();
             DictInitializer<GenericScriptableObject>.Initialize();
+        }
+
+        private static bool CompilationFailedOnEditorStart()
+        {
+            // There is an issue in Unity causing some generic unity objects to be re-generated, and references to them are lost:
+            // If there is a compilation error when you open Unity, not all assemblies are compiled. However, DidReloadScripts is executed anyway.
+            // This causes TypeCache to not include some classes. The plugin thinks those classes are removed, however they are just located in uncompiled assemblies.
+            // To avoid this, we need to compare the assemblies count on last Unity compilation before it exited, and the assemblies count now.
+            // If it is not equal, it means the project was loaded with errors, and the generic classes check should not run this time.
+
+            if ( ! PersistentStorage.FirstCompilation)
+                return false;
+
+            PersistentStorage.DisableFirstCompilation();
+            return PersistentStorage.AssembliesCount != GetAssembliesCount();
+        }
+
+        private static int GetAssembliesCount()
+        {
+            return Directory.GetFiles("Library/ScriptAssemblies", "*.dll").Length;
         }
 
         private static void UpdateGeneratedAssemblies()

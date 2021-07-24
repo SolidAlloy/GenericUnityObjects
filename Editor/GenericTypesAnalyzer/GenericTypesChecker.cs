@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
@@ -49,6 +50,12 @@
                 return RemoveGenericTypes(oldGenericTypes);
             }
 
+            // Per-type comparison
+            return CompareTypes(oldGenericTypes, newGenericTypes);
+        }
+
+        private bool CompareTypes(GenericTypeInfo[] oldGenericTypes, GenericTypeInfo[] newGenericTypes)
+        {
             var oldTypesSet = new HashSet<GenericTypeInfo>(oldGenericTypes);
             var newTypesSet = new HashSet<GenericTypeInfo>(newGenericTypes);
 
