@@ -21,6 +21,9 @@
         [SerializeField] private GameObject _gameObject;
         [SerializeField] private TypeReference _genericBehaviourType;
 
+        [SerializeField] private int _instanceID;
+        [SerializeField] private string _propertyPath;
+
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
         public static MenuItemMethod[] MenuItemMethods
@@ -76,6 +79,12 @@
             Instance._fileName = fileName;
         }
 
+        public static void SaveForScriptsReload(SerializedProperty property)
+        {
+            Instance._instanceID = property.serializedObject.targetObject.GetInstanceID();
+            Instance._propertyPath = property.propertyPath;
+        }
+
         public static void SaveForScriptsReload(GameObject gameObject, Type genericType)
         {
             Instance._gameObject = gameObject;
@@ -92,12 +101,31 @@
             return (Instance._gameObject, Instance._genericBehaviourType);
         }
 
+        public static SerializedProperty GetSavedProperty()
+        {
+            var targetObject = EditorUtility.InstanceIDToObject(Instance._instanceID);
+
+            if (targetObject == null)
+                return null;
+
+            var serializedObject = new SerializedObject(targetObject);
+            return serializedObject.FindProperty(Instance._propertyPath);
+        }
+
+        public static void DisableFirstCompilation()
+        {
+            Instance._firstCompilation = false;
+            EditorUtility.SetDirty(Instance);
+        }
+
         public static void Clear()
         {
             Instance._genericSOType = null;
             Instance._fileName = null;
             Instance._gameObject = null;
             Instance._genericBehaviourType = null;
+            Instance._instanceID = 0;
+            Instance._propertyPath = null;
         }
 
         public void Initialize() { }

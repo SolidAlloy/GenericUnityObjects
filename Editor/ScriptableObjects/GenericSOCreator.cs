@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObjects
 {
     using System;
-    using System.Linq;
     using Cysharp.Threading.Tasks;
     using GenericUnityObjects;
     using GenericUnityObjects.Util;
@@ -60,7 +59,15 @@
                     (Type genericSOType, string path) = PersistentStorage.GetGenericSODetails();
                     var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
                     await WaitUntilEditorInitialized();
-                    CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
+                    var createdAsset = CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
+
+                    var property = PersistentStorage.GetSavedProperty();
+
+                    if (property == null)
+                        return;
+
+                    property.objectReferenceValue = createdAsset;
+                    property.serializedObject.ApplyModifiedProperties();
                 }
                 finally
                 {
@@ -99,7 +106,7 @@
             AssetDatabase.Refresh();
         }
 
-        public static ScriptableObject CreateAssetAtPath(Type genericType, string path)
+        public static ScriptableObject CreateAssetAtPath(SerializedProperty property, Type genericType, string path)
         {
             if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out var concreteType))
             {
@@ -107,10 +114,12 @@
             }
 
             PersistentStorage.SaveForScriptsReload(genericType, path);
+            PersistentStorage.SaveForScriptsReload(property);
             PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationAtPath);
 
             ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericType.GetGenericTypeDefinition(), genericType.GenericTypeArguments);
             AssetDatabase.Refresh();
+            // At this point the domain is reloaded, so the method doesn't return.
             return null;
         }
 
