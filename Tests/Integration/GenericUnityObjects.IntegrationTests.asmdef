@@ -17,8 +17,15 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
+        "UNITY_INCLUDE_TESTS",
+        "TEST_FRAMEWORK"
     ],
-    "versionDefines": [],
+	"versionDefines": [
+        {
+            "name": "com.unity.test-framework",
+            "expression": "",
+            "define": "TEST_FRAMEWORK"
+        }
+    ],
     "noEngineReferences": false
 }
