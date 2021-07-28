@@ -88,6 +88,8 @@
             {
                 await UniTask.NextFrame();
             }
+
+            await UniTask.NextFrame();
         }
 
         public static void CreateAssetInteractively(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
@@ -97,6 +99,7 @@
             if (ScriptableObjectsDatabase.TryGetConcreteType(genericType, out var concreteType))
             {
                 CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
+                return;
             }
 
             PersistentStorage.SaveForScriptsReload(genericType, fileName);
