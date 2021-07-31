@@ -6,8 +6,7 @@
         "TypeReferences.Editor",
         "GenericUnityObjects",
         "TypeReferences",
-        "SolidUtilities",
-        "UniTask"
+        "SolidUtilities"
     ],
     "includePlatforms": [
         "Editor"

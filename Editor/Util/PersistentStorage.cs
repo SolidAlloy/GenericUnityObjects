@@ -52,43 +52,6 @@
 
         public static bool FirstCompilation => Instance._firstCompilation;
 
-        [SerializeField] private UnityEvent _afterReloadEvent = new UnityEvent();
-
-        public static void ExecuteOnScriptsReload(UnityAction action)
-        {
-            UnityEventTools.AddVoidPersistentListener(Instance._afterReloadEvent, action);
-            int lastListener = Instance._afterReloadEvent.GetPersistentEventCount() - 1;
-            Instance._afterReloadEvent.SetPersistentListenerState(lastListener, UnityEventCallState.EditorAndRuntime);
-            EditorUtility.SetDirty(Instance);
-        }
-
-        private static bool _skipEvent;
-
-        public static void SkipAfterAssemblyGenerationEvent() => _skipEvent = true;
-
-        [DidReloadScripts((int)DidReloadScriptsOrder.AfterAssemblyGeneration)]
-        private static void OnScriptsReload()
-        {
-            // Skip event is set by IconSetter when some DLL icons are set. Domain reload cannot be forced but it
-            // happens on the second frame after the recompilation, before an asset is created, so it cancels the asset
-            // creation. When asset is created on next domain reload, everything is OK.
-            if (_skipEvent)
-            {
-                _skipEvent = false;
-                return;
-            }
-
-            try
-            {
-                Instance._afterReloadEvent.Invoke();
-            }
-            finally
-            {
-                if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
-                    Instance._afterReloadEvent = new UnityEvent();
-            }
-        }
-
         public static void SaveForScriptsReload(Type genericTypeToCreate, string fileName)
         {
             Instance._genericSOType = genericTypeToCreate;
@@ -145,5 +108,88 @@
         }
 
         public void Initialize() { }
+
+        #region InvokeEventsOnScriptsReload
+
+        [SerializeField] private UnityEvent _afterReloadEvent = new UnityEvent();
+
+        public static void ExecuteOnScriptsReload(UnityAction action)
+        {
+            UnityEventTools.AddVoidPersistentListener(Instance._afterReloadEvent, action);
+            int lastListener = Instance._afterReloadEvent.GetPersistentEventCount() - 1;
+            Instance._afterReloadEvent.SetPersistentListenerState(lastListener, UnityEventCallState.EditorAndRuntime);
+            EditorUtility.SetDirty(Instance);
+        }
+
+        private static bool _skipEvent;
+
+        public static void SkipAfterAssemblyGenerationEvent() => _skipEvent = true;
+
+        [DidReloadScripts((int)DidReloadScriptsOrder.AfterAssemblyGeneration)]
+        private static void OnScriptsReload()
+        {
+            // Skip event is set by IconSetter when some DLL icons are set. Domain reload cannot be forced but it
+            // happens on the second frame after the recompilation, before an asset is created, so it cancels the asset
+            // creation. When asset is created on next domain reload, everything is OK.
+            if (_skipEvent)
+            {
+                _skipEvent = false;
+                return;
+            }
+
+            EditorApplication.update += InvokeEventsWhenEditorIsReady;
+        }
+
+        private static bool _editorInitialized;
+        private static bool _toolbarInitialized;
+        private static bool _lastFrameSkipped;
+
+        // We cannot use EditorCoroutines or UniTask here and have to rely on checking bool flags each update because
+        // only this way we can force editor to update.
+        private static void InvokeEventsWhenEditorIsReady()
+        {
+            if (_editorInitialized)
+            {
+                return;
+            }
+
+            if (!_toolbarInitialized)
+            {
+                try
+                {
+                    var _ = EditorStyles.toolbar;
+                    _toolbarInitialized = true;
+                }
+                catch (NullReferenceException)
+                {
+                    EditorApplication.QueuePlayerLoopUpdate();
+                    SceneView.RepaintAll();
+                    return;
+                }
+            }
+
+            if (!_lastFrameSkipped)
+            {
+                EditorApplication.QueuePlayerLoopUpdate();
+                SceneView.RepaintAll();
+                _lastFrameSkipped = true;
+                return;
+            }
+
+            _editorInitialized = true;
+            EditorApplication.update -= InvokeEventsWhenEditorIsReady;
+
+            try
+            {
+                Instance._afterReloadEvent.Invoke();
+            }
+            finally
+            {
+                if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
+                    Instance._afterReloadEvent = new UnityEvent();
+            }
+        }
+
+        #endregion
     }
 }

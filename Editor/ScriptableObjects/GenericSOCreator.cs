@@ -1,7 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObjects
 {
     using System;
-    using Cysharp.Threading.Tasks;
     using GenericUnityObjects;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
@@ -32,64 +31,39 @@
 
         private static void FinishSOCreationInteractively()
         {
-            async UniTaskVoid CreateAssetImpl()
+            try
             {
-                try
-                {
-                    (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
-                    var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
-                    await WaitUntilEditorInitialized();
-                    CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
-                }
-                finally
-                {
-                    PersistentStorage.Clear();
-                }
+                (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
+                var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                Debug.Log("before creating type");
+                CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
             }
-
-            CreateAssetImpl().Forget();
+            finally
+            {
+                PersistentStorage.Clear();
+            }
         }
 
         private static void FinishSOCreationAtPath()
         {
-            async UniTaskVoid CreateAssetImpl()
-            {
-                try
-                {
-                    (Type genericSOType, string path) = PersistentStorage.GetGenericSODetails();
-                    var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
-                    await WaitUntilEditorInitialized();
-                    var createdAsset = CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
-
-                    var property = PersistentStorage.GetSavedProperty();
-
-                    if (property == null)
-                        return;
-
-                    property.objectReferenceValue = createdAsset;
-                    property.serializedObject.ApplyModifiedProperties();
-                }
-                finally
-                {
-                    PersistentStorage.Clear();
-                }
-            }
-
-            CreateAssetImpl().Forget();
-        }
-
-        private static async UniTask WaitUntilEditorInitialized()
-        {
             try
             {
-                var _ = EditorStyles.toolbar;
-            }
-            catch (NullReferenceException)
-            {
-                await UniTask.NextFrame();
-            }
+                (Type genericSOType, string path) = PersistentStorage.GetGenericSODetails();
+                var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                var createdAsset = CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
 
-            await UniTask.NextFrame();
+                var property = PersistentStorage.GetSavedProperty();
+
+                if (property == null)
+                    return;
+
+                property.objectReferenceValue = createdAsset;
+                property.serializedObject.ApplyModifiedProperties();
+            }
+            finally
+            {
+                PersistentStorage.Clear();
+            }
         }
 
         public static void CreateAssetInteractively(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
