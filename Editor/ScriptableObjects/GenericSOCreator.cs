@@ -35,7 +35,6 @@
             {
                 (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
                 var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
-                Debug.Log("before creating type");
                 CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
             }
             finally
@@ -112,8 +111,7 @@
             catch (NullReferenceException)
             {
                 Debug.LogError(
-                    $"{nameof(CreateAssetFromConcreteType)} was most likely called too early. " +
-                    "Add it to EditorApplication.delayCall instead.");
+                    $"{nameof(CreateAssetFromConcreteType)} was most likely called too early. Delay it more.");
 
                 throw;
             }

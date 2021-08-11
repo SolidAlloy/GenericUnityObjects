@@ -63,7 +63,6 @@
                 position,
                 dropdownDrawer,
                 typeOptionsAttribute.ShortName,
-                typeOptionsAttribute.UseBuiltInNames,
                 onTypeSelected,
                 triggerDropdownImmediately);
 

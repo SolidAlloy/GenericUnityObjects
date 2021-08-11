@@ -36,7 +36,7 @@
                     _dropdownWindow.Close();
                     onTypeSelected(new[] { type });
                 },
-                attribute.SearchbarMinItemsCount, attribute.ExcludeNone);
+                TypeReferences.Editor.ProjectSettings.SearchbarMinItemsCount, attribute.ExcludeNone);
 
             if (attribute.ExpandAllFolders)
                 selectionTree.ExpandAllFolders();
