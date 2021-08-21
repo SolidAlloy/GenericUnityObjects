@@ -26,9 +26,8 @@
                 }
             }
 
-            AssetDatabase.Refresh();
-
             PersistentStorage.ExecuteOnScriptsReload(afterAddingTypes);
+            AssetDatabase.Refresh();
         }
     }
 }

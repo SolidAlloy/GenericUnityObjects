@@ -52,17 +52,31 @@
                 return false;
             }
 
-            string guid = GetGUIDFromIconLine(iconLine);
+            if (!GetGUIDFromIconLine(iconLine, out string guid))
+            {
+                customIcon = null;
+                return false;
+            }
+
             string texturePath = AssetDatabase.GUIDToAssetPath(guid);
             customIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
             Assert.IsNotNull(customIcon);
             return true;
         }
 
-        private static string GetGUIDFromIconLine(string iconLine)
+        private static bool GetGUIDFromIconLine(string iconLine, out string guid)
         {
             int guidIndex = iconLine.IndexOf("guid: ", StringComparison.Ordinal);
-            return iconLine.Substring(guidIndex + 6, 32);
+
+            // There may be instanceID instead of guid on the icon line.
+            if (guidIndex == -1 || iconLine.Length < guidIndex + 37)
+            {
+                guid = null;
+                return false;
+            }
+
+            guid = iconLine.Substring(guidIndex + 6, 32);
+            return true;
         }
 
         private static string GetIconLine(string assetPath)
