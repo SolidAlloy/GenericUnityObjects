@@ -60,6 +60,7 @@
 
             var asset = CreateAsset(property, type);
             property.objectReferenceValue = asset;
+            EditorGUIUtility.PingObject(asset);
         }
 
         private ScriptableObject CreateAsset(SerializedProperty property, Type type)

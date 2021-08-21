@@ -50,6 +50,7 @@
                 (Type genericSOType, string path) = PersistentStorage.GetGenericSODetails();
                 var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
                 var createdAsset = CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
+                EditorGUIUtility.PingObject(createdAsset);
 
                 var property = PersistentStorage.GetSavedProperty();
 
