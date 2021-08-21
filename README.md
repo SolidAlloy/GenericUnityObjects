@@ -19,7 +19,7 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 
 - Unity 2020.2 or higher
 
-- .NET 4.x
+- .NET 4.x :heavy_exclamation_mark:
 
   
 
@@ -149,6 +149,30 @@ public class WarriorStats<TClass> : GenericScriptableObject
 ```
 
 ***Warning!*** [See the limitations](#Limitations) of creating instances at runtime.
+
+### Creatable attribute
+
+You can eliminate the need to choose generic type from a list by marking the field as `[Creatable]`. If such a field is empty, the :heavy_plus_sign: button will appear next to the object picker, and you will be able to create a scriptable object of the needed type in a few clicks. Declare the attribute like in the following example:
+
+```csharp
+[CreateAssetMenu(menuName = "Classes/Archer")]
+public class Archer : WarriorClass
+{
+    [Creatable] public WarriorStats<Archer> Stats;
+
+    public override bool HasMeleeAttack => false;
+
+    public override bool HasRangedAttack => true;
+
+    public override bool HasAOEAttack => false;
+}
+```
+
+Then you will be able to create a scriptable object without choosing its generic argument by pressing the button.
+
+![Add creatable scriptable object](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.creatable-scriptable-object.gif)
+
+By the way, the attribute works with regular scriptable objects too, so you can use it everywhere.
 
 ## Generic MonoBehaviour Usage
 
