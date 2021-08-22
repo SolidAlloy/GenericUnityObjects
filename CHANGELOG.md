@@ -1,3 +1,23 @@
+# [2.6.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.5.0...2.6.0) (2021-08-22)
+
+
+### Bug Fixes
+
+* Added TEST_FRAMEWORK define symbol to unity test assemblies ([73ecc9d](https://github.com/SolidAlloy/GenericUnityObjects/commit/73ecc9d0a561c948130df5343b6619b80da03b41))
+* Fixed ArgumentOutOfRange exception when trying to find a custom script icon ([464e043](https://github.com/SolidAlloy/GenericUnityObjects/commit/464e043b2314849243bb0cd20165d204339c2daf))
+* Fixed attempt to generate a concrete class while it already exists when a generic scriptable object is created ([167e87c](https://github.com/SolidAlloy/GenericUnityObjects/commit/167e87c3dae6cd13d0546c205cbfb3f674f57012))
+* Fixed long delay before the interactive creation of a scriptable object ([d3f9e4f](https://github.com/SolidAlloy/GenericUnityObjects/commit/d3f9e4fd0f2d753f0002ba567cb6d1c1625b0181))
+* Fixed some generic types being regenerated when Unity starts with compilation errors ([920cbe1](https://github.com/SolidAlloy/GenericUnityObjects/commit/920cbe1b3683c95b57aefcc196e0481b27c60d09))
+* Removed unnecessary Assembly-CSharp inclusion in type dropdown ([c4e1663](https://github.com/SolidAlloy/GenericUnityObjects/commit/c4e1663c410ce885ba432162f5bd4789ec5fdf34))
+* Updated according to changes in TypeReferences ([a8d1883](https://github.com/SolidAlloy/GenericUnityObjects/commit/a8d18830fc14d51f8345e25abf50003137a902fc))
+
+
+### Features
+
+* Added ability to assign the created asset after assembly recompilation ([feab545](https://github.com/SolidAlloy/GenericUnityObjects/commit/feab545a640304cef31d141035461e3746001021))
+* Added object pinging in the hierarchy when an object is created through the Creatable attribute ([4f45bd1](https://github.com/SolidAlloy/GenericUnityObjects/commit/4f45bd1b647087452fd5e717b271224d000eacd6))
+* Added the creatable attribute that adds a Create button in the inspector next to object field ([cde98f2](https://github.com/SolidAlloy/GenericUnityObjects/commit/cde98f2d981701db3ee72d2fba93f8fc05a94184))
+
 # [2.5.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.4.10...2.5.0) (2021-06-20)
 
 
