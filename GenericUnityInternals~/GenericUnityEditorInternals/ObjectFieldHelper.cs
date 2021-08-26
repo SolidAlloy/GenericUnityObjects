@@ -90,7 +90,6 @@
             }
 
             ObjectSelector.get.ShowGeneric(obj, objectBeingEdited, ObjType, allowSceneObjects, niceTypeName);
-
         }
 
         private Object ValidateAssignmentForType(Object[] references)

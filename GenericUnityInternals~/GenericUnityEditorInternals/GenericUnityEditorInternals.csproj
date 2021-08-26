@@ -39,13 +39,13 @@
         <Reference Include="System.Core" />
         <Reference Include="System.Xml" />
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>C:\Program Files\Unity Editors\2021.1.3f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>C:\Program Files\Unity Editors\2021.1.16f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEditor.CoreModule">
-            <HintPath>c:\Program Files\Unity Editors\2021.1.3f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
+            <HintPath>c:\Program Files\Unity Editors\2021.1.16f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
-            <HintPath>c:\Program Files\Unity Editors\2021.1.3f1\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
+            <HintPath>c:\Program Files\Unity Editors\2021.1.16f1\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
         </Reference>
         <Reference Include="GenericUnityObjects">
             <HintPath>..\..\..\..\Library\ScriptAssemblies\GenericUnityObjects.dll</HintPath>
@@ -66,6 +66,7 @@
         <Compile Include="GenericUnityEventDrawer.cs" />
         <Compile Include="ObjectFieldHelper.cs" />
         <Compile Include="ObjectSelectorExtensions.cs" />
+        <Compile Include="ObjectSelectorHelper.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>

@@ -13,7 +13,7 @@
         /// This extension method is an alternative of <see cref="ObjectSelector.Show"/> that accepts a generic type
         /// and draws it correctly.
         /// </summary>
-        public static void ShowGeneric(this ObjectSelector this_, Object obj, Object objectBeingEdited, Type requiredType, bool allowSceneObjects, string niceTypeName)
+        public static void ShowGeneric(this ObjectSelector this_, Object obj, Object objectBeingEdited, Type requiredType, bool allowSceneObjects, string niceTypeName, Action<Object> onObjectSelectedUpdated = null)
         {
             this_.m_ObjectSelectorReceiver = null;
             this_.m_IsShowingAssets = true;
@@ -26,7 +26,7 @@
             this_.m_LastSelectedInstanceId = obj?.GetInstanceID() ?? 0;
 
             this_.m_OnObjectSelectorClosed = null;
-            this_.m_OnObjectSelectorUpdated = null;
+            this_.m_OnObjectSelectorUpdated = onObjectSelectedUpdated;
 
             // Do not allow to show scene objects if the object being edited is persistent
             this_.m_AllowSceneObjects = allowSceneObjects && ! typeof(ScriptableObject).IsAssignableFrom(requiredType)
