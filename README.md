@@ -241,6 +241,30 @@ The file name of a generic UnityEngine.Object must contain the name of the type 
 
 This way the plugin will be able to detect a class name change.
 
+### ApplyToChildren Attribute
+
+Sometimes you need to have an attribute on a generic class but it is not inherited, so when concrete children classes are generated, they don't have the attribute:
+
+```csharp
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+public class HideInMenuAttribute : Attribute { }
+
+// won't work on child concrete types here because HideInMenu is not inherited
+[HideInMenu]
+public class TestScriptableObject<T> : GenericScriptableObject { }
+```
+
+In this case, you can use the ApplyToChildren attribute to specify which attributes to use when generating concrete child classes:
+
+```csharp
+[ApplyToChildren(typeof(HideInMenuAttribute))]
+public class TestScriptableObject<T> : GenericScriptableObject { }
+```
+
+Note that only attributes with parameter-less constructors can be used for this.
+
+
+
 ## Limitations
 
 There are a few limitations that cannot be overcome, unfortunately.
