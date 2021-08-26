@@ -24,6 +24,8 @@
 
             TypeBuilder typeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericTypeWithArgs);
 
+            AssemblyCreatorHelper.AddChildrenAttributes(typeBuilder, genericTypeWithArgs);
+
             if (typeof(TObject) == typeof(MonoBehaviour))
             {
                 AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, genericTypeWithArgs);

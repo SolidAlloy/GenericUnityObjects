@@ -79,6 +79,25 @@
             typeBuilder.SetCustomAttribute(attributeBuilder);
         }
 
+        public static void AddChildrenAttributes(TypeBuilder typeBuilder, Type genericType)
+        {
+            var childrenAttributes = genericType.GetCustomAttribute<ApplyToChildrenAttribute>();
+
+            if (childrenAttributes == null)
+                return;
+
+            foreach (Type attributeType in childrenAttributes.Attributes)
+            {
+                var constructor = attributeType.GetConstructor(Type.EmptyTypes);
+
+                if (constructor == null)
+                    Debug.LogWarning($"Tried to add an attribute to a concrete class through the ApplyToChildren attribute, but the attribute does not have a default constructor: {attributeType}");
+
+                var attributeBuilder = new CustomAttributeBuilder(constructor, Array.Empty<object>());
+                typeBuilder.SetCustomAttribute(attributeBuilder);
+            }
+        }
+
         public static (string componentName, int order) GetComponentMenu(Type type)
         {
             string componentName;
