@@ -17,6 +17,8 @@
     internal static class ConcreteClassCreator<TObject>
         where TObject : Object
     {
+        public static event Action<Type, Type[]> ConcreteClassAdded;
+
         /// <summary>
         /// Creates a new concrete class assembly, adds it to the database, and adds a task to update behaviour icon
         /// if the generic type is MonoBehaviour.
@@ -31,6 +33,8 @@
             IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, assemblyGUID, typeof(TObject) == typeof(GenericScriptableObject));
 
             AddToDatabase(genericTypeInfo, argumentTypes, assemblyGUID);
+
+            ConcreteClassAdded?.Invoke(genericTypeWithoutArgs, argumentTypes);
         }
 
         /// <summary>
