@@ -2,7 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Util;
-    using TypeReferences;
+    using SolidUtilities.SerializableCollections;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEditor.Events;
@@ -15,15 +15,6 @@
     /// </summary>
     internal class PersistentStorage : EditorOnlySingletonSO<PersistentStorage>, ICanBeInitialized
     {
-        [SerializeField] private TypeReference _genericSOType;
-        [SerializeField] private string _fileName;
-
-        [SerializeField] private GameObject _gameObject;
-        [SerializeField] private TypeReference _genericBehaviourType;
-
-        [SerializeField] private int _instanceID;
-        [SerializeField] private string _propertyPath;
-
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
         [SerializeField] private int _assembliesCount;
@@ -52,59 +43,10 @@
 
         public static bool FirstCompilation => Instance._firstCompilation;
 
-        public static void SaveForScriptsReload(Type genericTypeToCreate, string fileName)
-        {
-            Instance._genericSOType = genericTypeToCreate;
-            Instance._fileName = fileName;
-        }
-
-        public static void SaveForScriptsReload(SerializedProperty property)
-        {
-            Instance._instanceID = property.serializedObject.targetObject.GetInstanceID();
-            Instance._propertyPath = property.propertyPath;
-        }
-
-        public static void SaveForScriptsReload(GameObject gameObject, Type genericType)
-        {
-            Instance._gameObject = gameObject;
-            Instance._genericBehaviourType = genericType;
-        }
-
-        public static (Type genericSOType, string fileName) GetGenericSODetails()
-        {
-            return (Instance._genericSOType, Instance._fileName);
-        }
-
-        public static (GameObject gameObject, Type genericBehaviourType) GetGenericBehaviourDetails()
-        {
-            return (Instance._gameObject, Instance._genericBehaviourType);
-        }
-
-        public static SerializedProperty GetSavedProperty()
-        {
-            var targetObject = EditorUtility.InstanceIDToObject(Instance._instanceID);
-
-            if (targetObject == null)
-                return null;
-
-            var serializedObject = new SerializedObject(targetObject);
-            return serializedObject.FindProperty(Instance._propertyPath);
-        }
-
         public static void DisableFirstCompilation()
         {
             Instance._firstCompilation = false;
             EditorUtility.SetDirty(Instance);
-        }
-
-        public static void Clear()
-        {
-            Instance._genericSOType = null;
-            Instance._fileName = null;
-            Instance._gameObject = null;
-            Instance._genericBehaviourType = null;
-            Instance._instanceID = 0;
-            Instance._propertyPath = null;
         }
 
         public void Initialize() { }
@@ -188,6 +130,40 @@
                 if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
                     Instance._afterReloadEvent = new UnityEvent();
             }
+        }
+
+        #endregion
+
+        #region Generic Data Save-Load
+
+        [SerializeField]
+        private SerializableDictionary<string, string> _savedData = new SerializableDictionary<string, string>();
+
+        public static void SaveData<T>(string key, T data)
+        {
+            Instance._savedData[key] = EditorJsonUtility.ToJson(new DataWrapper<T>(data));
+        }
+
+        public static T GetData<T>(string key)
+        {
+            if (!Instance._savedData.TryGetValue(key, out string serializedWrapper))
+                return default;
+
+            var wrapper = new DataWrapper<T>();
+            EditorJsonUtility.FromJsonOverwrite(serializedWrapper, wrapper);
+            return wrapper.Data;
+        }
+
+        public static void DeleteData(string key) => Instance._savedData.Remove(key);
+
+        [Serializable]
+        private class DataWrapper<T>
+        {
+            public T Data;
+
+            public DataWrapper() { }
+
+            public DataWrapper(T data) => Data = data;
         }
 
         #endregion

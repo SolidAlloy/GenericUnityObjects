@@ -2,6 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Util;
+    using TypeReferences;
     using UnityEditor;
     using UnityEngine;
     using Util;
@@ -13,6 +14,9 @@
     /// </summary>
     internal static class GenericBehaviourCreator
     {
+        private const string GameObjectKey = "GameObject";
+        private const string GenericTypeKey = "GenericBehaviourType";
+
         public static void AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
         {
             Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
@@ -24,7 +28,8 @@
                 return;
             }
 
-            PersistentStorage.SaveForScriptsReload(gameObject, genericType);
+            PersistentStorage.SaveData(GameObjectKey, gameObject);
+            PersistentStorage.SaveData(GenericTypeKey, new TypeReference(genericType));
             PersistentStorage.ExecuteOnScriptsReload(FinishBehaviourCreation);
 
             DestroySelectorComponent(gameObject, selectorComponentType);
@@ -37,13 +42,16 @@
         {
             try
             {
-                (GameObject gameObject, Type genericType) = PersistentStorage.GetGenericBehaviourDetails();
+                var gameObject = PersistentStorage.GetData<GameObject>(GameObjectKey);
+                Type genericType = PersistentStorage.GetData<TypeReference>(GenericTypeKey).Type;
+
                 Type concreteType = BehavioursDatabase.GetConcreteType(genericType);
                 gameObject.AddComponent(concreteType);
             }
             finally
             {
-                PersistentStorage.Clear();
+                PersistentStorage.DeleteData(GameObjectKey);
+                PersistentStorage.DeleteData(GenericTypeKey);
             }
         }
 

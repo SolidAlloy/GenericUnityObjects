@@ -4,6 +4,7 @@
     using GenericUnityObjects;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
+    using TypeReferences;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -11,6 +12,12 @@
 
     internal class GenericSOCreator
     {
+        private const string GenericSOTypeKey = "GenericSOType";
+        private const string FileNameKey = "FileName";
+        private const string PathKey = "Path";
+        private const string InstanceIDKey = "InstanceId";
+        private const string PropertyPathKey = "PropertyPath";
+
         /// <summary>
         /// Creates a <see cref="GenericScriptableObject"/> asset when used in a method with the <see cref="UnityEditor.MenuItem"/>
         /// attribute. A class derived from <see cref="GenericSOCreator"/> is generated automatically in a separate DLL
@@ -33,13 +40,16 @@
         {
             try
             {
-                (Type genericSOType, string fileName) = PersistentStorage.GetGenericSODetails();
-                var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                Type genericSOType = PersistentStorage.GetData<TypeReference>(GenericSOTypeKey).Type;
+                string fileName = PersistentStorage.GetData<string>(FileNameKey);
+
+                var concreteType = ScriptableObjectsDatabase.GetConcreteType(genericSOType);
                 CreateAssetFromConcreteType(concreteType, asset => ProjectWindowUtil.CreateAsset(asset, $"{fileName}.asset"));
             }
             finally
             {
-                PersistentStorage.Clear();
+                PersistentStorage.DeleteData(GenericSOTypeKey);
+                PersistentStorage.DeleteData(FileNameKey);
             }
         }
 
@@ -47,12 +57,14 @@
         {
             try
             {
-                (Type genericSOType, string path) = PersistentStorage.GetGenericSODetails();
-                var concreteType = BehavioursDatabase.GetConcreteType(genericSOType);
+                Type genericSOType = PersistentStorage.GetData<TypeReference>(GenericSOTypeKey).Type;
+                string path = PersistentStorage.GetData<string>(PathKey);
+
+                var concreteType = ScriptableObjectsDatabase.GetConcreteType(genericSOType);
                 var createdAsset = CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
                 EditorGUIUtility.PingObject(createdAsset);
 
-                var property = PersistentStorage.GetSavedProperty();
+                var property = GetSavedProperty();
 
                 if (property == null)
                     return;
@@ -62,8 +74,30 @@
             }
             finally
             {
-                PersistentStorage.Clear();
+                PersistentStorage.DeleteData(InstanceIDKey);
+                PersistentStorage.DeleteData(PropertyPathKey);
+                PersistentStorage.DeleteData(GenericSOTypeKey);
+                PersistentStorage.DeleteData(PathKey);
             }
+        }
+
+        private static SerializedProperty GetSavedProperty()
+        {
+            int instanceID = PersistentStorage.GetData<int>(InstanceIDKey);
+            var targetObject = EditorUtility.InstanceIDToObject(instanceID);
+
+            if (targetObject == null)
+                return null;
+
+            var serializedObject = new SerializedObject(targetObject);
+            string propertyPath = PersistentStorage.GetData<string>(PropertyPathKey);
+            return serializedObject.FindProperty(propertyPath);
+        }
+
+        private static void SaveProperty(SerializedProperty property)
+        {
+            PersistentStorage.SaveData(InstanceIDKey, property.serializedObject.targetObject.GetInstanceID());
+            PersistentStorage.SaveData(PropertyPathKey, property.propertyPath);
         }
 
         public static void CreateAssetInteractively(Type genericTypeWithoutArgs, Type[] genericArgs, string fileName)
@@ -76,7 +110,8 @@
                 return;
             }
 
-            PersistentStorage.SaveForScriptsReload(genericType, fileName);
+            PersistentStorage.SaveData(GenericSOTypeKey, new TypeReference(genericType));
+            PersistentStorage.SaveData(FileNameKey, fileName);
             PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationInteractively);
 
             ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
@@ -90,8 +125,9 @@
                 return CreateAssetFromConcreteType(concreteType, asset => AssetDatabase.CreateAsset(asset, path));
             }
 
-            PersistentStorage.SaveForScriptsReload(genericType, path);
-            PersistentStorage.SaveForScriptsReload(property);
+            PersistentStorage.SaveData(GenericSOTypeKey, new TypeReference(genericType));
+            PersistentStorage.SaveData(PathKey, new TypeReference(path));
+            SaveProperty(property);
             PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationAtPath);
 
             ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericType.GetGenericTypeDefinition(), genericType.GenericTypeArguments);
