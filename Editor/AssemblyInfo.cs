@@ -6,3 +6,4 @@ using GenericUnityObjects.Util;
 [assembly: InternalsVisibleTo(Config.MenuItemsAssemblyName)]
 [assembly: InternalsVisibleTo("OdinInternals")]
 [assembly: InternalsVisibleTo("GenericScriptableArchitecture.Editor")]
+[assembly: InternalsVisibleTo("GenericScriptableArchitecture.Timeline.Editor")]
