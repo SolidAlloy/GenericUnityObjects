@@ -6,6 +6,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
+    using UnityEngine;
     using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
@@ -56,6 +57,12 @@
 
                     // There was once NullReferenceReference here because Unity lost a MonoScript asset connected to
                     // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
+                    if (script == null)
+                    {
+                        Debug.LogWarning($"Found an assembly {assemblyPath} that should contain a concrete class, but it was not found there. Please delete the assembly and generate a concrete class again.");
+                        continue;
+                    }
+
                     Type value = script.GetClass();
 
                     concreteClassesDict.Add(key, value);
