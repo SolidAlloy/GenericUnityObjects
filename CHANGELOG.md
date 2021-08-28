@@ -1,3 +1,18 @@
+# [2.7.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.6.0...2.7.0) (2021-08-28)
+
+
+### Bug Fixes
+
+* Added a verbose warning message if a MonoScript is not found inside a generated assembly ([6cf4d08](https://github.com/SolidAlloy/GenericUnityObjects/commit/6cf4d088e24399afb91353d0a835b33a7dbc3048))
+
+
+### Features
+
+* Added ConcreteClassAdded event to ConcreteClassCreator ([e33f4b8](https://github.com/SolidAlloy/GenericUnityObjects/commit/e33f4b8a9759b0bb68291d02efee5aa770dd9e58))
+* Added new GenericScriptableArchitecture assemblies to InternalsVisibleTo ([91fabe0](https://github.com/SolidAlloy/GenericUnityObjects/commit/91fabe0055a184e7b1890059b59581eedde2a33a))
+* Added ObjectSelectorHelper.ShowGenericSelector() method ([387899f](https://github.com/SolidAlloy/GenericUnityObjects/commit/387899fdaacb5b14b161fe9e22a9912829ae860b))
+* Added the ApplyToChildren attribute ([9ade420](https://github.com/SolidAlloy/GenericUnityObjects/commit/9ade420dedde066a9d75c1b30e1eb1873702de52))
+
 # [2.6.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.5.0...2.6.0) (2021-08-22)
 
 
