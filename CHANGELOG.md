@@ -1,3 +1,10 @@
+## [2.7.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.7.0...2.7.1) (2021-08-30)
+
+
+### Bug Fixes
+
+* Fixed constant reloading when importing a generic type with a GUID reference to an icon but no texture in the project ([2698e47](https://github.com/SolidAlloy/GenericUnityObjects/commit/2698e475b95b75b27dc3c5ebc8e1507767161045))
+
 # [2.7.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.6.0...2.7.0) (2021-08-28)
 
 
