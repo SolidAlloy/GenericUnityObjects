@@ -16,6 +16,7 @@
 
             if (_disable)
             {
+                EditorApplication.LockReloadAssemblies();
                 AssetDatabase.DisallowAutoRefresh();
                 AssetDatabase.StartAssetEditing();
             }
@@ -27,6 +28,7 @@
             {
                 AssetDatabase.StopAssetEditing();
                 AssetDatabase.AllowAutoRefresh();
+                EditorApplication.UnlockReloadAssemblies();
             }
         }
     }

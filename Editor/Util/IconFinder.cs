@@ -60,8 +60,7 @@
 
             string texturePath = AssetDatabase.GUIDToAssetPath(guid);
             customIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
-            Assert.IsNotNull(customIcon);
-            return true;
+            return customIcon != null;
         }
 
         private static bool GetGUIDFromIconLine(string iconLine, out string guid)
