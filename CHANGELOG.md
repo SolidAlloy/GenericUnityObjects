@@ -1,3 +1,15 @@
+# [2.8.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.7.1...2.8.0) (2021-08-31)
+
+
+### Bug Fixes
+
+* Fixed NullReferenceException when adding new generic monobehaviour components ([03f17bf](https://github.com/SolidAlloy/GenericUnityObjects/commit/03f17bf78ad1056bd35816399ab9dabdaa304b44))
+
+
+### Features
+
+* Started drawing easy buttons in generic unityobjects inspectors if the package is installed ([ed0c74a](https://github.com/SolidAlloy/GenericUnityObjects/commit/ed0c74a685aa7a0d22fc0908eea96eac55e61621))
+
 ## [2.7.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.7.0...2.7.1) (2021-08-30)
 
 
