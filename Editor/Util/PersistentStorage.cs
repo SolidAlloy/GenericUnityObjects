@@ -141,7 +141,7 @@
 
         public static void SaveData<T>(string key, T data)
         {
-            Instance._savedData[key] = EditorJsonUtility.ToJson(new DataWrapper<T>(data));
+            Instance._savedData[key] = JsonUtility.ToJson(new DataWrapper<T>(data));
         }
 
         public static T GetData<T>(string key)
@@ -150,7 +150,7 @@
                 return default;
 
             var wrapper = new DataWrapper<T>();
-            EditorJsonUtility.FromJsonOverwrite(serializedWrapper, wrapper);
+            JsonUtility.FromJsonOverwrite(serializedWrapper, wrapper);
             return wrapper.Data;
         }
 
