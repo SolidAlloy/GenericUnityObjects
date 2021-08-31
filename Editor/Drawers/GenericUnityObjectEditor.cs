@@ -5,6 +5,10 @@
     using UnityEditorInternals;
     using UnityEngine;
 
+#if EASY_BUTTONS
+    using EasyButtons.Editor;
+#endif
+
 #if ! DISABLE_GENERIC_OBJECT_EDITOR
     [CanEditMultipleObjects]
     [CustomEditor(typeof(MonoBehaviour), true)]
@@ -19,9 +23,17 @@
     {
         private GenericUnityObjectHelper _helper;
 
+#if EASY_BUTTONS
+        private ButtonsDrawer _buttonsDrawer;
+#endif
+
         private void OnEnable()
         {
             _helper = new GenericUnityObjectHelper(target);
+
+#if EASY_BUTTONS
+            _buttonsDrawer = new ButtonsDrawer(target);
+#endif
         }
 
         public override void OnInspectorGUI()
@@ -47,6 +59,10 @@
                     EditorGUILayout.PropertyField(iterator, true, null);
                 }
             }
+
+#if EASY_BUTTONS
+            _buttonsDrawer.DrawButtons(targets);
+#endif
 
             serializedObject.ApplyModifiedProperties();
         }
