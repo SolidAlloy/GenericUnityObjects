@@ -45,7 +45,7 @@
                 serializedTypeRef.TypeNameAndAssembly = string.Empty;
             }
 
-            var dropdownDrawer = new TypeDropdownDrawer(selectedType, typeOptionsAttribute, fieldInfo?.DeclaringType);
+            var dropdownDrawer = new TypeDropdownDrawer(selectedType, typeOptionsAttribute, null);
 
             Action<Type> onTypeSelected;
 
