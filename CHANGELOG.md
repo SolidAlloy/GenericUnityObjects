@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.8.0...2.8.1) (2021-09-02)
+
+
+### Bug Fixes
+
+* Fixed generic scriptable objects with multiple type arguments having incorrect constraints when choosing generic arguments ([3eb0419](https://github.com/SolidAlloy/GenericUnityObjects/commit/3eb0419e8eae3abc1709d3d848803c75fb7d63ad))
+
 # [2.8.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.7.1...2.8.0) (2021-08-31)
 
 
