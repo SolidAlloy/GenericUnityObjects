@@ -20,7 +20,7 @@
                 return;
             }
 
-            var previouslyFailedAssemblies = PersistentStorage.GetFromPlayerPrefs<List<string>>(PreviouslyFailedAssemblyGuidsKey);
+            var previouslyFailedAssemblies = PersistentStorage.GetFromPlayerPrefs<List<string>>(PreviouslyFailedAssemblyGuidsKey) ?? new List<string>();
             var newFailedAssemblyGuids = new List<string>();
 
             using (new DisabledAssetDatabase(true))
