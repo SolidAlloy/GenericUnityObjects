@@ -44,7 +44,7 @@
             catch (ApplicationException)
             {
                 Debug.LogWarning("Editor could not load some of the scriptable objects from plugin's resources. It will try on next assembly reload.");
-                CompilationHelper.RecompileOnce();
+                EditorCoroutineHelper.Delay(CompilationHelper.RecompileOnce, 1f);
                 return;
             }
 
