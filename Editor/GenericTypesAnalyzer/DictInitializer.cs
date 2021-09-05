@@ -8,14 +8,38 @@
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using Util;
     using Object = UnityEngine.Object;
+
+    internal class DictInitializer
+    {
+        protected static readonly List<string> _failedAssemblyPaths = new List<string>();
+
+        public static void ReimportFailedAssemblies()
+        {
+            if (_failedAssemblyPaths.Count == 0)
+            {
+                return;
+            }
+
+            using (new DisabledAssetDatabase(true))
+            {
+                foreach (string assetPath in _failedAssemblyPaths)
+                {
+                    AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
+                }
+            }
+
+            AssetDatabase.Refresh();
+        }
+    }
 
     /// <summary>
     /// A class that gathers data from <see cref="GenerationDatabase{TUnityObject}"/> and
     /// fills <see cref="GenericTypesDatabase{TObject}"/> with items to be used at runtime.
     /// </summary>
     /// <typeparam name="TObject"> A type derived from <see cref="UnityEngine.Object"/>. </typeparam>
-    internal static class DictInitializer<TObject>
+    internal class DictInitializer<TObject> : DictInitializer
         where TObject : Object
     {
         public static void Initialize()
@@ -59,7 +83,8 @@
                     // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
                     if (script == null)
                     {
-                        Debug.LogWarning($"Found an assembly {assemblyPath} that should contain a concrete class, but it was not found there. Please delete the assembly and generate a concrete class again.");
+                        _failedAssemblyPaths.Add(assemblyPath);
+                        Debug.LogWarning($"Found an assembly {assemblyPath} that should contain a concrete class, but it was not found there. Will try to reimport it.");
                         continue;
                     }
 

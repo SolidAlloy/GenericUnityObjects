@@ -25,7 +25,13 @@
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
         private static void AnalyzeGenericTypes()
         {
-            if (CompilationFailedOnEditorStart())
+            try
+            {
+                if (CompilationFailedOnEditorStart())
+                    return;
+
+                EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
+
                 // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
                 // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
                 // to check changes to scripts in this situation, we can safely ignore this domain reload.
@@ -38,7 +44,6 @@
             {
                 Debug.LogWarning("Editor could not load some of the scriptable objects from plugin's resources. It will try on next assembly reload.");
                 return;
-                UpdateGeneratedAssemblies();
             }
 
             DictInitializer<MonoBehaviour>.Initialize();
