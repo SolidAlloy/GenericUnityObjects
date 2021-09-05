@@ -7,6 +7,7 @@
     using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEditor.Callbacks;
+    using UnityEditor.Compilation;
     using UnityEngine;
 
     /// <summary>
@@ -57,6 +58,7 @@
             catch (ApplicationException)
             {
                 Debug.LogWarning("Editor could not load some of the scriptable objects from plugin's resources. It will try on next assembly reload.");
+                CompilationHelper.RecompileOnce();
                 return;
             }
 
