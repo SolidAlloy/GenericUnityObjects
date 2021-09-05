@@ -156,6 +156,28 @@
 
         public static void DeleteData(string key) => Instance._savedData.Remove(key);
 
+        public static void SaveToPlayerPrefs<T>(string key, T data)
+        {
+            PlayerPrefs.SetString(key, JsonUtility.ToJson(new DataWrapper<T>(data)));
+            PlayerPrefs.Save();
+        }
+
+        public static T GetFromPlayerPrefs<T>(string key)
+        {
+            if ( ! PlayerPrefs.HasKey(key))
+                return default;
+
+            var wrapper = new DataWrapper<T>();
+            JsonUtility.FromJsonOverwrite(PlayerPrefs.GetString(key), wrapper);
+            return wrapper.Data;
+        }
+
+        public static void DeleteFromPlayerPrefs(string key)
+        {
+            PlayerPrefs.DeleteKey(key);
+            PlayerPrefs.Save();
+        }
+
         [Serializable]
         private class DataWrapper<T>
         {
