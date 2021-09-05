@@ -24,9 +24,20 @@
 
             using (new DisabledAssetDatabase(true))
             {
-                foreach (string assetPath in _failedAssemblyPaths)
+                foreach (string assemblyPath in _failedAssemblyPaths)
                 {
-                    AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
+                    AssetDatabase.ImportAsset(assemblyPath, ImportAssetOptions.ForceUpdate);
+
+                    string assemblyGuid = AssetDatabase.AssetPathToGUID(assemblyPath);
+
+                    if (string.IsNullOrEmpty(assemblyGuid))
+                        continue;
+
+                    foreach (string assetGuid in AssetDatabase.FindAssets($"t:ConcreteClass_{assemblyGuid}"))
+                    {
+                        Debug.Log($"Reimported {assetGuid}");
+                        AssetDatabase.ImportAsset(AssetDatabase.GUIDToAssetPath(assetGuid), ImportAssetOptions.ForceUpdate);
+                    }
                 }
             }
 
