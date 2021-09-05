@@ -1,13 +1,16 @@
 ﻿namespace GenericUnityObjects.Editor.GeneratedTypesDatabase
 {
     using System.Collections.Generic;
+    using GenericUnityObjects.Util;
     using SolidUtilities.Helpers;
     using UnityEditor;
     using UnityEngine;
     using Util;
     using Object = UnityEngine.Object;
 
-    internal abstract partial class GenerationDatabase<TUnityObject>
+    internal abstract partial class GenerationDatabase<TUnityObject> :
+        ISerializationCallbackReceiver,
+        ICanBeInitialized
         where TUnityObject : Object
     {
         [SerializeField] private ArgumentInfo[] _genericArgumentKeys;

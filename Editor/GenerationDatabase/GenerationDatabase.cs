@@ -28,9 +28,7 @@
     /// This allows changing objects while keeping them in the database.
     /// </remarks>
     internal abstract partial class GenerationDatabase<TUnityObject> :
-        EditorOnlySingletonSO<GenerationDatabase<TUnityObject>>,
-        ISerializationCallbackReceiver,
-        ICanBeInitialized
+        EditorOnlySingletonSO<GenerationDatabase<TUnityObject>>
         where TUnityObject : Object
     {
         protected FastIterationDictionary<ArgumentInfo, List<GenericTypeInfo>> _argumentGenericTypesDict;
