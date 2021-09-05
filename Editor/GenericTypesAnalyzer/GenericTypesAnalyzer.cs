@@ -48,6 +48,7 @@
                 return;
             }
 
+            CompilationHelper.CompilationNotNeeded();
             DictInitializer<MonoBehaviour>.Initialize();
             DictInitializer<GenericScriptableObject>.Initialize();
             FailedAssembliesChecker.ReimportFailedAssemblies();

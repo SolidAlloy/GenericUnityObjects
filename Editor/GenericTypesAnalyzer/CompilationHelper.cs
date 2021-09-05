@@ -27,5 +27,11 @@
             PlayerPrefs.Save();
             CompilationPipeline.RequestScriptCompilation();
         }
+
+        public static void CompilationNotNeeded()
+        {
+            PlayerPrefs.SetInt(CompiledOnceKey, 0);
+            PlayerPrefs.Save();
+        }
     }
 }
