@@ -49,8 +49,16 @@
         [DidReloadScripts((int)DidReloadScriptsOrder.BeforeAssemblyGeneration)]
         private static void SetIcons()
         {
-            if (Instance._dict.Count == 0)
+            try
+            {
+                if (Instance._dict.Count == 0)
+                    return;
+            }
+            catch (ApplicationException)
+            {
+                Debug.LogWarning("Editor could not load some of the scriptable objects from plugin's resources. It will try on next assembly reload.");
                 return;
+            }
 
             using (new DisabledAssetDatabase(true))
             {

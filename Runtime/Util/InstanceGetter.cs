@@ -103,6 +103,13 @@
                 throw;
             }
 
+#if UNITY_EDITOR
+            if (instance == null && File.Exists(_assetPath))
+            {
+                throw new ApplicationException($"AssetDatabase failed to load an asset at path {_assetPath} but the file was there.");
+            }
+#endif
+
             return instance;
         }
     }

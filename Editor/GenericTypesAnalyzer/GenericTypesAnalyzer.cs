@@ -26,18 +26,24 @@
         private static void AnalyzeGenericTypes()
         {
             if (CompilationFailedOnEditorStart())
+                // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
+                // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
+                // to check changes to scripts in this situation, we can safely ignore this domain reload.
+                if (!EditorApplication.isPlayingOrWillChangePlaymode)
+                {
+                    UpdateGeneratedAssemblies();
+                }
+            }
+            catch (ApplicationException)
+            {
+                Debug.LogWarning("Editor could not load some of the scriptable objects from plugin's resources. It will try on next assembly reload.");
                 return;
-
-            EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
-
-            // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
-            // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
-            // to check changes to scripts in this situation, we can safely ignore this domain reload.
-            if ( ! EditorApplication.isPlayingOrWillChangePlaymode)
                 UpdateGeneratedAssemblies();
+            }
 
             DictInitializer<MonoBehaviour>.Initialize();
             DictInitializer<GenericScriptableObject>.Initialize();
+            DictInitializer.ReimportFailedAssemblies();
         }
 
         private static bool CompilationFailedOnEditorStart()
