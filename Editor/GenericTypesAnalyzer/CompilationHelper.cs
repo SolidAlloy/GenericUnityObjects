@@ -4,6 +4,7 @@
     using UnityEditor.Compilation;
     using UnityEngine;
 
+    [InitializeOnLoad]
     internal static class CompilationHelper
     {
         private const string CompiledOnceKey = "CompiledOnce";
@@ -24,6 +25,7 @@
 
             PlayerPrefs.SetInt(CompiledOnceKey, 1);
             PlayerPrefs.Save();
+            Debug.Log("requesting compilation");
             CompilationPipeline.RequestScriptCompilation();
         }
     }
