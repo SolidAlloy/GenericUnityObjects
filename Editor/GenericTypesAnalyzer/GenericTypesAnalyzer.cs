@@ -50,7 +50,7 @@
 
             DictInitializer<MonoBehaviour>.Initialize();
             DictInitializer<GenericScriptableObject>.Initialize();
-            DictInitializer.ReimportFailedAssemblies();
+            FailedAssembliesChecker.ReimportFailedAssemblies();
         }
 
         private static bool CompilationFailedOnEditorStart()

@@ -94,7 +94,7 @@
                     // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
                     if (script == null)
                     {
-                        _failedAssemblyPaths.Add(assemblyPath);
+                        FailedAssembliesChecker.FailedAssemblyPaths.Add(assemblyPath);
                         Debug.LogWarning($"Found an assembly {assemblyPath} that should contain a concrete class, but it was not found there. Will try to reimport it.");
                         continue;
                     }
