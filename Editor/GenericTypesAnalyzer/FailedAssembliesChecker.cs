@@ -58,10 +58,7 @@
                         .Select(AssetDatabase.GUIDToAssetPath);
 
                     foreach (string assetPath in assetPaths)
-                    {
-                        Debug.Log($"Reimported {assetPath}");
                         AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
-                    }
                 }
             }
             finally
