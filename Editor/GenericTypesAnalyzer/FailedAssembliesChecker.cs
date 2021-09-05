@@ -8,7 +8,8 @@
 
     internal static class FailedAssembliesChecker
     {
-        private const string FailedAssemblyGuids = "FailedAssemblyGuids";
+        private const string PreviouslyFailedAssemblyGuidsKey = "PreviouslyFailedAssemblyGuids";
+        private const string NewFailedAssemblyGuidsKey = "NewFailedAssemblyGuids";
 
         public static readonly List<string> FailedAssemblyPaths = new List<string>();
 
@@ -19,51 +20,49 @@
                 return;
             }
 
-            var failedAssemblyGuids = new List<string>();
+            var previouslyFailedAssemblies = PersistentStorage.GetFromPlayerPrefs<List<string>>(PreviouslyFailedAssemblyGuidsKey);
+            var newFailedAssemblyGuids = new List<string>();
 
             using (new DisabledAssetDatabase(true))
             {
-                foreach (string assemblyPath in FailedAssemblyPaths)
+                var failedAssemblyPathsAndGuids = FailedAssemblyPaths.Select(path => (path, AssetDatabase.AssetPathToGUID(path)))
+                    .Where(pathAndGuid => !string.IsNullOrEmpty(pathAndGuid.Item2)).ToList();
+
+                foreach ((string path, string guid) in failedAssemblyPathsAndGuids)
                 {
-                    AssetDatabase.ImportAsset(assemblyPath, ImportAssetOptions.ForceUpdate);
+                    // Reimport only the assemblies that did not fail previously
+                    if (previouslyFailedAssemblies.Contains(guid))
+                        continue;
 
-                    string assemblyGuid = AssetDatabase.AssetPathToGUID(assemblyPath);
-
-                    if (!string.IsNullOrEmpty(assemblyGuid))
-                        failedAssemblyGuids.Add(assemblyGuid);
-
-
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                    newFailedAssemblyGuids.Add(guid);
                 }
+
+                // Remove all the assemblies that failed but were fixed from previously failed ones.
+                previouslyFailedAssemblies = previouslyFailedAssemblies.Intersect(failedAssemblyPathsAndGuids.Select(pathAndGuid => pathAndGuid.Item2)).ToList();
             }
 
-            if (failedAssemblyGuids.Count != 0)
-            {
-                PersistentStorage.SaveData(FailedAssemblyGuids, failedAssemblyGuids);
+            PersistentStorage.SaveToPlayerPrefs(PreviouslyFailedAssemblyGuidsKey, previouslyFailedAssemblies);
+            PersistentStorage.SaveToPlayerPrefs(NewFailedAssemblyGuidsKey, newFailedAssemblyGuids);
+
+            if (newFailedAssemblyGuids.Count != 0)
                 PersistentStorage.ExecuteOnScriptsReload(ReimportCreatedAssets);
-            }
 
             AssetDatabase.Refresh();
         }
 
         private static void ReimportCreatedAssets()
         {
-            try
-            {
-                var failedAssemblyGuids = PersistentStorage.GetData<List<string>>(FailedAssemblyGuids);
+            var failedAssemblyGuids = PersistentStorage.GetFromPlayerPrefs<List<string>>(NewFailedAssemblyGuidsKey);
 
-                using (new DisabledAssetDatabase(true))
-                {
-                    var assetPaths = failedAssemblyGuids
-                        .SelectMany(assemblyGuid => AssetDatabase.FindAssets($"t:ConcreteClass_{assemblyGuid}"))
-                        .Select(AssetDatabase.GUIDToAssetPath);
-
-                    foreach (string assetPath in assetPaths)
-                        AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
-                }
-            }
-            finally
+            using (new DisabledAssetDatabase(true))
             {
-                PersistentStorage.DeleteData(FailedAssemblyGuids);
+                var assetPaths = failedAssemblyGuids
+                    .SelectMany(assemblyGuid => AssetDatabase.FindAssets($"t:ConcreteClass_{assemblyGuid}"))
+                    .Select(AssetDatabase.GUIDToAssetPath);
+
+                foreach (string assetPath in assetPaths)
+                    AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
             }
 
             AssetDatabase.Refresh();
