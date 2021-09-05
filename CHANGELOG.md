@@ -1,3 +1,24 @@
+# [2.9.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.8.1...2.9.0) (2021-09-05)
+
+
+### Bug Fixes
+
+* Added automatic recompilation when an asset is not recognized ([73fce44](https://github.com/SolidAlloy/GenericUnityObjects/commit/73fce440a656fe359b8f8208bd8db14409809624))
+* Fixed an issue with databases being emptied when a Unity project is first opened after cloning ([4d1e94d](https://github.com/SolidAlloy/GenericUnityObjects/commit/4d1e94d2c46567ea15a78e8157e3547da162a4ed))
+* Fixed compilation key not being removed on editor quit ([bb84de2](https://github.com/SolidAlloy/GenericUnityObjects/commit/bb84de2ada7fd70e18205f57f58d25639af4777b))
+* Fixed CompilationHelper not executing scripts reload when needed ([9fdc02c](https://github.com/SolidAlloy/GenericUnityObjects/commit/9fdc02c2a2b3eb836b3f4362dcd067dbaf0d28ac))
+* Fixed NullReferenceException when there are broken assemblies ([ed9bff2](https://github.com/SolidAlloy/GenericUnityObjects/commit/ed9bff2f5b4400b97301e8bbaa6760ad881ee3bd))
+* Moved compilation-related fields of PersistentStorage to PlayerPrefs ([96b0bfc](https://github.com/SolidAlloy/GenericUnityObjects/commit/96b0bfcbaa2e69efc0884c4e74f929b11542cfb3))
+* Started reimporting assemblies that failed to import properly the first time ([07ca05e](https://github.com/SolidAlloy/GenericUnityObjects/commit/07ca05e0939c5f86e20525d94e56a1803b62f450))
+* Started reimporting created assets along with the corresponding assemblies when a MonoScript is lost ([f2cf56d](https://github.com/SolidAlloy/GenericUnityObjects/commit/f2cf56db16b78627741a4beb624c0bd8c98e5264))
+* Started reimporting created assets of failed assemblies on next domain reload ([583f74b](https://github.com/SolidAlloy/GenericUnityObjects/commit/583f74be1f7b34553058a93af855ed3ea6e7e23b))
+* Started skipping assembly reimport if we were not able to fix the assembly previously ([5e75444](https://github.com/SolidAlloy/GenericUnityObjects/commit/5e75444b28b9c5966e42f554d3623545b6a2333b))
+
+
+### Features
+
+* Added PlayerPrefs overloads for PersistentStorage save-loading methods ([2247f7b](https://github.com/SolidAlloy/GenericUnityObjects/commit/2247f7b12a94374441e1dc8fa831ef5656e07dc5))
+
 ## [2.8.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.8.0...2.8.1) (2021-09-02)
 
 
