@@ -15,10 +15,10 @@
     /// </summary>
     internal class PersistentStorage : EditorOnlySingletonSO<PersistentStorage>, ICanBeInitialized
     {
-        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
+        private const string AssembliesCountKey = "AssembliesCount";
+        private const string FirstCompilationKey = "FirstCompilation";
 
-        [SerializeField] private int _assembliesCount;
-        [SerializeField] private bool _firstCompilation;
+        [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
         public static MenuItemMethod[] MenuItemMethods
         {
@@ -32,21 +32,21 @@
 
         public static int AssembliesCount
         {
-            get => Instance._assembliesCount;
+            get => PlayerPrefs.GetInt(AssembliesCountKey);
             set
             {
-                Instance._assembliesCount = value;
-                Instance._firstCompilation = true;
-                EditorUtility.SetDirty(Instance);
+                PlayerPrefs.SetInt(AssembliesCountKey, value);
+                PlayerPrefs.SetInt(FirstCompilationKey, 1);
+                PlayerPrefs.Save();
             }
         }
 
-        public static bool FirstCompilation => Instance._firstCompilation;
+        public static bool FirstCompilation => PlayerPrefs.GetInt(FirstCompilationKey, 1) == 1;
 
         public static void DisableFirstCompilation()
         {
-            Instance._firstCompilation = false;
-            EditorUtility.SetDirty(Instance);
+            PlayerPrefs.SetInt(FirstCompilationKey, 0);
+            PlayerPrefs.Save();
         }
 
         public void Initialize() { }

@@ -58,7 +58,6 @@
             // This causes TypeCache to not include some classes. The plugin thinks those classes are removed, however they are just located in uncompiled assemblies.
             // To avoid this, we need to compare the assemblies count on last Unity compilation before it exited, and the assemblies count now.
             // If it is not equal, it means the project was loaded with errors, and the generic classes check should not run this time.
-
             if ( ! PersistentStorage.FirstCompilation)
                 return false;
 
