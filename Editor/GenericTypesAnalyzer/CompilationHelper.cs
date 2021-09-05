@@ -25,7 +25,6 @@
 
             PlayerPrefs.SetInt(CompiledOnceKey, 1);
             PlayerPrefs.Save();
-            Debug.Log("requesting compilation");
             CompilationPipeline.RequestScriptCompilation();
         }
     }

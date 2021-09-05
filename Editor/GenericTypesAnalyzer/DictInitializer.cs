@@ -35,7 +35,6 @@
 
                     foreach (string assetGuid in AssetDatabase.FindAssets($"t:ConcreteClass_{assemblyGuid}"))
                     {
-                        Debug.Log($"Reimported {assetGuid}");
                         AssetDatabase.ImportAsset(AssetDatabase.GUIDToAssetPath(assetGuid), ImportAssetOptions.ForceUpdate);
                     }
                 }
@@ -95,7 +94,6 @@
                     if (script == null)
                     {
                         FailedAssembliesChecker.FailedAssemblyPaths.Add(assemblyPath);
-                        Debug.LogWarning($"Found an assembly {assemblyPath} that should contain a concrete class, but it was not found there. Will try to reimport it.");
                         continue;
                     }
 
