@@ -7,7 +7,8 @@
         "GenericUnityObjects",
         "TypeReferences",
         "SolidUtilities",
-        "EasyButtons.Editor"
+        "EasyButtons.Editor",
+        "Unity.Settings.Editor"
     ],
     "includePlatforms": [
         "Editor"
