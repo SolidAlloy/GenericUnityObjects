@@ -113,7 +113,7 @@ public class WarriorStats<TClass> : GenericScriptableObject
 
 Now you can create assets:
 
-![Asset Creation GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.asset-creation.gif)
+![Asset Creation GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.images/asset-creation.gif)
 
 When you create an asset with certain generic arguments for the first time, a short compile dialog will show up. This is an expected behavior because the plugin needs to generate a non-generic class that derives from the generic class with the arguments you've chosen. Once the class is generated, a usual asset creation dialog will appear, where you will be prompted to enter the name of your new asset.
 
@@ -170,9 +170,13 @@ public class Archer : WarriorClass
 
 Then you will be able to create a scriptable object without choosing its generic argument by pressing the button.
 
-![Add creatable scriptable object](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.creatable-scriptable-object.gif)
+![Add creatable scriptable object](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.images/creatable-scriptable-object.gif)
 
 By the way, the attribute works with regular scriptable objects too, so you can use it everywhere.
+
+If you want the :heavy_plus_sign: button for all your GenericScriptableObject fields without writing the [Creatable] attribute every time, you can enable it in *Project Settings -> Packages -> Generic Unity Objects*
+
+![Project Settings](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.images/project-settings.png)
 
 ## Generic MonoBehaviour Usage
 
@@ -196,7 +200,7 @@ Note that the `Serializable` attribute is needed for a generic class to be seria
 
 Once the script is saved, you will be able to add a generic component through the **Add Component** button:
 
-![Add Component GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.add-component.gif)
+![Add Component GIF](https://media.githubusercontent.com/media/SolidAlloy/GenericUnityObjects/main/.images/add-component.gif)
 
 ### Creating an instance at runtime
 
@@ -228,7 +232,7 @@ In Unity 2020, remember to add the Serializable attribute to your class to be ab
 
 You will get an object field in the inspector:
 
-![Object Field](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.object-field.png)
+![Object Field](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.images/object-field.png)
 
 ### File Naming
 
@@ -297,7 +301,7 @@ Otherwise, when a concrete class is generated, it cannot access the constructor 
 
 When creating a custom editor for a generic ScriptableObject, the first thing you might notice is that it doesn't show a correct generic class in the header. To make it show the correct generic type, you need to add a reference to **GenericUnityEditorInternals.dll** and derive your custom editor from `GenericHeaderEditor`. The header will be displayed correctly then:
 
-![Object Field](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.generic-header.png)
+![Object Field](https://raw.githubusercontent.com/SolidAlloy/GenericScriptableObjects/main/.images/generic-header.png)
 
 ### MonoScript field
 

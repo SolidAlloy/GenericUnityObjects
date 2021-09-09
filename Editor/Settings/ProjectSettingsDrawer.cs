@@ -8,7 +8,7 @@
 
     public static class ProjectSettingsDrawer
     {
-        private const string AlwaysCreatableLabel = "Enable + button in all GenericScriptableObject fields";
+        private const string AlwaysCreatableLabel = "Enable + button for all GenericScriptableObject fields";
 
         private static readonly GUIContent _alwaysCreatableContent = new GUIContent(AlwaysCreatableLabel,
             "Use this to add the + button next to object field when using GenericScriptableObjects without the need to put [Creatable] attribute.");
@@ -33,7 +33,7 @@
 
         private static void OnGUI(string searchContext)
         {
-            using var _ = EditorGUIUtilityHelper.LabelWidthBlock(300f);
+            using var _ = EditorGUIUtilityHelper.LabelWidthBlock(310f);
 
             bool newValue = EditorGUILayout.Toggle(_alwaysCreatableContent, ProjectSettings.AlwaysCreatable);
 
