@@ -311,6 +311,14 @@ Unity can't handle object fields for generic objects properly. For example, it w
 
 The plugin uses custom ObjectField() methods for fields of generic objects to fix those issues. You can also use it in your custom editor. **GenericObjectDrawer** class has overloads of EditorGUI.ObjectField and EditorGUILayout.ObjectField that support generic objects.
 
+## Using with Git
+
+Sometimes, when you pull new commits from Git, you can see the following error in Unity console:
+
+> Failed to extract ConcreteClass_6506f902939610441800fd3d6df9e87b class of base type ...
+
+It's a misleading error. Everything is alright, and the class is extracted properly, so you won't lose any concrete classes you generated from a generic UnityEngine.Object class.
+
 ## Contributing
 
 First-of-all, thank you for considering contributing to the project!
