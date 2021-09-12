@@ -250,6 +250,12 @@
             UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, componentInfo.Name);
         }
 
+        protected override void SetupReorderableList(ReorderableList list)
+        {
+            base.SetupReorderableList(list);
+            list.draggable = true;
+        }
+
         // A struct responsible for obtaining the correct component name and keeping cache of generated names
         private readonly struct ComponentInfo
         {
