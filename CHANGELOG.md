@@ -1,3 +1,12 @@
+# [2.10.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.9.0...2.10.0) (2021-09-16)
+
+
+### Features
+
+* Added a checkbox in project settings allowing to put the + button next to all GenericScriptableObject fields regardless of the Creatable attribute ([5caf05b](https://github.com/SolidAlloy/GenericUnityObjects/commit/5caf05bf4cc973d5955ed2524a877934d1c6d95d))
+* Fixed an issue with selector component not being recognized after pulling changes from git repo ([2026c76](https://github.com/SolidAlloy/GenericUnityObjects/commit/2026c76cea23a05d3b1cf56d5d6a2307b293beaa))
+* Made responses in the unity event drawer draggable ([8292067](https://github.com/SolidAlloy/GenericUnityObjects/commit/8292067fa623601b54d55dc6a2ac495793f3bc76))
+
 # [2.9.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.8.1...2.9.0) (2021-09-05)
 
 
