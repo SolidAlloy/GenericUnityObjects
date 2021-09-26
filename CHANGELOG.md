@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.0...2.10.1) (2021-09-26)
+
+
+### Bug Fixes
+
+* Fixed the correct type not being found in MonoScript if the class was not the first in the file ([a1edfe5](https://github.com/SolidAlloy/GenericUnityObjects/commit/a1edfe52797451d2b42460cbd0122067288b29c1))
+
 # [2.10.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.9.0...2.10.0) (2021-09-16)
 
 
