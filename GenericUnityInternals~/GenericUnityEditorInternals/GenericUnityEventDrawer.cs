@@ -182,7 +182,8 @@
                 .Select(parameter => parameter.ParameterType)
                 .ToArray();
 
-            UnityEventDrawer.GeneratePopUpForType(menu, targetToUse, false, listener, delegateArgumentsTypes);
+            // TODO: probably need to differentiate between Unity 2020 and 2021
+            UnityEventDrawer.GeneratePopUpForType(menu, targetToUse, ComponentInfo.GetTypeName(target, true), listener, delegateArgumentsTypes);
 
             if ( ! (targetToUse is GameObject gameObject))
                 return menu;
