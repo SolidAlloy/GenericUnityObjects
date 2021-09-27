@@ -11,6 +11,7 @@
     using UnityEditorInternal;
     using UnityEngine;
     using UnityEngine.Events;
+    using Util;
     using Object = UnityEngine.Object;
 
     [CustomPropertyDrawer(typeof(UnityEventBase), true)]
@@ -274,29 +275,41 @@
 
             public static void ClearNames() => _names.Clear();
 
-            public static string GetTypeName(Object component, bool onlyShort)
+            public static string GetTypeName(Object unityObject, bool onlyShort)
             {
-                Type componentType = component.GetType();
+                Type unityObjectType = unityObject.GetType();
 
-                if ( ! _typeNameCache.TryGetValue(componentType, out string shortName))
+                if ( ! _typeNameCache.TryGetValue(unityObjectType, out string shortName))
                 {
-                    var componentAttribute = componentType.GetCustomAttribute<AddComponentMenu>();
+                    shortName = unityObject is MonoBehaviour
+                        ? GetBehaviourShortName(unityObjectType)
+                        : GetScriptableObjectShortName(unityObject, unityObjectType);
 
-                    shortName = componentAttribute == null
-                        ? componentType.Name :
-                        componentAttribute.componentMenu.Split('/').Last();
-
-                    _typeNameCache.Add(componentType, shortName);
+                    _typeNameCache.Add(unityObjectType, shortName);
                 }
 
                 if (onlyShort)
                     return shortName;
 
                 if (_names.Contains(shortName))
-                    return $"{componentType.Namespace}.{shortName}";
+                    return $"{unityObjectType.Namespace}.{shortName}";
 
                 _names.Add(shortName);
                 return shortName;
+            }
+
+            private static string GetBehaviourShortName(Type unityObjectType)
+            {
+                var componentAttribute = unityObjectType.GetCustomAttribute<AddComponentMenu>();
+
+                return componentAttribute == null
+                    ? unityObjectType.Name :
+                    componentAttribute.componentMenu.Split('/').Last();
+            }
+
+            private static string GetScriptableObjectShortName(Object unityObject, Type unityObjectType)
+            {
+                return unityObject is GenericScriptableObject ? TypeUtility.GetNiceNameOfGenericType(unityObjectType.BaseType) : unityObjectType.Name;
             }
         }
     }
