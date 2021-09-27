@@ -48,6 +48,9 @@
             {
                 var failedAssemblyGuids = PersistentStorage.GetData<List<string>>(FailedAssemblyGuidsKey);
 
+                if (failedAssemblyGuids == null)
+                    return;
+
                 using (new DisabledAssetDatabase(true))
                 {
                     var assetPaths = failedAssemblyGuids
