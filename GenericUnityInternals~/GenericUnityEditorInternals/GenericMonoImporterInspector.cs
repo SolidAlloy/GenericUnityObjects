@@ -35,7 +35,7 @@
             if (script is null)
                 return;
 
-            Type scriptType = script.GetClassType();
+            Type scriptType = script.GetClassType(null);
             _isTypeCompatible = MonoScriptImporterInspector.IsTypeCompatible(scriptType);
             _objectFields = GetObjectFields(scriptType);
             _newTargets = new Object[_objectFields.Length];
