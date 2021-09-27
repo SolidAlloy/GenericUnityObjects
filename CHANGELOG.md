@@ -1,3 +1,11 @@
+## [2.10.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.1...2.10.2) (2021-09-27)
+
+
+### Bug Fixes
+
+* Fixed ArgumentNullException after script reloading ([0486764](https://github.com/SolidAlloy/GenericUnityObjects/commit/0486764b6c9883cfde37ff8b1e81bc21ebe43b76))
+* Fixed incorrect type name when using UnityEvent with GenericScriptableObject ([a67f794](https://github.com/SolidAlloy/GenericUnityObjects/commit/a67f794d71a9931afbfbfc9e3c88ae64c0f19d7c))
+
 ## [2.10.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.0...2.10.1) (2021-09-26)
 
 
