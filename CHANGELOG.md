@@ -1,3 +1,10 @@
+## [2.10.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.2...2.10.3) (2021-09-29)
+
+
+### Bug Fixes
+
+* Fixed MissingReferenceException sometimes appearing on MacOS ([06f5298](https://github.com/SolidAlloy/GenericUnityObjects/commit/06f5298c6eb9dc15ec0b61e217d7c5d6d27c3daa))
+
 ## [2.10.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.1...2.10.2) (2021-09-27)
 
 
