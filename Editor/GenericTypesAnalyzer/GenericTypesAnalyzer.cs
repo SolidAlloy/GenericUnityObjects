@@ -107,7 +107,6 @@
 
         private static void FlushConfigChangesToDisk()
         {
-            AssetDatabase.SaveAssetIfDirty(PersistentStorage.Instance);
             AssetDatabase.SaveAssetIfDirty(GenerationDatabase<MonoBehaviour>.Instance);
             AssetDatabase.SaveAssetIfDirty(GenerationDatabase<GenericScriptableObject>.Instance);
             AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<MonoBehaviour>.Instance);
