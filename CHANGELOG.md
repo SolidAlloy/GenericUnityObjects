@@ -1,3 +1,10 @@
+## [2.10.4](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.3...2.10.4) (2021-09-30)
+
+
+### Bug Fixes
+
+* Started saving config changes to disk immediately after a change in generated assemblies ([1cec201](https://github.com/SolidAlloy/GenericUnityObjects/commit/1cec201c6311148470403ea6dceb68a2a76ff40c))
+
 ## [2.10.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.2...2.10.3) (2021-09-29)
 
 
