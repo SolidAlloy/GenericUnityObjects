@@ -5,6 +5,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
@@ -52,6 +53,7 @@
             DictInitializer<MonoBehaviour>.Initialize();
             DictInitializer<GenericScriptableObject>.Initialize();
             FailedAssembliesChecker.ReimportFailedAssemblies();
+            FlushConfigChangesToDisk();
         }
 
         private static bool CompilationFailedOnEditorStart()
@@ -101,6 +103,15 @@
 
             if (behavioursNeedDatabaseRefresh || scriptableObjectsNeedDatabaseRefresh)
                 AssetDatabase.Refresh();
+        }
+
+        private static void FlushConfigChangesToDisk()
+        {
+            AssetDatabase.SaveAssetIfDirty(PersistentStorage.Instance);
+            AssetDatabase.SaveAssetIfDirty(GenerationDatabase<MonoBehaviour>.Instance);
+            AssetDatabase.SaveAssetIfDirty(GenerationDatabase<GenericScriptableObject>.Instance);
+            AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<MonoBehaviour>.Instance);
+            AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<GenericScriptableObject>.Instance);
         }
     }
 }

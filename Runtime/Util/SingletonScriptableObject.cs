@@ -15,7 +15,7 @@
         private static readonly InstanceGetter<T> _getter = new InstanceGetter<T>(Config.ResourcesPath);
 
         /// <summary> Retrieves an instance to the asset. </summary>
-        protected static T Instance => _getter.GetInstance();
+        public static T Instance => _getter.GetInstance();
 
         protected new void SetDirty()
         {
