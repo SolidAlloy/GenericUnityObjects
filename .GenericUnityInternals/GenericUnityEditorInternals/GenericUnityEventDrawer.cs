@@ -23,133 +23,146 @@
             DrawerReplacer.ReplaceDefaultDrawer<UnityEventBase, GenericUnityEventDrawer>();
         }
 
-        // Default implementation, only GetType().Name is replaced with ComponentInfo.GetTypeName()
+        // The default implementation of DrawEvent. Only specific lines are changed and marked with the "Previously:" comments.
+        // For meaningful names, look at https://github.com/Unity-Technologies/UnityCsReference/blob/master/Editor/Mono/Inspector/UnityEventDrawer.cs
         protected override void DrawEvent(Rect rect, int index, bool isActive, bool isFocused)
         {
-            SerializedProperty pListener = m_ListenersArray.GetArrayElementAtIndex(index);
-
-            rect.y++;
-            var subRects = GetRowRects(rect);
-            Rect enabledRect = subRects[0];
-            Rect goRect = subRects[1];
-            Rect functionRect = subRects[2];
-            Rect argRect = subRects[3];
-
-            // find the current event target...
-            SerializedProperty callState = pListener.FindPropertyRelative(kCallStatePath);
-            SerializedProperty mode = pListener.FindPropertyRelative(kModePath);
-            SerializedProperty arguments = pListener.FindPropertyRelative(kArgumentsPath);
-            SerializedProperty listenerTarget = pListener.FindPropertyRelative(kInstancePath);
-            SerializedProperty methodName = pListener.FindPropertyRelative(kMethodNamePath);
-
+            SerializedProperty arrayElementAtIndex = this.m_ListenersArray.GetArrayElementAtIndex(index);
+            ++rect.y;
+            Rect[] rowRects = this.GetRowRects(rect);
+            Rect position1 = rowRects[0];
+            Rect position2 = rowRects[1];
+            Rect rect1 = rowRects[2];
+            Rect position3 = rowRects[3];
+            SerializedProperty propertyRelative1 = arrayElementAtIndex.FindPropertyRelative("m_CallState");
+            SerializedProperty propertyRelative2 = arrayElementAtIndex.FindPropertyRelative("m_Mode");
+            SerializedProperty propertyRelative3 = arrayElementAtIndex.FindPropertyRelative("m_Arguments");
+            SerializedProperty propertyRelative4 = arrayElementAtIndex.FindPropertyRelative("m_Target");
+            SerializedProperty propertyRelative5 = arrayElementAtIndex.FindPropertyRelative("m_MethodName");
             Color backgroundColor = GUI.backgroundColor;
             GUI.backgroundColor = Color.white;
-
-            EditorGUI.PropertyField(enabledRect, callState, GUIContent.none);
-
+            EditorGUI.PropertyField(position1, propertyRelative1, GUIContent.none);
             EditorGUI.BeginChangeCheck();
+            GUI.Box(position2, GUIContent.none);
+            EditorGUI.PropertyField(position2, propertyRelative4, GUIContent.none);
+            if (EditorGUI.EndChangeCheck()) propertyRelative5.stringValue = null;
+            PersistentListenerMode persistentListenerMode = UnityEventDrawer.GetMode(propertyRelative2);
+            if (propertyRelative4.objectReferenceValue == null ||
+                string.IsNullOrEmpty(propertyRelative5.stringValue))
+                persistentListenerMode = PersistentListenerMode.Void;
+            SerializedProperty propertyRelative6;
+            switch (persistentListenerMode)
             {
-                GUI.Box(goRect, GUIContent.none);
-                EditorGUI.PropertyField(goRect, listenerTarget, GUIContent.none);
-
-                if (EditorGUI.EndChangeCheck())
-                    methodName.stringValue = null;
+                case PersistentListenerMode.Object:
+                    propertyRelative6 = propertyRelative3.FindPropertyRelative("m_ObjectArgument");
+                    break;
+                case PersistentListenerMode.Int:
+                    propertyRelative6 = propertyRelative3.FindPropertyRelative("m_IntArgument");
+                    break;
+                case PersistentListenerMode.Float:
+                    propertyRelative6 = propertyRelative3.FindPropertyRelative("m_FloatArgument");
+                    break;
+                case PersistentListenerMode.String:
+                    propertyRelative6 = propertyRelative3.FindPropertyRelative("m_StringArgument");
+                    break;
+                case PersistentListenerMode.Bool:
+                    propertyRelative6 = propertyRelative3.FindPropertyRelative("m_BoolArgument");
+                    break;
+                default:
+                    propertyRelative6 = propertyRelative3.FindPropertyRelative("m_IntArgument");
+                    break;
             }
 
-
-            PersistentListenerMode modeEnum = UnityEventDrawer.GetMode(mode);
-
-            //only allow argument if we have a valid target / method
-            if (listenerTarget.objectReferenceValue == null || string.IsNullOrEmpty(methodName.stringValue))
-                modeEnum = PersistentListenerMode.Void;
-
-            SerializedProperty argument = modeEnum switch
+            string stringValue = propertyRelative3.FindPropertyRelative("m_ObjectArgumentAssemblyTypeName").stringValue;
+            Type type1 = typeof(Object);
+            if (!string.IsNullOrEmpty(stringValue))
             {
-                PersistentListenerMode.Object => arguments.FindPropertyRelative(kFloatArgument),
-                PersistentListenerMode.Int => arguments.FindPropertyRelative(kIntArgument),
-                PersistentListenerMode.Float => arguments.FindPropertyRelative(kObjectArgument),
-                PersistentListenerMode.String => arguments.FindPropertyRelative(kStringArgument),
-                PersistentListenerMode.Bool => arguments.FindPropertyRelative(kBoolArgument),
-                _ => arguments.FindPropertyRelative(kIntArgument)
-            };
-
-            string desiredArgTypeName = arguments.FindPropertyRelative(kObjectArgumentAssemblyTypeName).stringValue;
-            Type desiredType = typeof(Object);
-
-            if ( ! string.IsNullOrEmpty(desiredArgTypeName))
-                desiredType = Type.GetType(desiredArgTypeName, false) ?? typeof(Object);
-
-            if (modeEnum == PersistentListenerMode.Object)
-            {
-                EditorGUI.BeginChangeCheck();
-
-                var result = EditorGUI.ObjectField(argRect, GUIContent.none, argument.objectReferenceValue, desiredType, true);
-
-                if (EditorGUI.EndChangeCheck())
-                    argument.objectReferenceValue = result;
-            }
-            else if (modeEnum != PersistentListenerMode.Void && modeEnum != PersistentListenerMode.EventDefined)
-            {
-                EditorGUI.PropertyField(argRect, argument, GUIContent.none);
+                Type type2 = Type.GetType(stringValue, false);
+                if ((object) type2 == null) type2 = typeof(Object);
+                type1 = type2;
             }
 
-            using (new EditorGUI.DisabledScope(listenerTarget.objectReferenceValue == null))
+            int num;
+            switch (persistentListenerMode)
             {
-                EditorGUI.BeginProperty(functionRect, GUIContent.none, methodName);
+                case PersistentListenerMode.Void:
+                    num = 0;
+                    break;
+                case PersistentListenerMode.Object:
+                    EditorGUI.BeginChangeCheck();
 
-                GUIContent buttonContent;
+                    // Previously: Object @object = EditorGUI.ObjectField(position3, GUIContent.none, propertyRelative6.objectReferenceValue, type1, true);
+                    Object @object = ObjectField(position3, GUIContent.none,
+                        propertyRelative6.objectReferenceValue, type1, true);
 
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        propertyRelative6.objectReferenceValue = @object;
+                        goto label_22;
+                    }
+                    else goto label_22;
+                default:
+                    num = (uint) persistentListenerMode > 0U ? 1 : 0;
+                    break;
+            }
+
+            if (num != 0) EditorGUI.PropertyField(position3, propertyRelative6, GUIContent.none);
+            label_22:
+            using (new EditorGUI.DisabledScope(propertyRelative4.objectReferenceValue == null))
+            {
+                EditorGUI.BeginProperty(rect1, GUIContent.none, propertyRelative5);
+                GUIContent content;
                 if (EditorGUI.showMixedValue)
                 {
-                    buttonContent = EditorGUI.mixedValueContent;
+                    content = EditorGUI.mixedValueContent;
                 }
                 else
                 {
-                    StringBuilder buttonLabel = new StringBuilder();
-
-                    if (listenerTarget.objectReferenceValue == null || string.IsNullOrEmpty(methodName.stringValue))
+                    StringBuilder stringBuilder = new StringBuilder();
+                    if (propertyRelative4.objectReferenceValue == null ||
+                        string.IsNullOrEmpty(propertyRelative5.stringValue)) stringBuilder.Append("No Function");
+                    else if (!IsPersistantListenerValid(this.m_DummyEvent,
+                        propertyRelative5.stringValue, propertyRelative4.objectReferenceValue,
+                        UnityEventDrawer.GetMode(propertyRelative2), type1))
                     {
-                        buttonLabel.Append("No Function");
-                    }
-                    else if ( ! IsPersistantListenerValid(m_DummyEvent, methodName.stringValue,
-                        listenerTarget.objectReferenceValue, UnityEventDrawer.GetMode(mode), desiredType))
-                    {
-                        string instanceString = "UnknownComponent";
-
-                        Object instance = listenerTarget.objectReferenceValue;
-
-                        if (instance != null)
-                            instanceString = ComponentInfo.GetTypeName(instance, true);
-
-                        buttonLabel.Append($"<Missing {instanceString}.{methodName.stringValue}>");
+                        string str = "UnknownComponent";
+                        Object objectReferenceValue = propertyRelative4.objectReferenceValue;
+                        if (objectReferenceValue != null)
+                            // Previously: str = ((object) objectReferenceValue).GetType().Name;
+                            str = ComponentInfo.GetTypeName(objectReferenceValue, true);
+                        stringBuilder.Append(string.Format("<Missing {0}.{1}>", str,
+                            propertyRelative5.stringValue));
                     }
                     else
                     {
-                        buttonLabel.Append(ComponentInfo.GetTypeName(listenerTarget.objectReferenceValue, true));
-
-                        if ( ! string.IsNullOrEmpty(methodName.stringValue))
+                        // Previously: ((object) propertyRelative4.objectReferenceValue).GetType().Name
+                        stringBuilder.Append(ComponentInfo.GetTypeName(propertyRelative4.objectReferenceValue, true));
+                        if (!string.IsNullOrEmpty(propertyRelative5.stringValue))
                         {
-                            buttonLabel.Append(".");
-
-                            buttonLabel.Append(methodName.stringValue.StartsWith("set_")
-                                ? methodName.stringValue.Substring(4)
-                                : methodName.stringValue);
+                            stringBuilder.Append(".");
+                            if (propertyRelative5.stringValue.StartsWith("set_"))
+                                stringBuilder.Append(propertyRelative5.stringValue.Substring(4));
+                            else stringBuilder.Append(propertyRelative5.stringValue);
                         }
                     }
 
-                    buttonContent = GUIContent.Temp(buttonLabel.ToString());
+                    content = GUIContent.Temp(stringBuilder.ToString());
                 }
 
-                if (GUI.Button(functionRect, buttonContent, EditorStyles.popup))
-                {
-                    BuildPopupList(listenerTarget.objectReferenceValue, m_DummyEvent, pListener)
-                        .DropDown(functionRect);
-                }
-
+                if (EditorGUI.DropdownButton(rect1, content, FocusType.Passive, EditorStyles.popup))
+                    // Previously: UnityEventDrawer.BuildPopupList
+                    BuildPopupList(propertyRelative4.objectReferenceValue, this.m_DummyEvent, arrayElementAtIndex).DropDown(rect1);
                 EditorGUI.EndProperty();
             }
 
             GUI.backgroundColor = backgroundColor;
+        }
+
+        private static Object ObjectField(Rect position, GUIContent label, Object currentTarget, Type objType, bool allowSceneObjects)
+        {
+            return currentTarget?.GetType().Name.StartsWith("ConcreteClass_") is true
+                ? EditorGUIHelper.GenericObjectField(position, label, currentTarget, objType, allowSceneObjects)
+                : EditorGUI.ObjectField(position, label, currentTarget, objType, allowSceneObjects);
         }
 
         // Default implementation, only GetType().Name is replaced with ComponentInfo.GetTypeName()
