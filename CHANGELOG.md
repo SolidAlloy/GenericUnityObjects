@@ -1,3 +1,11 @@
+## [2.10.5](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.4...2.10.5) (2021-10-03)
+
+
+### Bug Fixes
+
+* Fixed "Type is not a supported pptr value" error when using UnityEvents ([f3a6804](https://github.com/SolidAlloy/GenericUnityObjects/commit/f3a680466e0a9792e94e7ba79af91a6039d1c9c5))
+* Fixed ApplicationException occurring sometimes after assembly reload ([0d56d5e](https://github.com/SolidAlloy/GenericUnityObjects/commit/0d56d5eed09b5f3fa3755228932f8435134e966a))
+
 ## [2.10.4](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.3...2.10.4) (2021-09-30)
 
 
