@@ -41,6 +41,9 @@
                 {
                     UpdateGeneratedAssemblies();
                 }
+
+                DictInitializer<MonoBehaviour>.Initialize();
+                DictInitializer<GenericScriptableObject>.Initialize();
             }
             catch (ApplicationException)
             {
@@ -50,8 +53,6 @@
             }
 
             CompilationHelper.CompilationNotNeeded();
-            DictInitializer<MonoBehaviour>.Initialize();
-            DictInitializer<GenericScriptableObject>.Initialize();
             FailedAssembliesChecker.ReimportFailedAssemblies();
             FlushConfigChangesToDisk();
         }
