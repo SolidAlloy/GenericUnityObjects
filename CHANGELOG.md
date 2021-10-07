@@ -1,3 +1,10 @@
+## [2.10.6](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.5...2.10.6) (2021-10-07)
+
+
+### Bug Fixes
+
+* Fixed missing method exception in Unity 2020.3.15 and older ([848005c](https://github.com/SolidAlloy/GenericUnityObjects/commit/848005c47ec8e9d7bef80fdfed05dddebc033cc4))
+
 ## [2.10.5](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.4...2.10.5) (2021-10-03)
 
 
