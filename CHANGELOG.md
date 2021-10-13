@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.6...2.11.0) (2021-10-13)
+
+
+### Features
+
+* Added an ability to traverse the hierarchy of types in the dropdown with keyboard ([1f8895d](https://github.com/SolidAlloy/GenericUnityObjects/commit/1f8895db60ad3058a819f24766d4e91f6a5757a6))
+
 ## [2.10.6](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.5...2.10.6) (2021-10-07)
 
 
