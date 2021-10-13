@@ -21,9 +21,7 @@
             var typeOptionsAttribute = new NonGenericAttribute(genericParamConstraints[0]);
             var selectionTree = GetSelectionTree(typeOptionsAttribute, onTypeSelected);
             var dropdownPosition = GetCenteredPosition(selectionTree);
-
-            _dropdownWindow = DropdownWindow.Create(
-                selectionTree, typeOptionsAttribute.DropdownHeight, dropdownPosition, DropdownWindowType.Popup);
+            _dropdownWindow = DropdownWindow.Create(selectionTree, typeOptionsAttribute.DropdownHeight, dropdownPosition, DropdownWindowType.Popup);
         }
 
         private SelectionTree GetSelectionTree(NonGenericAttribute attribute, Action<Type[]> onTypeSelected)
