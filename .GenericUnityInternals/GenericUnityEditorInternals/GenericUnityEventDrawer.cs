@@ -196,8 +196,7 @@
                 .Select(parameter => parameter.ParameterType)
                 .ToArray();
 
-            // TODO: probably need to differentiate between Unity 2020 and 2021
-            UnityEventDrawer.GeneratePopUpForType(menu, targetToUse, ComponentInfo.GetTypeName(target, true), listener, delegateArgumentsTypes);
+            GeneratePopUpForType(menu, targetToUse, ComponentInfo.GetTypeName(target, true), listener, delegateArgumentsTypes);
 
             if ( ! (targetToUse is GameObject gameObject))
                 return menu;
@@ -210,61 +209,11 @@
                     continue;
 
                 // GeneratePopUpForType(new ComponentInfo(component), menu, listener, delegateArgumentsTypes);
-                UnityEventDrawer.GeneratePopUpForType(menu, component, ComponentInfo.GetTypeName(component, false), listener, delegateArgumentsTypes);
+                GeneratePopUpForType(menu, component, ComponentInfo.GetTypeName(component, false), listener, delegateArgumentsTypes);
             }
 
             return menu;
         }
-
-        // Default implementation, only some method parameters are replaced with the ComponentInfo struct.
-        // private static void GeneratePopUpForType(ComponentInfo componentInfo, GenericMenu menu, SerializedProperty listener, Type[] delegateArgumentsTypes)
-        // {
-        //     var methods = new List<UnityEventDrawer.ValidMethodMap>();
-        //     bool didAddDynamic = false;
-        //
-        //     // skip 'void' event defined on the GUI as we have a void prebuilt type!
-        //     if ( delegateArgumentsTypes.Length != 0)
-        //     {
-        //         UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, delegateArgumentsTypes, methods,
-        //             PersistentListenerMode.EventDefined);
-        //
-        //         if (methods.Count > 0)
-        //         {
-        //             menu.AddDisabledItem(new GUIContent(componentInfo.Name + "/Dynamic " + string.Join(", ",
-        //                 delegateArgumentsTypes
-        //                 .Select(argumentType => UnityEventDrawer.GetTypeName(argumentType))
-        //                 .ToArray())));
-        //
-        //             UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, componentInfo.Name);
-        //             didAddDynamic = true;
-        //         }
-        //     }
-        //
-        //     methods.Clear();
-        //
-        //     UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(float) }, methods, PersistentListenerMode.Float);
-        //     UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(int) }, methods, PersistentListenerMode.Int);
-        //     UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(string) }, methods, PersistentListenerMode.String);
-        //     UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(bool) }, methods, PersistentListenerMode.Bool);
-        //     UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, new[] { typeof(Object) }, methods, PersistentListenerMode.Object);
-        //     UnityEventDrawer.GetMethodsForTargetAndMode(componentInfo.Component, Array.Empty<Type>(), methods, PersistentListenerMode.Void);
-        //
-        //     if (methods.Count == 0)
-        //         return;
-        //
-        //     if (didAddDynamic)
-        //     {
-        //         // AddSeperator doesn't seem to work for sub-menus, so we have to use this workaround instead of a proper separator for now.
-        //         menu.AddItem(new GUIContent(componentInfo.Name + "/ "), false, null);
-        //     }
-        //
-        //     if (delegateArgumentsTypes.Length != 0)
-        //     {
-        //         menu.AddDisabledItem(new GUIContent(componentInfo.Name + "/Static Parameters"));
-        //     }
-        //
-        //     UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, componentInfo.Name);
-        // }
 
         protected override void SetupReorderableList(ReorderableList list)
         {
@@ -272,20 +221,70 @@
             list.draggable = true;
         }
 
+        // Default implementation of GeneratePopUpForType, nothing's changed.
+        // It is duplicated because the signature of the method differs between 2020.3.16 and newer versions of Unity.
+        // The method is duplicated so that we don't have to rely on predefined symbols to use different methods.
+        private static void GeneratePopUpForType(
+            GenericMenu menu,
+            Object target,
+            string targetName,
+            SerializedProperty listener,
+            Type[] delegateArgumentsTypes)
+        {
+            List<UnityEventDrawer.ValidMethodMap> methods = new List<UnityEventDrawer.ValidMethodMap>();
+            bool flag = false;
+            if ((uint) delegateArgumentsTypes.Length > 0U)
+            {
+                UnityEventDrawer.GetMethodsForTargetAndMode(target, delegateArgumentsTypes, methods,
+                    PersistentListenerMode.EventDefined);
+                if (methods.Count > 0)
+                {
+                    menu.AddDisabledItem(new GUIContent(targetName + "/Dynamic " + string.Join(", ",
+                        delegateArgumentsTypes
+                        .Select(e => UnityEventDrawer.GetTypeName(e))
+                        .ToArray())));
+                    UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, targetName);
+                    flag = true;
+                }
+            }
+
+            methods.Clear();
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new Type[1]
+            {
+                typeof(float)
+            }, methods, PersistentListenerMode.Float);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new Type[1]
+            {
+                typeof(int)
+            }, methods, PersistentListenerMode.Int);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new Type[1]
+            {
+                typeof(string)
+            }, methods, PersistentListenerMode.String);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new Type[1]
+            {
+                typeof(bool)
+            }, methods, PersistentListenerMode.Bool);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new Type[1]
+            {
+                typeof(Object)
+            }, methods, PersistentListenerMode.Object);
+            UnityEventDrawer.GetMethodsForTargetAndMode(target, new Type[0], methods,
+                PersistentListenerMode.Void);
+            if (methods.Count <= 0)
+                return;
+            if (flag)
+                menu.AddItem(new GUIContent(targetName + "/ "), false, null);
+            if ((uint) delegateArgumentsTypes.Length > 0U)
+                menu.AddDisabledItem(new GUIContent(targetName + "/Static Parameters"));
+            UnityEventDrawer.AddMethodsToMenu(menu, listener, methods, targetName);
+        }
+
         // A struct responsible for obtaining the correct component name and keeping cache of generated names
         private readonly struct ComponentInfo
         {
             private static readonly Dictionary<Type, string> _typeNameCache = new Dictionary<Type, string>();
             private static readonly HashSet<string> _names = new HashSet<string>();
-
-            public readonly Component Component;
-            public readonly string Name;
-
-            public ComponentInfo(Component component)
-            {
-                Component = component;
-                Name = GetTypeName(Component, false);
-            }
 
             public static void ClearNames() => _names.Clear();
 
