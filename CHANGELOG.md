@@ -1,3 +1,10 @@
+## [2.11.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.0...2.11.1) (2021-10-16)
+
+
+### Bug Fixes
+
+* Fixed MissingMethodException when choosing a UnityEvent method in Unity 2020.3.16 and earlier ([896dcfe](https://github.com/SolidAlloy/GenericUnityObjects/commit/896dcfe0c0f143ef7ba7ce692cc70a13a492e56b))
+
 # [2.11.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.10.6...2.11.0) (2021-10-13)
 
 
