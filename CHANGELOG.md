@@ -1,3 +1,10 @@
+## [2.11.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.1...2.11.2) (2021-10-17)
+
+
+### Bug Fixes
+
+* Fixed NRE when choosing a type for a new generic unity object ([820f3b1](https://github.com/SolidAlloy/GenericUnityObjects/commit/820f3b1d158c033295bc5ee424f22e2fd451407a))
+
 ## [2.11.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.0...2.11.1) (2021-10-16)
 
 
