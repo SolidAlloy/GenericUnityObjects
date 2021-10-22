@@ -1,3 +1,10 @@
+## [2.11.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.2...2.11.3) (2021-10-22)
+
+
+### Bug Fixes
+
+* Fixed NRE when opening a type dropdown on MacOS ([8e3a0d8](https://github.com/SolidAlloy/GenericUnityObjects/commit/8e3a0d87e2ae58934883ecc2eab4aebfb07ef8f4))
+
 ## [2.11.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.1...2.11.2) (2021-10-17)
 
 
