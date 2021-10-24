@@ -5,7 +5,7 @@
   "description": "A plugin that allows using of generic scriptable objects and monobehaviours, creating assets and components from them, and instantiating them at runtime.",
   "dependencies": {
     "com.solidalloy.util": "1.33.1",
-    "com.solidalloy.type-references": "2.11.3",
+    "com.solidalloy.type-references": "2.11.4",
     "com.unity.settings-manager": "1.0.3"
   },
   "keywords": [
