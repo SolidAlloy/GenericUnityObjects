@@ -5,6 +5,10 @@
     using UnityEngine;
     using Object = UnityEngine.Object;
 
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+
     /// <summary>
     /// A database that holds references to generated concrete classes and provides them on demand when a generic class
     /// instance needs to be created.
@@ -21,6 +25,8 @@
 
         [SerializeField] private SerializableType[] _keys;
         [SerializeField] private SerializableTypeDictionary[] _values;
+
+        public static event Action<Type, Type> FoundNewType;
 
         public static void Initialize(Dictionary<Type, Dictionary<Type[], Type>> dict)
         {
@@ -123,6 +129,7 @@
                 return false;
 
             Add(genericType, derivedType);
+            FoundNewType?.Invoke(genericType, derivedType);
             return true;
         }
 
@@ -141,6 +148,10 @@
                     genericTypeWithoutArgs,
                     new Dictionary<Type[], Type>(default(TypeArrayComparer)) { { genericArgs, concreteType } });
             }
+
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+#endif
         }
 
         void ICanBeInitialized.Initialize() { }

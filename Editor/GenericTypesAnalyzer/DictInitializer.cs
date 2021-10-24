@@ -3,8 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
+    using SolidUtilities.Extensions;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -34,6 +36,34 @@
             }
 
             GenericTypesDatabase<TObject>.Initialize(dict);
+
+            // Sometimes, GenericTypesDatabase can find a generated assembly that was not added to the database for some reason.
+            GenericTypesDatabase<TObject>.FoundNewType += OnFoundNewType;
+        }
+
+        private static void OnFoundNewType(Type genericType, Type derivedType)
+        {
+            string assemblyName = derivedType.Assembly.GetName().Name;
+
+            var assetGuids = AssetDatabase.FindAssets(assemblyName, new[] { Config.AssembliesDirPath });
+
+            string assemblyGUID = assetGuids.FirstOrDefault(assetGuid =>
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+
+                var fileName = Path.GetFileNameWithoutExtension(assetPath);
+                var extension = Path.GetExtension(assetPath);
+                return assemblyName == fileName && extension == ".dll";
+            });
+
+            if (assemblyGUID == null)
+                return;
+
+            Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+            Type[] genericArgs = genericType.GenericTypeArguments;
+            var genericTypeInfo = GenericTypeInfo.Instantiate<TObject>(genericTypeWithoutArgs);
+
+            GenerationDatabase<TObject>.AddConcreteClass(genericTypeInfo, genericArgs, assemblyGUID);
         }
 
         private static void CheckSelectorAssembly(GenericTypeInfo genericTypeInfo)
