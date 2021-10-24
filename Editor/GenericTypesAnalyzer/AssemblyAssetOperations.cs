@@ -49,6 +49,10 @@
             public void Dispose()
             {
                 string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{_newAssemblyName}";
+
+                if (_oldAssemblyPath == $"{newAssemblyPathWithoutExtension}.dll")
+                    return;
+
                 File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
                 File.Move($"{_oldAssemblyPath}.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
             }

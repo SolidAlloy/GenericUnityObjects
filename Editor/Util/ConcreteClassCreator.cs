@@ -49,7 +49,7 @@
 
             try
             {
-                newAssemblyName = GetConcreteClassAssemblyName(genericType, argumentTypes);
+                newAssemblyName = GetConcreteClassAssemblyName(genericType, argumentTypes, AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID));
             }
             catch (TypeLoadException)
             {
@@ -113,10 +113,15 @@
             return fullName;
         }
 
-        private static string GetConcreteClassAssemblyName(Type genericTypeWithoutArgs, Type[] genericArgs)
+        private static string GetConcreteClassAssemblyName(Type genericTypeWithoutArgs, Type[] genericArgs, string oldAssemblyName = null)
         {
             var argumentsNames = genericArgs.Select(argument => GetShortNameForNaming(argument.FullName));
             string newAssemblyName = $"{GetShortNameForNaming(genericTypeWithoutArgs.FullName)}_{string.Join("_", argumentsNames)}";
+
+            // If we are updating the assembly and the names match, no need to add suffixes to the new name.
+            if (oldAssemblyName == newAssemblyName)
+                return newAssemblyName;
+
             var dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
             int identicalFilesCount = dirInfo.GetFiles($"{newAssemblyName}*.dll").Length;
 
