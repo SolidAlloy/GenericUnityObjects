@@ -1,3 +1,11 @@
+## [2.11.4](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.3...2.11.4) (2021-10-24)
+
+
+### Bug Fixes
+
+* Fixed suffixes being added to generated assemblies names when they are updated ([4f79d82](https://github.com/SolidAlloy/GenericUnityObjects/commit/4f79d822b6b016d58910413ef7bbed2b76bcf0ec))
+* Started adding back generated assemblies that exist in the folder but are missing in the database ([1e88e3c](https://github.com/SolidAlloy/GenericUnityObjects/commit/1e88e3cd93882f5ec8c89b6cad437b967eee0197))
+
 ## [2.11.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.2...2.11.3) (2021-10-22)
 
 
