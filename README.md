@@ -11,7 +11,7 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 
 - Create object fields for generic UnityEngine.Objects and assigned created assets/components to those fields.
 
-- Instantiate generic UnityEngine.Objects from scripts (but see the limitations.)
+- Instantiate generic UnityEngine.Objects from scripts (but see the [limitations](#limitations).)
 
   
 
@@ -322,6 +322,22 @@ Sometimes, when you pull new commits from Git, you can see the following error i
 > Failed to extract ConcreteClass_6506f902939610441800fd3d6df9e87b class of base type ...
 
 It's a misleading error. Everything is alright, and the class is extracted properly, so you won't lose any concrete classes you generated from a generic UnityEngine.Object class.
+
+### Merging conflicts in the .dll assets
+
+You might experience the following situation:
+
+- You've generated a new .dll asset by creating a scriptable object of new type.
+- Your colleague generated a .dll asset of the same type before pulling your changes.
+- Now, when merging your commits, you will need to solve a conflict with two identical .dll files but with different GUIDs.
+
+First-of-all, you can choose whatever version of the .dll and .dll.mdb files. They are identical, assuming the generic type they were created for has the same signature (the same name, namespace, names of its generic arguments).
+
+Choose one GUID you will use in the project from now on. Let's imagine you chose to keep your GUID. When solving merge conflicts in other files like your-type.dll.meta and SOGenerationDatabase.asset, choose your GUID and delete theirs.
+
+There may already be assets created with their GUID, so you need to replace it with yours. Use a search-and-replace tool to replace their GUID with yours recursively across the project.
+
+The merge should be complete now. Their scriptable objects and prefabs should have a reference to your version of the generated .dll asset and will not be broken when you return to the Unity Editor window.
 
 ## Contributing
 
