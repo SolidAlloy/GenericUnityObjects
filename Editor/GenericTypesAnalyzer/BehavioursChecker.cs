@@ -4,6 +4,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using SolidUtilities.Helpers;
+    using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
@@ -83,7 +84,7 @@
         private static void UpdateSelectorAssembly(string selectorAssemblyGUID, Type newType)
         {
             string newAssemblyName = GetSelectorAssemblyName(newType);
-            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(selectorAssemblyGUID);
+            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(AssetDatabase.GUIDToAssetPath(selectorAssemblyGUID));
             string newAssemblyPath = AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType, selectorAssemblyGUID);
             assemblyReplacer.FinishReplacement(newAssemblyPath);
         }

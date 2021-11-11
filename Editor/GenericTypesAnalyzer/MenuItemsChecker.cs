@@ -16,7 +16,7 @@
     /// </summary>
     public static class MenuItemsChecker
     {
-        private const string AssemblyName = Config.MenuItemsAssemblyName;
+        private const string AssemblyName = "GeneratedMenuItems";
 
         public static bool Check()
         {
@@ -31,12 +31,10 @@
                     // nothing to delete or create
                     return false;
                 }
-                else
-                {
-                    RemoveMenuItemsAssembly();
-                    PersistentStorage.MenuItemMethods = new MenuItemMethod[0];
-                    return true;
-                }
+
+                RemoveMenuItemsAssembly();
+                PersistentStorage.MenuItemMethods = new MenuItemMethod[0];
+                return true;
             }
 
             var newMenuItemMethods = GetMenuItemMethods(newScriptableObjects);
@@ -91,19 +89,31 @@
         private static void CreateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
         {
             string assemblyPath = AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
+            PersistentStorage.MenuItemsAssemblyPath = assemblyPath;
             string assemblyGUID = AssemblyGeneration.GetUniqueGUID();
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID, true);
         }
 
         private static void RemoveMenuItemsAssembly()
         {
-            AssetDatabase.DeleteAsset($"{Config.AssembliesDirPath}/{AssemblyName}.dll");
+            string assemblyPath = PersistentStorage.MenuItemsAssemblyPath;
+
+            if (!string.IsNullOrEmpty(assemblyPath))
+                AssetDatabase.DeleteAsset(assemblyPath);
         }
 
         private static void UpdateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
         {
-            // No need to update it using AssemblyReplacer because the name doesn't change.
-            AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
+            // The name of the assembly shouldn't change, but we still use AssemblyReplace just to be save because the name can change because of a plugin update.
+            string oldAssemblyPath = PersistentStorage.MenuItemsAssemblyPath;
+
+            if (string.IsNullOrEmpty(oldAssemblyPath))
+                oldAssemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}"; // The old name of the menu items assembly before it was made non-constant.
+
+            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(oldAssemblyPath);
+            string newAssemblyPath = AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
+            assemblyReplacer.FinishReplacement(newAssemblyPath);
+            PersistentStorage.MenuItemsAssemblyPath = newAssemblyPath;
         }
     }
 }

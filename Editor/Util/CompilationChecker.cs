@@ -23,7 +23,9 @@ namespace GenericUnityObjects.Editor.Util
         {
             CompilationPipeline.compilationStarted += OnCompilationStarted;
             CompilationPipeline.compilationFinished += OnCompilationFinished;
+#pragma warning disable 618
             CompilationPipeline.assemblyCompilationStarted += OnAssemblyCompilationStarted;
+#pragma warning restore 618
             _assemblies = new List<string>();
         }
 

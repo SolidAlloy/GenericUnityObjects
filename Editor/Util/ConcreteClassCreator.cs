@@ -56,7 +56,7 @@
                 return;
             }
 
-            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(concreteClass.AssemblyGUID);
+            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(AssetDatabase.GUIDToAssetPath(concreteClass.AssemblyGUID));
             string newAssemblyPath = CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
             assemblyReplacer.FinishReplacement(newAssemblyPath);
 

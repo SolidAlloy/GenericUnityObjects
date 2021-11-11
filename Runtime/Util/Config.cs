@@ -5,8 +5,6 @@
     /// </summary>
     internal static class Config
     {
-        public const string MenuItemsAssemblyName = "GeneratedMenuItems";
-
         public const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
         public const string ResourcesPath = MainFolderPath + "/Resources";
         public const string EditorResourcesPath = MainFolderPath + "/EditorResources";

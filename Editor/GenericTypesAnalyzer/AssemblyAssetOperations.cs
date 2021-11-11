@@ -20,9 +20,9 @@
             AssetDatabase.DeleteAsset(assemblyPath);
         }
 
-        public static AssemblyReplacer StartAssemblyReplacement(string assemblyGUID)
+        public static AssemblyReplacer StartAssemblyReplacement(string oldAssemblyPath)
         {
-            return new AssemblyReplacer(AssetDatabase.GUIDToAssetPath(assemblyGUID));
+            return new AssemblyReplacer(oldAssemblyPath);
         }
 
         public readonly struct AssemblyReplacer

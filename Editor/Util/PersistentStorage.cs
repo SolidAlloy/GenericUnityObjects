@@ -17,6 +17,7 @@
     {
         private const string AssembliesCountKey = "AssembliesCount";
         private const string FirstCompilationKey = "FirstCompilation";
+        private const string MenuItemsAssemblyKey = "MenuItemsAssemblyPath";
 
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
@@ -27,6 +28,16 @@
             {
                 Instance._menuItemMethods = value;
                 EditorUtility.SetDirty(Instance);
+            }
+        }
+
+        public static string MenuItemsAssemblyPath
+        {
+            get => PlayerPrefs.GetString(MenuItemsAssemblyKey);
+            set
+            {
+                PlayerPrefs.SetString(MenuItemsAssemblyKey, value);
+                PlayerPrefs.Save();
             }
         }
 

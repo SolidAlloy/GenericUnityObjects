@@ -10,7 +10,7 @@
     using UnityEngine.Assertions;
     using Util;
 
-    internal class GenericSOCreator
+    internal static class GenericSOCreator
     {
         private const string GenericSOTypeKey = "GenericSOType";
         private const string FileNameKey = "FileName";
@@ -26,7 +26,7 @@
         /// <param name="genericTypeWithoutArgs">The type of <see cref="GenericScriptableObject"/> to create.</param>
         /// <param name="fileName">Name for an asset.</param>
         [UsedImplicitly]
-        protected static void CreateAsset(Type genericTypeWithoutArgs, string fileName)
+        public static void CreateAsset(Type genericTypeWithoutArgs, string fileName)
         {
             Assert.IsTrue(genericTypeWithoutArgs.IsGenericTypeDefinition);
 

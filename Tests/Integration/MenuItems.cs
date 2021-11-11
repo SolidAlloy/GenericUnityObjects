@@ -2,6 +2,7 @@
 {
     using System.Collections;
     using System.IO;
+    using Editor.Util;
     using JetBrains.Annotations;
     using NUnit.Framework;
     using SolidUtilities.Editor.Helpers;
@@ -13,7 +14,7 @@
     public class MenuItems : ScriptableObject
     {
         private const string OneErrorLog = "OneErrorLog";
-        private static readonly string _menuItemsDLLPath = $"{Config.AssembliesDirPath}/{Config.MenuItemsAssemblyName}.dll";
+        private static readonly string _menuItemsDLLPath = PersistentStorage.MenuItemsAssemblyPath;
 
         [UnitySetUp, UsedImplicitly]
         public IEnumerator BeforeEachTest()
