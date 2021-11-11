@@ -66,10 +66,10 @@
 
 
 
-        private static void CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
+        private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
             string newAssemblyName, string assemblyGUID)
         {
-            AssemblyCreator.CreateConcreteClass<TObject>(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), assemblyGUID);
+            return AssemblyCreator.CreateConcreteClass<TObject>(newAssemblyName, genericTypeWithoutArgs.MakeGenericType(argumentTypes), assemblyGUID);
         }
 
         private static void AddToDatabase(GenericTypeInfo genericTypeInfo, Type[] argumentTypes, string assemblyGUID)
@@ -80,14 +80,13 @@
         private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes)
         {
             string assemblyName = GetConcreteClassAssemblyName(genericTypeWithoutArgs, argumentTypes);
-            string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
 
             string assemblyGUID;
 
             using (new DisabledAssetDatabase(true))
             {
                 assemblyGUID = AssemblyGeneration.GetUniqueGUID();
-                CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName, assemblyGUID);
+                string assemblyPath = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName, assemblyGUID);
                 AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID);
             }
 

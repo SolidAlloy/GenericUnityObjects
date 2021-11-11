@@ -29,9 +29,8 @@
             string assemblyName = GetSelectorAssemblyName(behaviourType);
             genericTypeInfo.AssemblyGUID = AssemblyGeneration.GetUniqueGUID();
 
-            AssemblyCreator.CreateSelectorAssembly(assemblyName, behaviourType, genericTypeInfo.AssemblyGUID);
+            string assemblyPath = AssemblyCreator.CreateSelectorAssembly(assemblyName, behaviourType, genericTypeInfo.AssemblyGUID);
 
-            string assemblyPath = $"{Config.AssembliesDirPath}/{assemblyName}.dll";
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, genericTypeInfo.AssemblyGUID);
             IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, genericTypeInfo.AssemblyGUID, false);
             base.AddNewGenericType(genericTypeInfo);

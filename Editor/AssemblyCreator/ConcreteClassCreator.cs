@@ -3,6 +3,7 @@
     using System;
     using System.Reflection;
     using System.Reflection.Emit;
+    using GenericUnityObjects.Util;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -14,10 +15,10 @@
         /// <summary>
         /// Not supposed to be used directly. Instead, use <see cref="AssemblyCreator.CreateConcreteClass{TObject}"/>.
         /// </summary>
-        public static void CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs, string assemblyGUID)
+        public static string CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs, string assemblyGUID)
             where TObject : Object
         {
-            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, $"ConcreteClass_{assemblyGUID}", genericTypeWithArgs);
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(Config.AssembliesDirPath, assemblyName, $"ConcreteClass_{assemblyGUID}", genericTypeWithArgs);
 
             AssemblyCreatorHelper.AddChildrenAttributes(concreteClassAssembly.TypeBuilder, genericTypeWithArgs);
 
@@ -25,6 +26,8 @@
             {
                 AssemblyCreatorHelper.AddComponentMenuAttribute(concreteClassAssembly.TypeBuilder, genericTypeWithArgs);
             }
+
+            return concreteClassAssembly.Path;
         }
     }
 }

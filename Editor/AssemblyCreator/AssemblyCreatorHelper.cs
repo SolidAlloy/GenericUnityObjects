@@ -3,6 +3,7 @@
     using System;
     using System.Configuration.Assemblies;
     using System.Globalization;
+    using System.IO;
     using System.Reflection;
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
@@ -52,7 +53,7 @@
             }
         }
 
-        public static AssemblyBuilder GetAssemblyBuilder(string generatedAssemblyName)
+        public static AssemblyBuilder GetAssemblyBuilder(string assemblyDir, string generatedAssemblyName)
         {
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName(generatedAssemblyName)
@@ -62,7 +63,7 @@
                     ProcessorArchitecture = ProcessorArchitecture.MSIL,
                     VersionCompatibility = AssemblyVersionCompatibility.SameDomain
                 },
-                AssemblyBuilderAccess.RunAndSave, Config.AssembliesDirPath);
+                AssemblyBuilderAccess.RunAndSave, assemblyDir);
 
             return assemblyBuilder;
         }
@@ -130,30 +131,34 @@
             return (componentName, order);
         }
 
-        public static ConcreteTypeAssembly CreateConcreteClassAssembly(string assemblyName, string className, Type parentType)
+        public static ConcreteTypeAssembly CreateConcreteClassAssembly(string dirPath, string assemblyName, string className, Type parentType)
         {
-            return new ConcreteTypeAssembly(assemblyName, className, parentType);
+            return new ConcreteTypeAssembly(dirPath, assemblyName, className, parentType);
         }
 
         public readonly struct ConcreteTypeAssembly : IDisposable
         {
             public readonly TypeBuilder TypeBuilder;
             private readonly AssemblyBuilder _assemblyBuilder;
-            private readonly string _assemblyName;
+            private readonly string _dllName;
 
-            public ConcreteTypeAssembly(string assemblyName, string className, Type parentType)
+            public readonly string Path;
+
+            public ConcreteTypeAssembly(string dirPath, string assemblyName, string className, Type parentType)
             {
-                _assemblyName = assemblyName;
-                _assemblyBuilder = GetAssemblyBuilder(assemblyName);
-                ModuleBuilder moduleBuilder = GetModuleBuilder(_assemblyBuilder, _assemblyName);
+                assemblyName = $"z_{assemblyName}"; // We prefix assemblies with z_ to keep them at the bottom of dropdowns where the DLL files are listed.
+                _dllName = $"{assemblyName}.dll";
+                Path = System.IO.Path.Combine(dirPath, _dllName);
 
+                _assemblyBuilder = GetAssemblyBuilder(dirPath, assemblyName);
+                ModuleBuilder moduleBuilder = GetModuleBuilder(_assemblyBuilder, assemblyName);
                 TypeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, parentType);
             }
 
             public void Dispose()
             {
                 TypeBuilder.CreateType();
-                _assemblyBuilder.Save($"{_assemblyName}.dll");
+                _assemblyBuilder.Save(_dllName);
             }
         }
     }

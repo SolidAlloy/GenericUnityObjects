@@ -3,6 +3,7 @@
     using System;
     using System.Reflection;
     using System.Reflection.Emit;
+    using GenericUnityObjects.Util;
     using ScriptableObjects;
     using UnityEditor;
     using UnityEngine.Assertions;
@@ -71,11 +72,11 @@
             }
         }
 
-        public static void CreateMenuItemsImpl(string assemblyName, MenuItemMethod[] menuItemMethods)
+        public static string CreateMenuItemsImpl(string assemblyName, MenuItemMethod[] menuItemMethods)
         {
             const string menuItemsTypeName = "MenuItems";
 
-            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, menuItemsTypeName, typeof(GenericSOCreator));
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(Config.AssembliesDirPath, assemblyName, menuItemsTypeName, typeof(GenericSOCreator));
 
             int menuItemsLength = menuItemMethods.Length;
 
@@ -83,6 +84,8 @@
             {
                 AddMenuItemMethod(concreteClassAssembly.TypeBuilder, menuItemMethods[i], i);
             }
+
+            return concreteClassAssembly.Path;
         }
 
         private static void AddMenuItemMethod(TypeBuilder typeBuilder, MenuItemMethod menuItemMethod, int index)

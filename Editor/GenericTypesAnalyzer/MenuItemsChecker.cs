@@ -90,8 +90,7 @@
 
         private static void CreateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
         {
-            AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
-            string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
+            string assemblyPath = AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
             string assemblyGUID = AssemblyGeneration.GetUniqueGUID();
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID, true);
         }
