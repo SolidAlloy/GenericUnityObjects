@@ -69,7 +69,7 @@
 
         public static ModuleBuilder GetModuleBuilder(AssemblyBuilder assemblyBuilder, string generatedAssemblyName)
         {
-            return assemblyBuilder.DefineDynamicModule($"{generatedAssemblyName}.dll", true);
+            return assemblyBuilder.DefineDynamicModule($"{generatedAssemblyName}.dll", false);
         }
 
         public static void AddComponentMenuAttribute(TypeBuilder typeBuilder, Type genericType)

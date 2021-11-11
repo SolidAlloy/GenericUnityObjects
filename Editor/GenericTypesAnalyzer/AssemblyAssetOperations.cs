@@ -17,14 +17,7 @@
                 return;
 
             string assemblyPath = AssetDatabase.GUIDToAssetPath(assemblyGUID);
-            RemoveAssemblyByPath(assemblyPath);
-        }
-
-        public static void RemoveAssemblyByPath(string assemblyPath)
-        {
-            string mdbPath = $"{assemblyPath}.mdb";
             AssetDatabase.DeleteAsset(assemblyPath);
-            AssetDatabase.DeleteAsset(mdbPath);
         }
 
         public readonly struct AssemblyReplacer : IDisposable
@@ -43,18 +36,14 @@
                 _newAssemblyName = newAssemblyName;
                 _oldAssemblyPath = oldAssemblyPath;
                 File.Delete(_oldAssemblyPath);
-                File.Delete($"{_oldAssemblyPath}.mdb");
             }
 
             public void Dispose()
             {
                 string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{_newAssemblyName}";
 
-                if (_oldAssemblyPath == $"{newAssemblyPathWithoutExtension}.dll")
-                    return;
-
-                File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
-                File.Move($"{_oldAssemblyPath}.mdb.meta", $"{newAssemblyPathWithoutExtension}.dll.mdb.meta");
+                if (_oldAssemblyPath != $"{newAssemblyPathWithoutExtension}.dll")
+                    File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
             }
         }
     }

@@ -27,7 +27,6 @@
             }
 
             AssetDatabase.ImportAsset(assemblyPath);
-            AssetDatabase.ImportAsset($"{assemblyPath}.mdb");
         }
 
         // Sometimes, we need to know GUID of a future DLL before we start creating and importing it.

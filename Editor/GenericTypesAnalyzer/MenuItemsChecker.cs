@@ -98,8 +98,7 @@
 
         private static void RemoveMenuItemsAssembly()
         {
-            string assemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll";
-            AssemblyAssetOperations.RemoveAssemblyByPath(assemblyPath);
+            AssetDatabase.DeleteAsset($"{Config.AssembliesDirPath}/{AssemblyName}.dll");
         }
 
         private static void UpdateMenuItemsAssembly(MenuItemMethod[] menuItemMethods)
