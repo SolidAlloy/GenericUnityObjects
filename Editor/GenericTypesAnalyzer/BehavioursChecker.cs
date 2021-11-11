@@ -83,11 +83,9 @@
         private static void UpdateSelectorAssembly(string selectorAssemblyGUID, Type newType)
         {
             string newAssemblyName = GetSelectorAssemblyName(newType);
-
-            using (AssemblyAssetOperations.AssemblyReplacer.UsingGUID(selectorAssemblyGUID, newAssemblyName))
-            {
-                AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType, selectorAssemblyGUID);
-            }
+            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(selectorAssemblyGUID);
+            string newAssemblyPath = AssemblyCreator.CreateSelectorAssembly(newAssemblyName, newType, selectorAssemblyGUID);
+            assemblyReplacer.FinishReplacement(newAssemblyPath);
         }
 
         private void UpdateBehaviourComponentName(BehaviourInfo behaviour, string newComponentName)

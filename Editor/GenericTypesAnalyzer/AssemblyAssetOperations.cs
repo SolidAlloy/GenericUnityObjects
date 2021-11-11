@@ -20,30 +20,25 @@
             AssetDatabase.DeleteAsset(assemblyPath);
         }
 
-        public readonly struct AssemblyReplacer : IDisposable
+        public static AssemblyReplacer StartAssemblyReplacement(string assemblyGUID)
+        {
+            return new AssemblyReplacer(AssetDatabase.GUIDToAssetPath(assemblyGUID));
+        }
+
+        public readonly struct AssemblyReplacer
         {
             private readonly string _oldAssemblyPath;
-            private readonly string _newAssemblyName;
 
-            public static AssemblyReplacer UsingGUID(string assemblyGUID, string newAssemblyName)
+            public AssemblyReplacer(string oldAssemblyPath)
             {
-                string oldAssemblyPath = AssetDatabase.GUIDToAssetPath(assemblyGUID);
-                return new AssemblyReplacer(oldAssemblyPath, newAssemblyName);
-            }
-
-            private AssemblyReplacer(string oldAssemblyPath, string newAssemblyName)
-            {
-                _newAssemblyName = newAssemblyName;
                 _oldAssemblyPath = oldAssemblyPath;
-                File.Delete(_oldAssemblyPath);
+                File.Delete(oldAssemblyPath);
             }
 
-            public void Dispose()
+            public void FinishReplacement(string newAssemblyPath)
             {
-                string newAssemblyPathWithoutExtension = $"{Config.AssembliesDirPath}/{_newAssemblyName}";
-
-                if (_oldAssemblyPath != $"{newAssemblyPathWithoutExtension}.dll")
-                    File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPathWithoutExtension}.dll.meta");
+                if (_oldAssemblyPath != newAssemblyPath)
+                    File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPath}.meta");
             }
         }
     }

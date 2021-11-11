@@ -56,10 +56,9 @@
                 return;
             }
 
-            using (AssemblyAssetOperations.AssemblyReplacer.UsingGUID(concreteClass.AssemblyGUID, newAssemblyName))
-            {
-                CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
-            }
+            var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(concreteClass.AssemblyGUID);
+            string newAssemblyPath = CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
+            assemblyReplacer.FinishReplacement(newAssemblyPath);
 
             IconSetter.AddAssemblyForIconChange(genericTypeGUID, concreteClass.AssemblyGUID, typeof(TObject) == typeof(GenericScriptableObject));
         }
