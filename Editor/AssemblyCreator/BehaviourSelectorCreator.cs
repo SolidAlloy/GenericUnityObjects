@@ -16,19 +16,9 @@
         /// </summary>
         public static void CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs, string assemblyGUID)
         {
-            string className = $"ClassSelector_{assemblyGUID}";
-
-            AssemblyBuilder assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
-            ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(assemblyBuilder, assemblyName);
-
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, typeof(BehaviourSelector));
-
-            CreateBehaviourTypeProperty(typeBuilder, genericBehaviourWithoutArgs);
-            AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, genericBehaviourWithoutArgs);
-
-            typeBuilder.CreateType();
-
-            assemblyBuilder.Save($"{assemblyName}.dll");
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, $"ClassSelector_{assemblyGUID}", typeof(BehaviourSelector));
+            CreateBehaviourTypeProperty(concreteClassAssembly.TypeBuilder, genericBehaviourWithoutArgs);
+            AssemblyCreatorHelper.AddComponentMenuAttribute(concreteClassAssembly.TypeBuilder, genericBehaviourWithoutArgs);
         }
 
         private static void CreateBehaviourTypeProperty(TypeBuilder typeBuilder, Type propertyValue)

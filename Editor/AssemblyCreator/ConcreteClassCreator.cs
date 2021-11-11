@@ -17,22 +17,14 @@
         public static void CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs, string assemblyGUID)
             where TObject : Object
         {
-            string concreteClassName = $"ConcreteClass_{assemblyGUID}";
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, $"ConcreteClass_{assemblyGUID}", genericTypeWithArgs);
 
-            AssemblyBuilder assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
-            ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(assemblyBuilder, assemblyName);
-
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(concreteClassName, TypeAttributes.NotPublic, genericTypeWithArgs);
-
-            AssemblyCreatorHelper.AddChildrenAttributes(typeBuilder, genericTypeWithArgs);
+            AssemblyCreatorHelper.AddChildrenAttributes(concreteClassAssembly.TypeBuilder, genericTypeWithArgs);
 
             if (typeof(TObject) == typeof(MonoBehaviour))
             {
-                AssemblyCreatorHelper.AddComponentMenuAttribute(typeBuilder, genericTypeWithArgs);
+                AssemblyCreatorHelper.AddComponentMenuAttribute(concreteClassAssembly.TypeBuilder, genericTypeWithArgs);
             }
-
-            typeBuilder.CreateType();
-            assemblyBuilder.Save($"{assemblyName}.dll");
         }
     }
 }

@@ -129,5 +129,32 @@
 
             return (componentName, order);
         }
+
+        public static ConcreteTypeAssembly CreateConcreteClassAssembly(string assemblyName, string className, Type parentType)
+        {
+            return new ConcreteTypeAssembly(assemblyName, className, parentType);
+        }
+
+        public readonly struct ConcreteTypeAssembly : IDisposable
+        {
+            public readonly TypeBuilder TypeBuilder;
+            private readonly AssemblyBuilder _assemblyBuilder;
+            private readonly string _assemblyName;
+
+            public ConcreteTypeAssembly(string assemblyName, string className, Type parentType)
+            {
+                _assemblyName = assemblyName;
+                _assemblyBuilder = GetAssemblyBuilder(assemblyName);
+                ModuleBuilder moduleBuilder = GetModuleBuilder(_assemblyBuilder, _assemblyName);
+
+                TypeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, parentType);
+            }
+
+            public void Dispose()
+            {
+                TypeBuilder.CreateType();
+                _assemblyBuilder.Save($"{_assemblyName}.dll");
+            }
+        }
     }
 }

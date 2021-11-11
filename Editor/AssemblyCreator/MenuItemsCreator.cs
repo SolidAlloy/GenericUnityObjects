@@ -75,21 +75,14 @@
         {
             const string menuItemsTypeName = "MenuItems";
 
-            AssemblyBuilder assemblyBuilder = AssemblyCreatorHelper.GetAssemblyBuilder(assemblyName);
-            ModuleBuilder moduleBuilder = AssemblyCreatorHelper.GetModuleBuilder(assemblyBuilder, assemblyName);
-
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(menuItemsTypeName, TypeAttributes.NotPublic, typeof(GenericSOCreator));
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, menuItemsTypeName, typeof(GenericSOCreator));
 
             int menuItemsLength = menuItemMethods.Length;
 
             for (int i = 0; i < menuItemsLength; i++)
             {
-                AddMenuItemMethod(typeBuilder, menuItemMethods[i], i);
+                AddMenuItemMethod(concreteClassAssembly.TypeBuilder, menuItemMethods[i], i);
             }
-
-            typeBuilder.CreateType();
-
-            assemblyBuilder.Save($"{assemblyName}.dll");
         }
 
         private static void AddMenuItemMethod(TypeBuilder typeBuilder, MenuItemMethod menuItemMethod, int index)
