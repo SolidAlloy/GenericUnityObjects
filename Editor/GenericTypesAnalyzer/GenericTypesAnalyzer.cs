@@ -3,13 +3,10 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.Linq;
-    using System.Reflection;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
-    using UnityEditor.Compilation;
     using UnityEngine;
     using Util;
 
@@ -90,7 +87,7 @@
 
             using (new DisabledAssetDatabase(true))
             {
-                Directory.CreateDirectory(Config.AssembliesDirPath);
+                Config.CreateNecessaryDirectories();
 
                 behavioursNeedDatabaseRefresh =
                     ArgumentsChecker<MonoBehaviour>.Check(behavioursChecker)

@@ -39,7 +39,7 @@
             _testGameObject = new GameObject();
 
             var selectorType = AssetDatabase
-                .LoadAssetAtPath<MonoScript>($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}_1.dll")
+                .LoadAssetAtPath<MonoScript>($"{Config.BehaviourSelectorsPath}/{TestHelper.DefaultGenericClassName}_1.dll")
                 .GetClass();
 
             GenericBehaviourCreator.AddComponent(
@@ -74,7 +74,7 @@
         [Test]
         public void Concrete_class_is_added_when_concrete_component_is_added_for_the_first_time()
         {
-            Assert.That(File.Exists($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}_Int32.dll"));
+            Assert.That(File.Exists($"{Config.MonoBehavioursPath}/{TestHelper.DefaultGenericClassName}_Int32.dll"));
 
             var menuPaths = Unsupported.GetSubmenus("Component");
             Assert.That(menuPaths.Contains($"Component/Scripts/{TestHelper.DefaultGenericClassName}<int>"));
@@ -88,7 +88,7 @@
         public void Assembly_does_not_reload_when_concrete_component_is_added_for_the_second_time()
         {
             var selectorType = AssetDatabase
-                .LoadAssetAtPath<MonoScript>($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}_1.dll")
+                .LoadAssetAtPath<MonoScript>($"{Config.MonoBehavioursPath}/{TestHelper.DefaultGenericClassName}_1.dll")
                 .GetClass();
 
             GenericBehaviourCreator.AddComponent(

@@ -6,11 +6,8 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Extensions;
     using UnityEditor;
-    using UnityEngine;
     using UnityEngine.Assertions;
-    using Util;
     using Object = UnityEngine.Object;
 
     /// <summary>
@@ -45,7 +42,7 @@
         {
             string assemblyName = derivedType.Assembly.GetName().Name;
 
-            var assetGuids = AssetDatabase.FindAssets(assemblyName, new[] { Config.AssembliesDirPath });
+            var assetGuids = AssetDatabase.FindAssets(assemblyName, new[] { Config.GetAssemblyPathForType(genericType) });
 
             string assemblyGUID = assetGuids.FirstOrDefault(assetGuid =>
             {

@@ -35,7 +35,7 @@
             _testGameObject = new GameObject();
 
             var selectorType = AssetDatabase
-                .LoadAssetAtPath<MonoScript>($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}_1.dll")
+                .LoadAssetAtPath<MonoScript>($"{Config.BehaviourSelectorsPath}/{TestHelper.DefaultGenericClassName}_1.dll")
                 .GetClass();
 
             GenericBehaviourCreator.AddComponent(

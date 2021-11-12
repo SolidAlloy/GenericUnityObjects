@@ -1,13 +1,48 @@
 ﻿namespace GenericUnityObjects.Util
 {
+    using System;
+    using System.IO;
+    using UnityEngine;
+
     /// <summary>
     /// Holder of constant values used by multiple classes in the plugin.
     /// </summary>
     internal static class Config
     {
-        public const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
         public const string ResourcesPath = MainFolderPath + "/Resources";
         public const string EditorResourcesPath = MainFolderPath + "/EditorResources";
-        public const string AssembliesDirPath = MainFolderPath + "/Assemblies";
+        private const string AssembliesDirPath = MainFolderPath + "/Assemblies";
+        private const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
+        public const string ScriptableObjectsPath = AssembliesDirPath + "/ScriptableObjects";
+        public const string MonoBehavioursPath = AssembliesDirPath + "/MonoBehaviours";
+        public const string BehaviourSelectorsPath = AssembliesDirPath + "/BehaviourSelectors";
+
+        public static string GetAssemblyPathForType(Type parentType)
+        {
+            if (typeof(GenericScriptableObject).IsAssignableFrom(parentType))
+            {
+                return ScriptableObjectsPath;
+            }
+
+            if (typeof(BehaviourSelector).IsAssignableFrom(parentType))
+            {
+                return BehaviourSelectorsPath;
+            }
+
+            if (typeof(MonoBehaviour).IsAssignableFrom(parentType))
+            {
+                return MonoBehavioursPath;
+            }
+
+            return AssembliesDirPath;
+        }
+
+        public static void CreateNecessaryDirectories()
+        {
+            Directory.CreateDirectory(AssembliesDirPath);
+            Directory.CreateDirectory(ScriptableObjectsPath);
+            Directory.CreateDirectory(MonoBehavioursPath);
+            Directory.CreateDirectory(BehaviourSelectorsPath);
+        }
     }
 }

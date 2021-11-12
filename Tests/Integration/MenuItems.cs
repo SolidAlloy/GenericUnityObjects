@@ -34,7 +34,7 @@
         {
             AssetDatabase.DeleteAsset(TestHelper.TestingDir);
 
-            DirectoryInfo dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
+            DirectoryInfo dirInfo = new DirectoryInfo(Config.GetAssemblyPathForType(null));
 
             foreach (FileInfo file in dirInfo.GetFiles())
             {

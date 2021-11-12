@@ -3,7 +3,6 @@
     using System;
     using System.Reflection;
     using System.Reflection.Emit;
-    using GenericUnityObjects.Util;
     using ScriptableObjects;
     using UnityEditor;
     using UnityEngine.Assertions;
@@ -76,7 +75,7 @@
         {
             const string menuItemsTypeName = "MenuItems";
 
-            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(Config.AssembliesDirPath, assemblyName, menuItemsTypeName, typeof(GenericSOCreator));
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, menuItemsTypeName, typeof(GenericSOCreator));
 
             int menuItemsLength = menuItemMethods.Length;
 

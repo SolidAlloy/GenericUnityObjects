@@ -1,9 +1,6 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using GenericUnityObjects.Util;
     using UnityEngine;
     using Object = UnityEngine.Object;
 
@@ -18,7 +15,7 @@
         public static string CreateConcreteClass<TObject>(string assemblyName, Type genericTypeWithArgs, string assemblyGUID)
             where TObject : Object
         {
-            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(Config.AssembliesDirPath, assemblyName, $"ConcreteClass_{assemblyGUID}", genericTypeWithArgs);
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, $"ConcreteClass_{assemblyGUID}", genericTypeWithArgs);
 
             AssemblyCreatorHelper.AddChildrenAttributes(concreteClassAssembly.TypeBuilder, genericTypeWithArgs);
 

@@ -131,8 +131,9 @@
             return (componentName, order);
         }
 
-        public static ConcreteTypeAssembly CreateConcreteClassAssembly(string dirPath, string assemblyName, string className, Type parentType)
+        public static ConcreteTypeAssembly CreateConcreteClassAssembly(string assemblyName, string className, Type parentType)
         {
+            string dirPath = Config.GetAssemblyPathForType(parentType);
             return new ConcreteTypeAssembly(dirPath, assemblyName, className, parentType);
         }
 
