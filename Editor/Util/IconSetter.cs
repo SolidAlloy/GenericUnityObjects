@@ -69,6 +69,7 @@
                     foreach (string guid in kvp.Value)
                     {
                         string path = AssetDatabase.GUIDToAssetPath(guid);
+
                         var script = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
 
                         // Something unexpected happened. The newly generated assembly was removed while the scripts were reloading.
@@ -76,8 +77,23 @@
                         if (script == null)
                             continue;
 
+#if UNITY_2021_2_OR_NEWER
+                        var pluginImporter = AssetImporter.GetAtPath(path) as PluginImporter;
+
+                        if (pluginImporter == null)
+                            continue;
+
+                        var type = script.GetClass();
+
+                        if (type == null)
+                            continue;
+
+                        pluginImporter.SetIcon(type.FullName, kvp.Key);
+                        pluginImporter.SaveAndReimport();
+#else
                         EditorGUIUtilityProxy.SetIconForObject(script, kvp.Key);
                         MonoImporterProxy.CopyMonoScriptIconToImporters(script);
+#endif
                     }
                 }
             }
