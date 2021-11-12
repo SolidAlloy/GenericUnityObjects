@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.UnityEditorInternals
 {
     using System;
+    using System.Reflection;
     using UnityEditor;
     using UnityEditor.SearchService;
     using UnityEngine;
@@ -60,7 +61,9 @@
             this_.m_DelegateView = GUIView.current;
             // type filter requires unqualified names for built-in types, but will prioritize them over user types, so ensure user types are namespace-qualified
 
-            this_.m_RequiredType = GenericTypeHelper.GetConcreteType(requiredType).FullName;
+            // Set required type throw reflection to avoid ambiguity between m_RequiredType and m_RequiredTypes
+            var requiredTypeStr = GenericTypeHelper.GetConcreteType(requiredType).FullName;
+            this_.SetRequiredType(requiredTypeStr);
 
             this_.m_SearchFilter = string.Empty;
             this_.m_OriginalSelection = obj;
@@ -162,7 +165,7 @@
                     this_.m_SkipHiddenPackages = false;
             }
 
-            if (ObjectSelector.ShouldTreeViewBeUsed(this_.m_RequiredType))
+            if (ObjectSelector.ShouldTreeViewBeUsed(requiredTypeStr))
             {
                 this_.m_ObjectTreeWithSearch.Init(this_.position, this_, this_.CreateAndSetTreeView, this_.TreeViewSelection, this_.ItemWasDoubleClicked, initialSelection, 0);
             }
@@ -174,6 +177,28 @@
                 if (initialSelection != 0)
                     this_.m_ListArea.Frame(initialSelection, true, false);
             }
+        }
+
+        private static void SetRequiredType(this ObjectSelector this_, string type)
+        {
+            var requiredTypeField = typeof(ObjectSelector).GetField("m_RequiredType", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (requiredTypeField != null)
+            {
+                requiredTypeField.SetValue(this_, type);
+                return;
+            }
+
+            const string requiredTypesFieldName = "m_RequiredTypes";
+            requiredTypeField = typeof(ObjectSelector).GetField(requiredTypesFieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (requiredTypeField == null)
+            {
+                Debug.LogWarning($"{requiredTypesFieldName} field was not found in the ObjectSelector class.");
+                return;
+            }
+
+            requiredTypeField.SetValue(this_, new[] { type });
         }
     }
 }
