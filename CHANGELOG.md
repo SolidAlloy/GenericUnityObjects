@@ -1,3 +1,17 @@
+# [2.12.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.4...2.12.0) (2021-11-16)
+
+
+### Bug Fixes
+
+* Fixed MissingFieldException when using the plugin in Unity 2021.2 ([5c61cf3](https://github.com/SolidAlloy/GenericUnityObjects/commit/5c61cf3451f78e224aa4dbf9031cc90e9caa8ca2))
+
+
+### Features
+
+* Adapted the plugin for NET Standard 2.1 ([f5f885f](https://github.com/SolidAlloy/GenericUnityObjects/commit/f5f885fae6e7ae1748c7c9910bdfbdcd3c7e927d))
+* Added z_ prefix to all the generated assemblies to keep them at the bottom of dropdowns where DLL files are listed ([1e6652a](https://github.com/SolidAlloy/GenericUnityObjects/commit/1e6652a1fea1f0c6c41d31f18b9896f0a143426f))
+* Stopped generating .mdb files ([6fe50ed](https://github.com/SolidAlloy/GenericUnityObjects/commit/6fe50ed4a625c569f36435f7cf6485fc5eaf9a0b))
+
 ## [2.11.4](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.3...2.11.4) (2021-10-24)
 
 
