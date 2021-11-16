@@ -1,3 +1,10 @@
+## [2.12.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.12.0...2.12.1) (2021-11-16)
+
+
+### Bug Fixes
+
+* Updated the ClassTypeReference dependency ([9f80a4e](https://github.com/SolidAlloy/GenericUnityObjects/commit/9f80a4e3a01647acade01cee562b4cc1ae5f19f5))
+
 # [2.12.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.11.4...2.12.0) (2021-11-16)
 
 
