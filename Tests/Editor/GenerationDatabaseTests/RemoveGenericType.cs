@@ -32,7 +32,7 @@
             {
                 CallRemoveGenericType(_genericType);
 
-                Assert.IsFalse(_database.InstanceGenericTypes.Contains(_genericType));
+                Assert.IsFalse(_database.InstanceGenericTypeArguments.Keys.Contains(_genericType));
             }
 
             [Test]
@@ -53,7 +53,7 @@
                 CallRemoveGenericType(_genericType);
                 CallRemoveGenericType(_secondGenericType);
 
-                Assert.IsEmpty(_database.InstanceArguments);
+                Assert.IsEmpty(_database.InstanceArgumentGenericTypes.Keys);
             }
 
             [Test]

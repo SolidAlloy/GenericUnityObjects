@@ -15,7 +15,7 @@
         {
             bool needsAssetDatabaseRefresh = false;
 
-            foreach (ArgumentInfo argument in GenerationDatabase<TObject>.Arguments)
+            foreach (ArgumentInfo argument in GenerationDatabase<TObject>.ArgumentGenericTypes.Keys)
             {
                 if (argument.RetrieveType<TObject>(out Type type, out bool retrievedFromGUID))
                 {

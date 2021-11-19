@@ -36,13 +36,13 @@
         protected Pool<ArgumentInfo> _argumentsPool;
         protected Pool<GenericTypeInfo> _genericTypesPool;
 
-        public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
+        public static IKeysValuesHolder<ArgumentInfo, List<GenericTypeInfo>> ArgumentGenericTypes => Instance._argumentGenericTypesDict;
 
-        public ArgumentInfo[] InstanceArguments => _argumentGenericTypesDict.KeysCollection;
+        public static IKeysValuesHolder<GenericTypeInfo, List<ConcreteClass>> GenericTypeArguments => Instance._genericTypeArgumentsDict;
 
-        public static GenericTypeInfo[] GenericTypes => Instance.InstanceGenericTypes;
+        public IKeysValuesHolder<ArgumentInfo, List<GenericTypeInfo>> InstanceArgumentGenericTypes => _argumentGenericTypesDict;
 
-        public GenericTypeInfo[] InstanceGenericTypes => _genericTypeArgumentsDict.KeysCollection;
+        public IKeysValuesHolder<GenericTypeInfo, List<ConcreteClass>> InstanceGenericTypeArguments => _genericTypeArgumentsDict;
 
         [CanBeNull]
         public static string GetCachedGenericTypeGUID(string typeNameAndAssembly)

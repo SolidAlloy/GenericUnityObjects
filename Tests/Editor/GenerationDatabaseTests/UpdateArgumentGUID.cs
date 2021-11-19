@@ -24,8 +24,8 @@
             {
                 _database.UpdateArgumentGUIDImpl(_firstArg, NewGUID);
 
-                Assert.IsTrue(_database.InstanceArguments.Length == 2);
-                Assert.Contains(_expectedArg, _database.InstanceArguments);
+                Assert.IsTrue(_database.InstanceArgumentGenericTypes.Keys.Count == 2);
+                Assert.Contains(_expectedArg, _database.InstanceArgumentGenericTypes.Keys.ToArray());
             }
 
             [Test]

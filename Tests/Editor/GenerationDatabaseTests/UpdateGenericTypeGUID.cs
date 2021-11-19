@@ -24,8 +24,8 @@
             {
                 _database.UpdateGenericTypeGUIDImpl(_genericType, NewGUID);
 
-                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
-                Assert.Contains(_expectedBehaviour, _database.InstanceGenericTypes);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.Count == 1);
+                Assert.Contains(_expectedBehaviour, _database.InstanceGenericTypeArguments.Keys.ToArray());
             }
 
             [Test]

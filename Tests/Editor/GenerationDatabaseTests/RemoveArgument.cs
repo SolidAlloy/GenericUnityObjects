@@ -24,7 +24,7 @@
             public void Removes_argument_from_arguments_list()
             {
                 CallRemoveArgument();
-                Assert.IsFalse(_database.InstanceArguments.Contains(_firstArg));
+                Assert.IsFalse(_database.InstanceArgumentGenericTypes.Keys.Contains(_firstArg));
             }
 
             [Test]

@@ -40,8 +40,8 @@
             {
                 CallUpdateGenericType();
 
-                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
-                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypes);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.Count == 1);
+                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypeArguments.Keys.ToArray());
             }
 
             [Test]
@@ -77,8 +77,8 @@
             {
                 CallUpdateGenericType();
 
-                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
-                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypes);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.Count == 1);
+                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypeArguments.Keys.ToArray());
             }
 
             [Test]

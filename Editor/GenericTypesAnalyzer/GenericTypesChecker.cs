@@ -25,13 +25,13 @@
 
         public bool Check()
         {
-            var oldGenericTypes = GenerationDatabase<TObject>.GenericTypes;
+            var oldGenericTypes = GenerationDatabase<TObject>.GenericTypeArguments.Keys;
             var newGenericTypes = TypeCache.GetTypesDerivedFrom<TObject>()
                 .Where(type => type.IsGenericType && ! type.IsAbstract)
                 .Select(GenericTypeInfo.Instantiate<TObject>)
                 .ToArray();
 
-            int oldGenericTypesLength = oldGenericTypes.Length;
+            int oldGenericTypesLength = oldGenericTypes.Count;
             int newGenericTypesLength = newGenericTypes.Length;
 
             // Optimizations for common cases.
@@ -54,7 +54,7 @@
             return CompareTypes(oldGenericTypes, newGenericTypes);
         }
 
-        private bool CompareTypes(GenericTypeInfo[] oldGenericTypes, GenericTypeInfo[] newGenericTypes)
+        private bool CompareTypes(IReadOnlyList<GenericTypeInfo> oldGenericTypes, GenericTypeInfo[] newGenericTypes)
         {
             var oldTypesSet = new HashSet<GenericTypeInfo>(oldGenericTypes);
             var newTypesSet = new HashSet<GenericTypeInfo>(newGenericTypes);
