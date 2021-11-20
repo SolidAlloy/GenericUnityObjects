@@ -20,45 +20,35 @@
     /// </summary>
     internal static class GenericTypesAnalyzer
     {
-        [DidReloadScripts((int)DidReloadScriptsOrder.AssemblyGeneration)]
         [SuppressMessage("ReSharper", "RCS1233",
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
-        private static void AnalyzeGenericTypes()
+        public static void AnalyzeGenericTypes()
         {
 #if GENERIC_UNITY_OBJECTS_DEBUG
             using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
 #endif
 
-            try
-            {
-                if (CompilationFailedOnEditorStart())
-                    return;
-
-                EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
-
-                // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
-                // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
-                // to check changes to scripts in this situation, we can safely ignore this domain reload.
-                if (!EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-                    UpdateGeneratedAssemblies();
-                    // We don't check missing selector assemblies because a new one would be created in
-                    // UpdateGeneratedAssemblies anyway if a generic type exists in the project and is missing from the database.
-                    AddMissingConcreteClassesToDatabase<GenericScriptableObject>();
-                    AddMissingConcreteClassesToDatabase<MonoBehaviour>();
-                }
-
-                if (FailedAssembliesChecker.FailedAssemblyPaths.Count == 0)
-                {
-                    DictInitializer<MonoBehaviour>.Initialize();
-                    DictInitializer<GenericScriptableObject>.Initialize();
-                }
-            }
-            catch (ApplicationException)
-            {
-                // Recompilation doesn't work when it is requested instantly, for some reason
-                EditorCoroutineHelper.Delay(CompilationHelper.RecompileOnce, 1f);
+            if (CompilationFailedOnEditorStart())
                 return;
+
+            EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
+
+            // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
+            // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
+            // to check changes to scripts in this situation, we can safely ignore this domain reload.
+            if (!EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                UpdateGeneratedAssemblies();
+                // We don't check missing selector assemblies because a new one would be created in
+                // UpdateGeneratedAssemblies anyway if a generic type exists in the project and is missing from the database.
+                AddMissingConcreteClassesToDatabase<GenericScriptableObject>();
+                AddMissingConcreteClassesToDatabase<MonoBehaviour>();
+            }
+
+            if (FailedAssembliesChecker.FailedAssemblyPaths.Count == 0)
+            {
+                DictInitializer<MonoBehaviour>.Initialize();
+                DictInitializer<GenericScriptableObject>.Initialize();
             }
 
             CompilationHelper.CompilationNotNeeded();

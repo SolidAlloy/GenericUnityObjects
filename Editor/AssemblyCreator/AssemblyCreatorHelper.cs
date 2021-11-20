@@ -8,6 +8,7 @@
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
     using UnityEngine;
+    using Util;
 
     /// <summary>
     /// A storage for methods and properties used by multiple AssemblyCreator-related classes.
@@ -133,6 +134,10 @@
 
         public static ConcreteTypeAssembly CreateConcreteClassAssembly(string assemblyName, string className, Type parentType)
         {
+            // The actions that happen on scripts reload need to be delayed by one frame because if they happen in the first frame,
+            // the AssetDatabase won't import the created assembly.
+            PersistentStorage.DelayActionsOnScriptsReload = true;
+
             string dirPath = Config.GetAssemblyPathForType(parentType);
             return new ConcreteTypeAssembly(dirPath, assemblyName, className, parentType);
         }

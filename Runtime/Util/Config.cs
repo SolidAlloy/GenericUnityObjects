@@ -11,11 +11,11 @@
     {
         public const string ResourcesPath = MainFolderPath + "/Resources";
         public const string EditorResourcesPath = MainFolderPath + "/EditorResources";
-        private const string AssembliesDirPath = MainFolderPath + "/Assemblies";
-        private const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
         public const string ScriptableObjectsPath = AssembliesDirPath + "/ScriptableObjects";
         public const string MonoBehavioursPath = AssembliesDirPath + "/MonoBehaviours";
         public const string BehaviourSelectorsPath = AssembliesDirPath + "/BehaviourSelectors";
+        private const string AssembliesDirPath = MainFolderPath + "/Assemblies";
+        private const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
 
         public static string GetAssemblyPathForType(Type parentType)
         {
