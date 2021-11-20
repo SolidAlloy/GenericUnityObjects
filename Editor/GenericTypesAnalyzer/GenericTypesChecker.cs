@@ -140,7 +140,7 @@
                 return;
 
             DebugUtility.Log($"{typeof(TObject).Name} GUID updated: {genericType.GUID} => {newGUID}");
-            GenerationDatabase<TObject>.UpdateGenericTypeGUID(genericType, newGUID);
+            GenerationDatabase<TObject>.UpdateGenericType(genericType, genericTypeInfo => genericTypeInfo.UpdateGUID(newGUID));
         }
 
         public void UpdateReferencedGenericTypes(ArgumentInfo argument, GenericTypeInfo[] referencedGenericTypes)
@@ -183,7 +183,7 @@
         protected virtual bool UpdateGenericTypeArgNames(GenericTypeInfo genericType, string[] newArgNames, Type newType)
         {
             DebugUtility.Log($"{typeof(TObject).Name} args updated: '{string.Join(", ", genericType.ArgNames)}' => '{string.Join(", ", newArgNames)}'");
-            GenerationDatabase<TObject>.UpdateGenericTypeArgs(genericType, newArgNames);
+            GenerationDatabase<TObject>.UpdateGenericType(genericType, genericTypeInfo => genericTypeInfo.UpdateArgNames(newArgNames));
             return false;
         }
 

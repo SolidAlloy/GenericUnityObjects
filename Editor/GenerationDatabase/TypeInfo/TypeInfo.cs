@@ -194,7 +194,7 @@
             }
             else if (this is GenericTypeInfo genericTypeInfo)
             {
-                GenerationDatabase<TObject>.UpdateGenericTypeGUID(genericTypeInfo, newGUID);
+                GenerationDatabase<TObject>.UpdateGenericType(genericTypeInfo, info => info.UpdateGUID(newGUID));
             }
             else
             {

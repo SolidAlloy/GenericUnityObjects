@@ -247,52 +247,22 @@
             });
         }
 
-        public static void UpdateGenericTypeGUID(GenericTypeInfo genericTypeInfo, string newGUID)
+        public static void UpdateGenericType(GenericTypeInfo genericTypeInfo, Action<GenericTypeInfo> updateAction)
         {
-            Instance.UpdateGenericTypeGUIDImpl(genericTypeInfo, newGUID);
+            Instance.UpdateGenericTypeImpl(genericTypeInfo, updateAction);
         }
 
-        public void UpdateGenericTypeGUIDImpl(GenericTypeInfo genericTypeInfo, string newGUID)
+        public void UpdateGenericTypeImpl(GenericTypeInfo genericTypeInfo, Action<GenericTypeInfo> updateAction)
         {
-            TemporarilyRemovingGenericType(genericTypeInfo, () =>
-            {
-                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-                {
-                    genericTypeToChange.UpdateGUID(newGUID);
-                });
-            });
-        }
-
-        public static void UpdateGenericTypeArgs(GenericTypeInfo genericTypeInfo, string[] newArgNames)
-        {
-            Instance.UpdateGenericTypeArgsImpl(genericTypeInfo, newArgNames);
-        }
-
-        public void UpdateGenericTypeArgsImpl(GenericTypeInfo genericTypeInfo, string[] newArgNames)
-        {
-            TemporarilyRemovingGenericType(genericTypeInfo, () =>
-            {
-                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-                {
-                    genericTypeToChange.UpdateArgNames(newArgNames);
-                });
-            });
+            TemporarilyRemovingGenericType(genericTypeInfo, () => _genericTypesPool.ChangeItem(ref genericTypeInfo, updateAction));
         }
 
         public static void UpdateGenericType(GenericTypeInfo genericTypeInfo, Type newType)
         {
-            Instance.UpdateGenericTypeImpl(genericTypeInfo, newType);
-        }
-
-        public void UpdateGenericTypeImpl(GenericTypeInfo genericTypeInfo, Type newType)
-        {
-            TemporarilyRemovingGenericType(genericTypeInfo, () =>
+            Instance.UpdateGenericTypeImpl(genericTypeInfo, info =>
             {
-                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-                {
-                    genericTypeToChange.UpdateNameAndAssembly(newType);
-                    genericTypeToChange.UpdateArgNames(newType.GetGenericArguments());
-                });
+                info.UpdateNameAndAssembly(newType);
+                info.UpdateArgNames(newType.GetGenericArguments());
             });
         }
 

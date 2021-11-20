@@ -18,7 +18,11 @@
             private static TypeStub _typeStub;
 
             private static void CallUpdateGenericType() =>
-                _database.UpdateGenericTypeImpl(_genericType, _typeStub);
+                _database.UpdateGenericTypeImpl(_genericType, info =>
+                {
+                    info.UpdateNameAndAssembly(_typeStub);
+                    info.UpdateArgNames(_typeStub.GetGenericArguments());
+                });
 
             [OneTimeSetUp]
             public void BeforeAllTests()
