@@ -6,8 +6,8 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
+    using SolidUtilities.Extensions;
     using UnityEditor;
-    using UnityEditor.Callbacks;
     using UnityEngine;
     using Util;
     using Object = UnityEngine.Object;
@@ -72,14 +72,14 @@
                 return;
             }
 
-            var registeredGuids = GenerationDatabase<TObject>.GenericTypeArguments.Values
-                .Aggregate((allConcreteClasses, thisClasses) =>
-                {
-                    allConcreteClasses.AddRange(thisClasses);
-                    return allConcreteClasses;
-                })
-                .Select(concreteClass => concreteClass.AssemblyGUID)
-                .ToHashSet();
+            // Have to use the extension method explicitly to avoid ambiguous reference error between SolidUtilities.ToHashSet and NetStandard 2.1 Enumerable.ToHashSet
+            var registeredGuids = EnumerableExtensions.ToHashSet(GenerationDatabase<TObject>.GenericTypeArguments.Values
+                    .Aggregate((allConcreteClasses, thisClasses) =>
+                    {
+                        allConcreteClasses.AddRange(thisClasses);
+                        return allConcreteClasses;
+                    })
+                    .Select(concreteClass => concreteClass.AssemblyGUID));
 
             // If there are assemblies that exist in the folder but are missing from the database, add them to the database.
             foreach (string guid in guids)
