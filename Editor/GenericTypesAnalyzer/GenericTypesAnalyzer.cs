@@ -3,13 +3,14 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
     using Util;
-
+    using Object = UnityEngine.Object;
 #if GENERIC_UNITY_OBJECTS_DEBUG
     using SolidUtilities.Helpers;
 #endif
@@ -24,6 +25,10 @@
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
         private static void AnalyzeGenericTypes()
         {
+#if GENERIC_UNITY_OBJECTS_DEBUG
+            using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
+#endif
+
             try
             {
                 if (CompilationFailedOnEditorStart())
@@ -37,10 +42,17 @@
                 if (!EditorApplication.isPlayingOrWillChangePlaymode)
                 {
                     UpdateGeneratedAssemblies();
+                    // We don't check missing selector assemblies because a new one would be created in
+                    // UpdateGeneratedAssemblies anyway if a generic type exists in the project and is missing from the database.
+                    AddMissingConcreteClassesToDatabase<GenericScriptableObject>();
+                    AddMissingConcreteClassesToDatabase<MonoBehaviour>();
                 }
 
-                DictInitializer<MonoBehaviour>.Initialize();
-                DictInitializer<GenericScriptableObject>.Initialize();
+                if (FailedAssembliesChecker.FailedAssemblyPaths.Count == 0)
+                {
+                    DictInitializer<MonoBehaviour>.Initialize();
+                    DictInitializer<GenericScriptableObject>.Initialize();
+                }
             }
             catch (ApplicationException)
             {
@@ -52,6 +64,59 @@
             CompilationHelper.CompilationNotNeeded();
             FailedAssembliesChecker.ReimportFailedAssemblies();
             FlushConfigChangesToDisk();
+        }
+
+        private static void AddMissingConcreteClassesToDatabase<TObject>()
+            where TObject : Object
+        {
+            var guids = AssetDatabase.FindAssets(string.Empty, new[] { Config.GetAssemblyPathForType(typeof(TObject)) });
+
+            int concreteClassesCount = GenerationDatabase<TObject>.GenericTypeArguments.Values
+                .Select(concreteClasses => concreteClasses.Count).Sum();
+
+            Debug.Log($"guids count {guids.Length}, concreteClasses count {concreteClassesCount}");
+
+            // The guids count may be lower than the concrete class count because some assemblies are located in another folder
+            if (guids.Length <= concreteClassesCount)
+            {
+                return;
+            }
+
+            var registeredGuids = GenerationDatabase<TObject>.GenericTypeArguments.Values
+                .Aggregate((allConcreteClasses, thisClasses) =>
+                {
+                    allConcreteClasses.AddRange(thisClasses);
+                    return allConcreteClasses;
+                })
+                .Select(concreteClass => concreteClass.AssemblyGUID)
+                .ToHashSet();
+
+            // If there are assemblies that exist in the folder but are missing from the database, add them to the database.
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var monoScript = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
+
+                if (monoScript == null)
+                {
+                    FailedAssembliesChecker.FailedAssemblyPaths.Add(path);
+                    continue;
+                }
+
+                if (registeredGuids.Contains(guid))
+                {
+                    continue;
+                }
+
+                var concreteType = monoScript.GetClass();
+                var genericType = concreteType?.BaseType;
+
+                Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+                Type[] genericArgs = genericType.GenericTypeArguments;
+
+                var genericTypeInfo = GenericTypeInfo.Instantiate<TObject>(genericTypeWithoutArgs);
+                GenerationDatabase<TObject>.AddConcreteClass(genericTypeInfo, genericArgs, guid);
+            }
         }
 
         private static bool CompilationFailedOnEditorStart()
@@ -76,7 +141,7 @@
         private static void UpdateGeneratedAssemblies()
         {
 #if GENERIC_UNITY_OBJECTS_DEBUG
-            using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
+            using var timer = Timer.CheckInMilliseconds("UpdateGeneratedAssemblies");
 #endif
 
             bool behavioursNeedDatabaseRefresh;
