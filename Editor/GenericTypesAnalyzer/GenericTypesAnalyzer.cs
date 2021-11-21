@@ -4,15 +4,13 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
+    using SolidUtilities.Extensions;
     using UnityEditor;
-    using UnityEditor.Callbacks;
-    using UnityEditor.Compilation;
     using UnityEngine;
     using Util;
-
+    using Object = UnityEngine.Object;
 #if GENERIC_UNITY_OBJECTS_DEBUG
     using SolidUtilities.Helpers;
 #endif
@@ -22,39 +20,98 @@
     /// </summary>
     internal static class GenericTypesAnalyzer
     {
-        [DidReloadScripts((int)DidReloadScriptsOrder.AssemblyGeneration)]
         [SuppressMessage("ReSharper", "RCS1233",
             Justification = "We need | instead of || so that all methods are executed before moving to the next statement.")]
-        private static void AnalyzeGenericTypes()
+        public static void AnalyzeGenericTypes()
         {
-            try
+#if GENERIC_UNITY_OBJECTS_DEBUG
+            using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
+#endif
+
+            if (CompilationFailedOnEditorStart())
+                return;
+
+            EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
+
+            // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
+            // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
+            // to check changes to scripts in this situation, we can safely ignore this domain reload.
+            if (!EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                if (CompilationFailedOnEditorStart())
-                    return;
+                UpdateGeneratedAssemblies();
+                // We don't check missing selector assemblies because a new one would be created in
+                // UpdateGeneratedAssemblies anyway if a generic type exists in the project and is missing from the database.
+                AddMissingConcreteClassesToDatabase<GenericScriptableObject>();
+                AddMissingConcreteClassesToDatabase<MonoBehaviour>();
+            }
 
-                EditorApplication.quitting += () => PersistentStorage.AssembliesCount = GetAssembliesCount();
-
-                // If PlayOptions is disabled and the domain reload happens on entering Play Mode, no changes to scripts
-                // can be detected but NullReferenceException is thrown from UnityEditor internals. Since it is useless
-                // to check changes to scripts in this situation, we can safely ignore this domain reload.
-                if (!EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-                    UpdateGeneratedAssemblies();
-                }
-
+            if (FailedAssembliesChecker.FailedAssemblyPaths.Count == 0)
+            {
                 DictInitializer<MonoBehaviour>.Initialize();
                 DictInitializer<GenericScriptableObject>.Initialize();
-            }
-            catch (ApplicationException)
-            {
-                // Recompilation doesn't work when it is requested instantly, for some reason
-                EditorCoroutineHelper.Delay(CompilationHelper.RecompileOnce, 1f);
-                return;
             }
 
             CompilationHelper.CompilationNotNeeded();
             FailedAssembliesChecker.ReimportFailedAssemblies();
             FlushConfigChangesToDisk();
+        }
+
+        private static void AddMissingConcreteClassesToDatabase<TObject>()
+            where TObject : Object
+        {
+            string folderPath = Config.GetAssemblyPathForType(typeof(TObject));
+
+            // When Config.CreateNecessaryDirectories is run the first time, AssetDatabase does not import the folders,
+            // so it throws warning thinking they don't exist.
+            if (!AssetDatabase.IsValidFolder(folderPath))
+                return;
+
+            var guids = AssetDatabase.FindAssets(string.Empty, new[] { folderPath });
+
+            int concreteClassesCount = GenerationDatabase<TObject>.GenericTypeArguments.Values
+                .Select(concreteClasses => concreteClasses.Count).Sum();
+
+            // The guids count may be lower than the concrete class count because some assemblies are located in another folder
+            if (guids.Length <= concreteClassesCount)
+            {
+                return;
+            }
+
+            // Have to use the extension method explicitly to avoid ambiguous reference error between SolidUtilities.ToHashSet and NetStandard 2.1 Enumerable.ToHashSet
+            var registeredGuids = EnumerableExtensions.ToHashSet(GenerationDatabase<TObject>.GenericTypeArguments.Values
+                    .Aggregate((allConcreteClasses, thisClasses) =>
+                    {
+                        allConcreteClasses.AddRange(thisClasses);
+                        return allConcreteClasses;
+                    })
+                    .Select(concreteClass => concreteClass.AssemblyGUID));
+
+            // If there are assemblies that exist in the folder but are missing from the database, add them to the database.
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var monoScript = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
+
+                if (monoScript == null)
+                {
+                    FailedAssembliesChecker.FailedAssemblyPaths.Add(path);
+                    continue;
+                }
+
+                if (registeredGuids.Contains(guid))
+                {
+                    continue;
+                }
+
+                var concreteType = monoScript.GetClass();
+                var genericType = concreteType?.BaseType;
+
+                Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
+                Type[] genericArgs = genericType.GenericTypeArguments;
+
+                var genericTypeInfo = GenericTypeInfo.Instantiate<TObject>(genericTypeWithoutArgs);
+                GenerationDatabase<TObject>.AddConcreteClass(genericTypeInfo, genericArgs, guid);
+            }
         }
 
         private static bool CompilationFailedOnEditorStart()
@@ -79,7 +136,7 @@
         private static void UpdateGeneratedAssemblies()
         {
 #if GENERIC_UNITY_OBJECTS_DEBUG
-            using var timer = Timer.CheckInMilliseconds("AnalyzeGenericTypes");
+            using var timer = Timer.CheckInMilliseconds("UpdateGeneratedAssemblies");
 #endif
 
             bool behavioursNeedDatabaseRefresh;
@@ -90,8 +147,6 @@
 
             using (new DisabledAssetDatabase(true))
             {
-                Directory.CreateDirectory(Config.AssembliesDirPath);
-
                 behavioursNeedDatabaseRefresh =
                     ArgumentsChecker<MonoBehaviour>.Check(behavioursChecker)
                     | behavioursChecker.Check();

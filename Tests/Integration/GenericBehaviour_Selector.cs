@@ -15,7 +15,7 @@
     {
         private const string NewBehaviourName = "NewBehaviour";
 
-        private static readonly string DefaultSelectorPath = $"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}_1.dll";
+        private static readonly string DefaultSelectorPath = $"{Config.BehaviourSelectorsPath}/{TestHelper.DefaultGenericClassName}_1.dll";
 
         [SerializeField] private GameObject _testGameObject;
 
@@ -145,7 +145,7 @@
 
         private void AssertThatSelectorIsUpdated(string className, string argName)
         {
-            Assert.That(File.Exists($"{Config.AssembliesDirPath}/{className}_1.dll"));
+            Assert.That(File.Exists($"{Config.BehaviourSelectorsPath}/{className}_1.dll"));
 
             var menuPaths = Unsupported.GetSubmenus("Component");
             Assert.That(menuPaths.Contains($"Component/Scripts/{className}<{argName}>"));
@@ -157,8 +157,8 @@
 
         private void AssertThatSelectorChanges(string oldClassname, string newClassName)
         {
-            Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{oldClassname}_1.dll"));
-            Assert.That(File.Exists($"{Config.AssembliesDirPath}/{newClassName}_1.dll"));
+            Assert.IsFalse(File.Exists($"{Config.BehaviourSelectorsPath}/{oldClassname}_1.dll"));
+            Assert.That(File.Exists($"{Config.BehaviourSelectorsPath}/{newClassName}_1.dll"));
 
             var menuPaths = Unsupported.GetSubmenus("Component");
             Assert.IsFalse(menuPaths.Contains($"Component/Scripts/{oldClassname}<T>"));

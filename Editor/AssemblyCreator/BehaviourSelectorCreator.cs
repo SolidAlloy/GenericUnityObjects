@@ -4,7 +4,6 @@
     using System.Reflection;
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
-    using UnityEngine;
 
     /// <summary>
     /// Emits and saves an assembly of a concrete class that inherits from <see cref="BehaviourSelector"/>.
@@ -16,7 +15,7 @@
         /// </summary>
         public static string CreateSelectorAssemblyImpl(string assemblyName, Type genericBehaviourWithoutArgs, string assemblyGUID)
         {
-            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(Config.AssembliesDirPath, assemblyName, $"ClassSelector_{assemblyGUID}", typeof(BehaviourSelector));
+            using var concreteClassAssembly = AssemblyCreatorHelper.CreateConcreteClassAssembly(assemblyName, $"ClassSelector_{assemblyGUID}", typeof(BehaviourSelector));
             CreateBehaviourTypeProperty(concreteClassAssembly.TypeBuilder, genericBehaviourWithoutArgs);
             AssemblyCreatorHelper.AddComponentMenuAttribute(concreteClassAssembly.TypeBuilder, genericBehaviourWithoutArgs);
             return concreteClassAssembly.Path;

@@ -36,13 +36,13 @@
         protected Pool<ArgumentInfo> _argumentsPool;
         protected Pool<GenericTypeInfo> _genericTypesPool;
 
-        public static ArgumentInfo[] Arguments => Instance.InstanceArguments;
+        public static IKeysValuesHolder<ArgumentInfo, List<GenericTypeInfo>> ArgumentGenericTypes => Instance._argumentGenericTypesDict;
 
-        public ArgumentInfo[] InstanceArguments => _argumentGenericTypesDict.KeysCollection;
+        public static IKeysValuesHolder<GenericTypeInfo, List<ConcreteClass>> GenericTypeArguments => Instance._genericTypeArgumentsDict;
 
-        public static GenericTypeInfo[] GenericTypes => Instance.InstanceGenericTypes;
+        public IKeysValuesHolder<ArgumentInfo, List<GenericTypeInfo>> InstanceArgumentGenericTypes => _argumentGenericTypesDict;
 
-        public GenericTypeInfo[] InstanceGenericTypes => _genericTypeArgumentsDict.KeysCollection;
+        public IKeysValuesHolder<GenericTypeInfo, List<ConcreteClass>> InstanceGenericTypeArguments => _genericTypeArgumentsDict;
 
         [CanBeNull]
         public static string GetCachedGenericTypeGUID(string typeNameAndAssembly)
@@ -247,52 +247,22 @@
             });
         }
 
-        public static void UpdateGenericTypeGUID(GenericTypeInfo genericTypeInfo, string newGUID)
+        public static void UpdateGenericType(GenericTypeInfo genericTypeInfo, Action<GenericTypeInfo> updateAction)
         {
-            Instance.UpdateGenericTypeGUIDImpl(genericTypeInfo, newGUID);
+            Instance.UpdateGenericTypeImpl(genericTypeInfo, updateAction);
         }
 
-        public void UpdateGenericTypeGUIDImpl(GenericTypeInfo genericTypeInfo, string newGUID)
+        public void UpdateGenericTypeImpl(GenericTypeInfo genericTypeInfo, Action<GenericTypeInfo> updateAction)
         {
-            TemporarilyRemovingGenericType(genericTypeInfo, () =>
-            {
-                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-                {
-                    genericTypeToChange.UpdateGUID(newGUID);
-                });
-            });
-        }
-
-        public static void UpdateGenericTypeArgs(GenericTypeInfo genericTypeInfo, string[] newArgNames)
-        {
-            Instance.UpdateGenericTypeArgsImpl(genericTypeInfo, newArgNames);
-        }
-
-        public void UpdateGenericTypeArgsImpl(GenericTypeInfo genericTypeInfo, string[] newArgNames)
-        {
-            TemporarilyRemovingGenericType(genericTypeInfo, () =>
-            {
-                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-                {
-                    genericTypeToChange.UpdateArgNames(newArgNames);
-                });
-            });
+            TemporarilyRemovingGenericType(genericTypeInfo, () => _genericTypesPool.ChangeItem(ref genericTypeInfo, updateAction));
         }
 
         public static void UpdateGenericType(GenericTypeInfo genericTypeInfo, Type newType)
         {
-            Instance.UpdateGenericTypeImpl(genericTypeInfo, newType);
-        }
-
-        public void UpdateGenericTypeImpl(GenericTypeInfo genericTypeInfo, Type newType)
-        {
-            TemporarilyRemovingGenericType(genericTypeInfo, () =>
+            Instance.UpdateGenericTypeImpl(genericTypeInfo, info =>
             {
-                _genericTypesPool.ChangeItem(ref genericTypeInfo, genericTypeToChange =>
-                {
-                    genericTypeToChange.UpdateNameAndAssembly(newType);
-                    genericTypeToChange.UpdateArgNames(newType.GetGenericArguments());
-                });
+                info.UpdateNameAndAssembly(newType);
+                info.UpdateArgNames(newType.GetGenericArguments());
             });
         }
 

@@ -248,10 +248,10 @@
             public static void AssertThatConcreteClassIsRemoved(string argName, string secondArgName = null)
             {
                 // dll does not exist
-                Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{argName}.dll"));
+                Assert.IsFalse(File.Exists($"{Config.ScriptableObjectsPath}/{DefaultGenericClassName}1_{argName}.dll"));
 
                 if (secondArgName != null)
-                    Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{secondArgName}.dll"));
+                    Assert.IsFalse(File.Exists($"{Config.ScriptableObjectsPath}/{DefaultGenericClassName}1_{secondArgName}.dll"));
 
                 // LoadAssetAtPath is null
                 var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
@@ -261,7 +261,7 @@
             public static void AssertThatConcreteClassChanged(string newTypeName, Type argType)
             {
                 // old dll does not exist
-                Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{DefaultGenericClassName}1_{argType.Name}.dll"));
+                Assert.IsFalse(File.Exists($"{Config.ScriptableObjectsPath}/{DefaultGenericClassName}1_{argType.Name}.dll"));
 
                 // LoadAssetAtPath is null
                 var asset = AssetDatabase.LoadMainAssetAtPath(DefaultAssetPath);
@@ -291,7 +291,7 @@
 
             public static void AssertThatConcreteClassIsRemoved(GameObject testGameObject, string className, string fullArgName, string shortArgName)
             {
-                Assert.IsFalse(File.Exists($"{Config.AssembliesDirPath}/{className}_{fullArgName}.dll"));
+                Assert.IsFalse(File.Exists($"{Config.MonoBehavioursPath}/{className}_{fullArgName}.dll"));
 
                 var menuPaths = Unsupported.GetSubmenus("Component");
                 Assert.IsFalse(menuPaths.Contains($"Component/Scripts/{className}<{shortArgName}>"));
@@ -305,7 +305,7 @@
             {
                 AssertThatConcreteClassIsRemoved(testGameObject, oldClassName, fullArgName, shortArgName);
 
-                Assert.That(File.Exists($"{Config.AssembliesDirPath}/{newClassName}_1.dll"));
+                Assert.That(File.Exists($"{Config.BehaviourSelectorsPath}/{newClassName}_1.dll"));
 
                 var menuPaths = Unsupported.GetSubmenus("Component");
                 Assert.That(menuPaths.Contains($"Component/Scripts/{newClassName}<T>"));

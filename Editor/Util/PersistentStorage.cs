@@ -18,6 +18,7 @@
         private const string AssembliesCountKey = "AssembliesCount";
         private const string FirstCompilationKey = "FirstCompilation";
         private const string MenuItemsAssemblyKey = "MenuItemsAssemblyPath";
+        private const string DelayActionsOnScriptsReloadKey = "DelayActionsOnScriptsReload";
 
         [SerializeField] private MenuItemMethod[] _menuItemMethods = { };
 
@@ -52,6 +53,16 @@
             }
         }
 
+        public static bool DelayActionsOnScriptsReload
+        {
+            get => PlayerPrefs.GetInt(DelayActionsOnScriptsReloadKey, 0) == 1;
+            set
+            {
+                PlayerPrefs.SetInt(DelayActionsOnScriptsReloadKey, value ? 1 : 0);
+                PlayerPrefs.Save();
+            }
+        }
+
         public static bool FirstCompilation => PlayerPrefs.GetInt(FirstCompilationKey, 1) == 1;
 
         public static void DisableFirstCompilation()
@@ -78,9 +89,16 @@
 
         public static void SkipAfterAssemblyGenerationEvent() => _skipEvent = true;
 
-        [DidReloadScripts((int)DidReloadScriptsOrder.AfterAssemblyGeneration)]
-        private static void OnScriptsReload()
+        public static void OnScriptsReload()
         {
+            // If an exception happened in GenericTypesAnalyzer and the recompilation is requested,
+            // no need to run the actions because they might throw errors too.
+            // Try running the action after the compilation then.
+            if (CompilationHelper.RecompilationRequested)
+            {
+                return;
+            }
+
             // Skip event is set by IconSetter when some DLL icons are set. Domain reload cannot be forced but it
             // happens on the second frame after the recompilation, before an asset is created, so it cancels the asset
             // creation. When asset is created on next domain reload, everything is OK.

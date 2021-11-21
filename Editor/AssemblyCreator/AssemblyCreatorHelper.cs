@@ -8,6 +8,7 @@
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
     using UnityEngine;
+    using Util;
 
     /// <summary>
     /// A storage for methods and properties used by multiple AssemblyCreator-related classes.
@@ -131,12 +132,21 @@
             return (componentName, order);
         }
 
-        public static ConcreteTypeAssembly CreateConcreteClassAssembly(string dirPath, string assemblyName, string className, Type parentType)
+        public static ConcreteClassAssembly CreateConcreteClassAssembly(string assemblyName, string className, Type parentType)
         {
-            return new ConcreteTypeAssembly(dirPath, assemblyName, className, parentType);
+            // The actions that happen on scripts reload need to be delayed by one frame because if they happen in the first frame,
+            // the AssetDatabase won't import the created assembly.
+            PersistentStorage.DelayActionsOnScriptsReload = true;
+
+            string dirPath = Config.GetAssemblyPathForType(parentType);
+
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
+            return new ConcreteClassAssembly(dirPath, assemblyName, className, parentType);
         }
 
-        public readonly struct ConcreteTypeAssembly : IDisposable
+        public readonly struct ConcreteClassAssembly : IDisposable
         {
             public readonly TypeBuilder TypeBuilder;
             private readonly AssemblyBuilder _assemblyBuilder;
@@ -144,7 +154,7 @@
 
             public readonly string Path;
 
-            public ConcreteTypeAssembly(string dirPath, string assemblyName, string className, Type parentType)
+            public ConcreteClassAssembly(string dirPath, string assemblyName, string className, Type parentType)
             {
                 assemblyName = $"z_{assemblyName}"; // We prefix assemblies with z_ to keep them at the bottom of dropdowns where the DLL files are listed.
                 _dllName = $"{assemblyName}.dll";

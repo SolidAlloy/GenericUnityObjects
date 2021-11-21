@@ -25,13 +25,13 @@
 
         public bool Check()
         {
-            var oldGenericTypes = GenerationDatabase<TObject>.GenericTypes;
+            var oldGenericTypes = GenerationDatabase<TObject>.GenericTypeArguments.Keys;
             var newGenericTypes = TypeCache.GetTypesDerivedFrom<TObject>()
                 .Where(type => type.IsGenericType && ! type.IsAbstract)
                 .Select(GenericTypeInfo.Instantiate<TObject>)
                 .ToArray();
 
-            int oldGenericTypesLength = oldGenericTypes.Length;
+            int oldGenericTypesLength = oldGenericTypes.Count;
             int newGenericTypesLength = newGenericTypes.Length;
 
             // Optimizations for common cases.
@@ -54,7 +54,7 @@
             return CompareTypes(oldGenericTypes, newGenericTypes);
         }
 
-        private bool CompareTypes(GenericTypeInfo[] oldGenericTypes, GenericTypeInfo[] newGenericTypes)
+        private bool CompareTypes(IReadOnlyList<GenericTypeInfo> oldGenericTypes, GenericTypeInfo[] newGenericTypes)
         {
             var oldTypesSet = new HashSet<GenericTypeInfo>(oldGenericTypes);
             var newTypesSet = new HashSet<GenericTypeInfo>(newGenericTypes);
@@ -140,7 +140,7 @@
                 return;
 
             DebugUtility.Log($"{typeof(TObject).Name} GUID updated: {genericType.GUID} => {newGUID}");
-            GenerationDatabase<TObject>.UpdateGenericTypeGUID(genericType, newGUID);
+            GenerationDatabase<TObject>.UpdateGenericType(genericType, genericTypeInfo => genericTypeInfo.UpdateGUID(newGUID));
         }
 
         public void UpdateReferencedGenericTypes(ArgumentInfo argument, GenericTypeInfo[] referencedGenericTypes)
@@ -183,7 +183,7 @@
         protected virtual bool UpdateGenericTypeArgNames(GenericTypeInfo genericType, string[] newArgNames, Type newType)
         {
             DebugUtility.Log($"{typeof(TObject).Name} args updated: '{string.Join(", ", genericType.ArgNames)}' => '{string.Join(", ", newArgNames)}'");
-            GenerationDatabase<TObject>.UpdateGenericTypeArgs(genericType, newArgNames);
+            GenerationDatabase<TObject>.UpdateGenericType(genericType, genericTypeInfo => genericTypeInfo.UpdateArgNames(newArgNames));
             return false;
         }
 

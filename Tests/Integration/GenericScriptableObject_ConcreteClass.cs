@@ -65,7 +65,7 @@
         [Test, Category(ZeroWarnings)]
         public void Concrete_class_dll_is_added_when_concrete_class_is_instantiated_for_the_first_time()
         {
-            Assert.That(File.Exists($"{Config.AssembliesDirPath}/{TestHelper.DefaultGenericClassName}1_{_defaultArgumentType.Name}.dll"));
+            Assert.That(File.Exists($"{Config.ScriptableObjectsPath}/{TestHelper.DefaultGenericClassName}1_{_defaultArgumentType.Name}.dll"));
         }
 
         [Test, Category(ZeroWarnings)]

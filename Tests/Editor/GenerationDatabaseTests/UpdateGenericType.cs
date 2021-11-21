@@ -18,7 +18,11 @@
             private static TypeStub _typeStub;
 
             private static void CallUpdateGenericType() =>
-                _database.UpdateGenericTypeImpl(_genericType, _typeStub);
+                _database.UpdateGenericTypeImpl(_genericType, info =>
+                {
+                    info.UpdateNameAndAssembly(_typeStub);
+                    info.UpdateArgNames(_typeStub.GetGenericArguments());
+                });
 
             [OneTimeSetUp]
             public void BeforeAllTests()
@@ -40,8 +44,8 @@
             {
                 CallUpdateGenericType();
 
-                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
-                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypes);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.Count == 1);
+                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypeArguments.Keys.ToArray());
             }
 
             [Test]
@@ -77,8 +81,8 @@
             {
                 CallUpdateGenericType();
 
-                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
-                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypes);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.Count == 1);
+                Assert.Contains(_expectedGenericType, _database.InstanceGenericTypeArguments.Keys.ToArray());
             }
 
             [Test]

@@ -33,7 +33,7 @@
             {
                 _database.AddConcreteClassImpl(_genericType, _firstSecondArgs, AssemblyGUID);
 
-                Assert.IsTrue(_database.InstanceArguments.SequenceEqual(_firstSecondArgs));
+                Assert.IsTrue(_database.InstanceArgumentGenericTypes.Keys.SequenceEqual(_firstSecondArgs));
             }
 
             [Test]

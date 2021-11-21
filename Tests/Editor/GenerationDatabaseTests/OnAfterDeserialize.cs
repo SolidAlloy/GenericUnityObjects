@@ -54,14 +54,14 @@
             public void Restores_arguments()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.Arguments.SequenceEqual(_firstSecondArgs));
+                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.ArgumentGenericTypes.Keys.SequenceEqual(_firstSecondArgs));
             }
 
             [Test]
             public void Restores_behaviours()
             {
                 ReserializeDatabase();
-                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.GenericTypes.SequenceEqual(_expectedGenericTypes));
+                Assert.IsTrue(GenerationDatabase<MonoBehaviour>.GenericTypeArguments.Keys.SequenceEqual(_expectedGenericTypes));
             }
 
             [Test]

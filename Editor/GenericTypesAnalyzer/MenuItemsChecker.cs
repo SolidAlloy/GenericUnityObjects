@@ -108,7 +108,7 @@
             string oldAssemblyPath = PersistentStorage.MenuItemsAssemblyPath;
 
             if (string.IsNullOrEmpty(oldAssemblyPath))
-                oldAssemblyPath = $"{Config.AssembliesDirPath}/{AssemblyName}.dll"; // The old name of the menu items assembly before it was made non-constant.
+                oldAssemblyPath = $"{Config.GetAssemblyPathForType(null)}/{AssemblyName}.dll"; // The old name of the menu items assembly before it was made non-constant.
 
             var assemblyReplacer = AssemblyAssetOperations.StartAssemblyReplacement(oldAssemblyPath);
             string newAssemblyPath = AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);

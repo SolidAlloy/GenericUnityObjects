@@ -15,8 +15,8 @@
 
                 _database.AddGenericTypeImpl(_genericType);
 
-                Assert.IsTrue(_database.InstanceGenericTypes.SequenceEqual(expectedGenericTypes));
-                Assert.IsEmpty(_database.InstanceArguments);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.SequenceEqual(expectedGenericTypes));
+                Assert.IsEmpty(_database.InstanceArgumentGenericTypes.Keys);
             }
 
             [Test]

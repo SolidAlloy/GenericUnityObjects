@@ -22,16 +22,16 @@
             [Test]
             public void Updates_behaviour_GUID_in_behaviours_list()
             {
-                _database.UpdateGenericTypeGUIDImpl(_genericType, NewGUID);
+                _database.UpdateGenericTypeImpl(_genericType, genericTypeInfo => genericTypeInfo.UpdateGUID(NewGUID));
 
-                Assert.IsTrue(_database.InstanceGenericTypes.Length == 1);
-                Assert.Contains(_expectedBehaviour, _database.InstanceGenericTypes);
+                Assert.IsTrue(_database.InstanceGenericTypeArguments.Keys.Count == 1);
+                Assert.Contains(_expectedBehaviour, _database.InstanceGenericTypeArguments.Keys.ToArray());
             }
 
             [Test]
             public void Updates_behaviour_GUID_in_referenced_behaviours()
             {
-                _database.UpdateGenericTypeGUIDImpl(_genericType, NewGUID);
+                _database.UpdateGenericTypeImpl(_genericType, genericTypeInfo => genericTypeInfo.UpdateGUID(NewGUID));
 
                 var behaviours = _database.GetReferencedGenericTypesImpl(_firstArg);
 
@@ -41,7 +41,7 @@
             [Test]
             public void Concrete_classes_can_be_found_by_new_behaviour()
             {
-                _database.UpdateGenericTypeGUIDImpl(_genericType, NewGUID);
+                _database.UpdateGenericTypeImpl(_genericType, genericTypeInfo => genericTypeInfo.UpdateGUID(NewGUID));
 
                 var concreteClasses = _database.GetConcreteClassesImpl(_genericType);
 
@@ -51,7 +51,7 @@
             [Test]
             public void Updates_passed_argument_GUID()
             {
-                _database.UpdateGenericTypeGUIDImpl(_genericType, NewGUID);
+                _database.UpdateGenericTypeImpl(_genericType, genericTypeInfo => genericTypeInfo.UpdateGUID(NewGUID));
                 Assert.IsTrue(_genericType.GUID == NewGUID);
             }
         }

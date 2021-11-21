@@ -6,11 +6,8 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Extensions;
     using UnityEditor;
-    using UnityEngine;
     using UnityEngine.Assertions;
-    using Util;
     using Object = UnityEngine.Object;
 
     /// <summary>
@@ -23,8 +20,8 @@
     {
         public static void Initialize()
         {
-            var genericTypes = GenerationDatabase<TObject>.GenericTypes;
-            var dict = new Dictionary<Type, Dictionary<Type[], Type>>(genericTypes.Length);
+            var genericTypes = GenerationDatabase<TObject>.GenericTypeArguments.Keys;
+            var dict = new Dictionary<Type, Dictionary<Type[], Type>>(genericTypes.Count);
 
             foreach (GenericTypeInfo genericTypeInfo in genericTypes)
             {
@@ -45,7 +42,7 @@
         {
             string assemblyName = derivedType.Assembly.GetName().Name;
 
-            var assetGuids = AssetDatabase.FindAssets(assemblyName, new[] { Config.AssembliesDirPath });
+            var assetGuids = AssetDatabase.FindAssets(assemblyName, new[] { Config.GetAssemblyPathForType(genericType) });
 
             string assemblyGUID = assetGuids.FirstOrDefault(assetGuid =>
             {
@@ -128,8 +125,6 @@
 
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
 
-            // There was once NullReferenceReference here because Unity lost a MonoScript asset connected to
-            // the concrete class assembly. Would be great to find a consistent reproduction of the issue.
             if (script == null)
             {
                 FailedAssembliesChecker.FailedAssemblyPaths.Add(assemblyPath);

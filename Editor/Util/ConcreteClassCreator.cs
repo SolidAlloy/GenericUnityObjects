@@ -7,7 +7,6 @@
     using GenericUnityObjects.Util;
     using SolidUtilities.Extensions;
     using UnityEditor;
-    using UnityEngine;
     using Object = UnityEngine.Object;
 
     /// <summary>
@@ -120,13 +119,14 @@
             if (oldAssemblyName == newAssemblyName)
                 return newAssemblyName;
 
-            var dirInfo = new DirectoryInfo(Config.AssembliesDirPath);
+            Type genericTypeWithArgs = genericTypeWithoutArgs.MakeGenericType(genericArgs);
+
+            var dirInfo = new DirectoryInfo(Config.GetAssemblyPathForType(genericTypeWithArgs));
             int identicalFilesCount = dirInfo.GetFiles($"{newAssemblyName}*.dll").Length;
 
             if (identicalFilesCount == 0)
                 return newAssemblyName;
 
-            Type genericTypeWithArgs = genericTypeWithoutArgs.MakeGenericType(genericArgs);
             bool typeExists = TypeCache.GetTypesDerivedFrom(genericTypeWithArgs).Any(type => type.IsEmpty());
 
             if (typeExists)
