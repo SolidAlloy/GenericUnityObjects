@@ -59,7 +59,14 @@
         private static void AddMissingConcreteClassesToDatabase<TObject>()
             where TObject : Object
         {
-            var guids = AssetDatabase.FindAssets(string.Empty, new[] { Config.GetAssemblyPathForType(typeof(TObject)) });
+            string folderPath = Config.GetAssemblyPathForType(typeof(TObject));
+
+            // When Config.CreateNecessaryDirectories is run the first time, AssetDatabase does not import the folders,
+            // so it throws warning thinking they don't exist.
+            if (!AssetDatabase.IsValidFolder(folderPath))
+                return;
+
+            var guids = AssetDatabase.FindAssets(string.Empty, new[] { folderPath });
 
             int concreteClassesCount = GenerationDatabase<TObject>.GenericTypeArguments.Values
                 .Select(concreteClasses => concreteClasses.Count).Sum();
