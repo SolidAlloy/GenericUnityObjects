@@ -1,9 +1,8 @@
-﻿namespace GenericUnityObjects.Editor
+﻿namespace GenericUnityObjects.Editor.Util
 {
     using UnityEditor;
     using UnityEditor.Compilation;
     using UnityEngine;
-    using Util;
 
     [InitializeOnLoad]
     internal static class CompilationHelper
