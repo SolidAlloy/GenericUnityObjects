@@ -139,6 +139,10 @@
             PersistentStorage.DelayActionsOnScriptsReload = true;
 
             string dirPath = Config.GetAssemblyPathForType(parentType);
+
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
             return new ConcreteClassAssembly(dirPath, assemblyName, className, parentType);
         }
 

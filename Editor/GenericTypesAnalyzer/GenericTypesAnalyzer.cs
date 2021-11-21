@@ -71,8 +71,6 @@
             int concreteClassesCount = GenerationDatabase<TObject>.GenericTypeArguments.Values
                 .Select(concreteClasses => concreteClasses.Count).Sum();
 
-            Debug.Log($"guids count {guids.Length}, concreteClasses count {concreteClassesCount}");
-
             // The guids count may be lower than the concrete class count because some assemblies are located in another folder
             if (guids.Length <= concreteClassesCount)
             {
@@ -149,8 +147,6 @@
 
             using (new DisabledAssetDatabase(true))
             {
-                Config.CreateNecessaryDirectories();
-
                 behavioursNeedDatabaseRefresh =
                     ArgumentsChecker<MonoBehaviour>.Check(behavioursChecker)
                     | behavioursChecker.Check();

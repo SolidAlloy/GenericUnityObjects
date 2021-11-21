@@ -11,10 +11,10 @@
     {
         public const string ResourcesPath = MainFolderPath + "/Resources";
         public const string EditorResourcesPath = MainFolderPath + "/EditorResources";
-        private const string ScriptableObjectsPath = AssembliesDirPath + "/ScriptableObjects";
-        private const string MonoBehavioursPath = AssembliesDirPath + "/MonoBehaviours";
-        private const string BehaviourSelectorsPath = AssembliesDirPath + "/BehaviourSelectors";
-        private const string AssembliesDirPath = MainFolderPath + "/Assemblies";
+        public const string ScriptableObjectsPath = AssembliesDirPath + "/ScriptableObjects";
+        public const string MonoBehavioursPath = AssembliesDirPath + "/MonoBehaviours";
+        public const string BehaviourSelectorsPath = AssembliesDirPath + "/BehaviourSelectors";
+        public const string AssembliesDirPath = MainFolderPath + "/Assemblies";
         private const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
 
         public static string GetAssemblyPathForType(Type parentType)
@@ -35,14 +35,6 @@
             }
 
             return AssembliesDirPath;
-        }
-
-        public static void CreateNecessaryDirectories()
-        {
-            Directory.CreateDirectory(AssembliesDirPath);
-            Directory.CreateDirectory(ScriptableObjectsPath);
-            Directory.CreateDirectory(MonoBehavioursPath);
-            Directory.CreateDirectory(BehaviourSelectorsPath);
         }
     }
 }
