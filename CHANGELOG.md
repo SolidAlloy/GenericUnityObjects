@@ -1,3 +1,18 @@
+# [2.13.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.12.1...2.13.0) (2021-11-21)
+
+
+### Bug Fixes
+
+* Fixed NullReferenceException when generating a new concrete class ([c8f0a83](https://github.com/SolidAlloy/GenericUnityObjects/commit/c8f0a833eb771c9f12ec09a52ab30be662067934))
+* Removed the deprecated warning when setting custom icons ([b104d91](https://github.com/SolidAlloy/GenericUnityObjects/commit/b104d910740df149718259d2c4f816eee65d4791))
+* Started creating directories only when they are needed instead of creating them beforehand ([e425f32](https://github.com/SolidAlloy/GenericUnityObjects/commit/e425f328dbd3c12f3b42e9852eeb4b6d24a4b653))
+
+
+### Features
+
+* Added PackageUpgrade to move the generated assemblies to their new directories ([ffb4388](https://github.com/SolidAlloy/GenericUnityObjects/commit/ffb438829be92f7bbdf8fc37870737fb77a13f02))
+* Started detecting and adding back generated assemblies whose information was missing from the database ([ef33dbf](https://github.com/SolidAlloy/GenericUnityObjects/commit/ef33dbfaeef6730f93a75321687ea409c0f8ffeb))
+
 ## [2.12.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.12.0...2.12.1) (2021-11-16)
 
 
