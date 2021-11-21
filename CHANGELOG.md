@@ -1,3 +1,10 @@
+## [2.13.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.13.0...2.13.1) (2021-11-21)
+
+
+### Bug Fixes
+
+* Updated SolidUtilities to the required version ([735a0d0](https://github.com/SolidAlloy/GenericUnityObjects/commit/735a0d08caa79bc06771c3fba9dfe938433a2f40))
+
 # [2.13.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.12.1...2.13.0) (2021-11-21)
 
 
