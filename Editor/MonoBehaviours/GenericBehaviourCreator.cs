@@ -2,9 +2,11 @@
 {
     using System;
     using GenericUnityObjects.Util;
+    using JetBrains.Annotations;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Events;
     using Util;
     using Object = UnityEngine.Object;
 
@@ -17,15 +19,16 @@
         private const string GameObjectKey = "GameObject";
         private const string GenericTypeKey = "GenericBehaviourType";
 
-        public static void AddComponent(Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
+        [ContractAnnotation("=> null, reloadRequired: true; => notnull, reloadRequired: false")]
+        public static Component AddComponent([CanBeNull] Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs, out bool reloadRequired)
         {
             Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
 
             if (BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteComponent))
             {
                 DestroySelectorComponent(gameObject, selectorComponentType);
-                gameObject.AddComponent(concreteComponent);
-                return;
+                reloadRequired = false;
+                return gameObject.AddComponent(concreteComponent);
             }
 
             PersistentStorage.SaveData(GameObjectKey, gameObject);
@@ -35,7 +38,16 @@
             DestroySelectorComponent(gameObject, selectorComponentType);
 
             ConcreteClassCreator<MonoBehaviour>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
-            AssetDatabase.Refresh();
+            reloadRequired = true;
+            return null;
+        }
+
+        public static void AddComponent([CanBeNull] Type selectorComponentType, GameObject gameObject, Type genericTypeWithoutArgs, Type[] genericArgs)
+        {
+            AddComponent(selectorComponentType, gameObject, genericTypeWithoutArgs, genericArgs, out bool reloadRequired);
+
+            if (reloadRequired)
+                AssetDatabase.Refresh();
         }
 
         private static void FinishBehaviourCreation()
@@ -57,6 +69,9 @@
 
         private static void DestroySelectorComponent(GameObject gameObject, Type selectorComponentType)
         {
+            if (selectorComponentType == null)
+                return;
+
             if (gameObject.TryGetComponent(selectorComponentType, out Component selectorComponent))
             {
                 Object.DestroyImmediate(selectorComponent);
