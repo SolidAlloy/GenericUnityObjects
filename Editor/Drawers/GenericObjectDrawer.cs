@@ -46,9 +46,10 @@
         public static Object ObjectField(Rect rect, GUIContent label, Object currentTarget, Type objType,
             bool allowSceneObjects)
         {
-            return objType.IsGenericType
-                ? EditorGUIHelper.GenericObjectField(rect, label, currentTarget, objType, allowSceneObjects)
-                : EditorGUI.ObjectField(rect, label ?? GUIContent.none, currentTarget, objType, allowSceneObjects);
+            if (objType.IsGenericType || IsTargetGeneric(currentTarget))
+                return EditorGUIHelper.GenericObjectField(rect, label, currentTarget, objType, allowSceneObjects);
+
+            return EditorGUI.ObjectField(rect, label ?? GUIContent.none, currentTarget, objType, allowSceneObjects);
         }
 
         /// <summary>
@@ -64,9 +65,25 @@
         public static Object ObjectField(string label, Object currentTarget, Type objType,
             bool allowSceneObjects)
         {
-            return objType.IsGenericType
-                ? EditorGUILayoutHelper.GenericObjectField(label, currentTarget, objType, allowSceneObjects)
-                : EditorGUILayout.ObjectField(label, currentTarget, objType, allowSceneObjects);
+            if (objType.IsGenericType || IsTargetGeneric(currentTarget))
+            {
+                return EditorGUILayoutHelper.GenericObjectField(label, currentTarget, objType, allowSceneObjects);
+            }
+
+            return EditorGUILayout.ObjectField(label, currentTarget, objType, allowSceneObjects);
+        }
+
+        private static bool IsTargetGeneric(Object target)
+        {
+            if (target == null)
+                return false;
+
+            var targetBaseType = target.GetType().BaseType;
+
+            if (targetBaseType == null)
+                return false;
+
+            return targetBaseType.IsGenericType;
         }
     }
 }
