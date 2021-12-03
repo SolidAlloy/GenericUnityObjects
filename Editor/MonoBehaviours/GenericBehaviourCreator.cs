@@ -24,11 +24,11 @@
         {
             Type genericType = genericTypeWithoutArgs.MakeGenericType(genericArgs);
 
-            if (BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteComponent))
+            if (BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteType))
             {
                 DestroySelectorComponent(gameObject, selectorComponentType);
                 reloadRequired = false;
-                return gameObject.AddComponent(concreteComponent);
+                return Undo.AddComponent(gameObject, concreteType);
             }
 
             PersistentStorage.SaveData(GameObjectKey, gameObject);
@@ -58,7 +58,7 @@
                 Type genericType = PersistentStorage.GetData<TypeReference>(GenericTypeKey).Type;
 
                 Type concreteType = BehavioursDatabase.GetConcreteType(genericType);
-                gameObject.AddComponent(concreteType);
+                Undo.AddComponent(gameObject, concreteType);
             }
             finally
             {
