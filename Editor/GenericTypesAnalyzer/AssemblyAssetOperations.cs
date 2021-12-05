@@ -37,8 +37,15 @@
 
             public void FinishReplacement(string newAssemblyPath)
             {
-                if (_oldAssemblyPath != newAssemblyPath)
-                    File.Move($"{_oldAssemblyPath}.meta", $"{newAssemblyPath}.meta");
+                if (_oldAssemblyPath == newAssemblyPath)
+                    return;
+
+                string oldAssemblyMeta = $"{_oldAssemblyPath}.meta";
+
+                if (!File.Exists(oldAssemblyMeta))
+                    return;
+
+                File.Move(oldAssemblyMeta, $"{newAssemblyPath}.meta");
             }
         }
     }
