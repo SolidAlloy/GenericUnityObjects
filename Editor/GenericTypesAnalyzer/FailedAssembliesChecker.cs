@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using GeneratedTypesDatabase;
     using UnityEditor;
     using Util;
 
@@ -10,6 +11,8 @@
         private const string FailedAssemblyGuidsKey = "FailedAssemblyGuids";
 
         public static readonly List<string> FailedAssemblyPaths = new List<string>();
+
+        public static readonly List<GenericTypeInfo> MissingSelectors = new List<GenericTypeInfo>();
 
         public static void ReimportFailedAssemblies()
         {
@@ -40,6 +43,16 @@
             }
 
             AssetDatabase.Refresh();
+        }
+
+        public static void AddMissingSelectors()
+        {
+            using var _ = new DisabledAssetDatabase(true);
+
+            foreach (GenericTypeInfo genericTypeInfo in MissingSelectors)
+            {
+                BehavioursChecker.AddSelectorAssembly(genericTypeInfo);
+            }
         }
 
         private static void ReimportCreatedAssets()

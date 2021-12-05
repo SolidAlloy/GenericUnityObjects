@@ -16,13 +16,7 @@
     /// </summary>
     internal class BehavioursChecker : GenericTypesChecker<MonoBehaviour>
     {
-        protected override bool AddNewGenericTypes(GenericTypeInfo[] genericTypes)
-        {
-            base.AddNewGenericTypes(genericTypes);
-            return true;
-        }
-
-        protected override void AddNewGenericType(GenericTypeInfo genericTypeInfo)
+        public static void AddSelectorAssembly(GenericTypeInfo genericTypeInfo)
         {
             Type behaviourType = genericTypeInfo.Type;
             Assert.IsNotNull(behaviourType);
@@ -34,6 +28,17 @@
 
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, genericTypeInfo.AssemblyGUID);
             IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, genericTypeInfo.AssemblyGUID, false);
+        }
+
+        protected override bool AddNewGenericTypes(GenericTypeInfo[] genericTypes)
+        {
+            base.AddNewGenericTypes(genericTypes);
+            return true;
+        }
+
+        protected override void AddNewGenericType(GenericTypeInfo genericTypeInfo)
+        {
+            AddSelectorAssembly(genericTypeInfo);
             base.AddNewGenericType(genericTypeInfo);
         }
 

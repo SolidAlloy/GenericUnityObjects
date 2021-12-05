@@ -71,7 +71,11 @@
             string assemblyPath = AssetDatabase.GUIDToAssetPath(genericTypeInfo.AssemblyGUID);
 
             if (!File.Exists(assemblyPath))
+            {
+                DebugUtility.Log($"Detected a missing selector assembly for type {genericTypeInfo.TypeFullName}, adding it back.");
+                FailedAssembliesChecker.MissingSelectors.Add(genericTypeInfo);
                 return;
+            }
 
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assemblyPath);
 

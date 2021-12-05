@@ -52,6 +52,7 @@
             }
 
             CompilationHelper.CompilationNotNeeded();
+            FailedAssembliesChecker.AddMissingSelectors();
             FailedAssembliesChecker.ReimportFailedAssemblies();
             FlushConfigChangesToDisk();
         }
