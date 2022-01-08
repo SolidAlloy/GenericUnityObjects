@@ -1,7 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.GeneratedTypesDatabase
 {
     using System;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
     using UnityEngine;
 
     [Serializable]

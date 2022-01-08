@@ -3,7 +3,7 @@
     using System;
     using System.Collections;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine.TestTools;
 

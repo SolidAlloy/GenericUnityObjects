@@ -1,7 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;

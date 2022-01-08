@@ -5,7 +5,7 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Extensions;
+    using SolidUtilities;
     using UnityEditor;
     using Object = UnityEngine.Object;
 

@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Extensions;
+    using SolidUtilities;
     using UnityEditor;
     using Util;
 

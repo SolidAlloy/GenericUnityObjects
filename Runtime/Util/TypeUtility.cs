@@ -3,8 +3,7 @@
     using System;
     using System.Linq;
     using JetBrains.Annotations;
-    using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
 #if UNITY_EDITOR
     using UnityEditor;
 #endif

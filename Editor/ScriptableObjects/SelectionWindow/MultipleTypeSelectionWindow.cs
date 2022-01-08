@@ -3,8 +3,7 @@
     using System;
     using System.Linq;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Editor.Extensions;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using TypeReferences;
     using UnityEditor;
     using UnityEngine;

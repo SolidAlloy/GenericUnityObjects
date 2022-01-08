@@ -2,8 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Editor.Extensions;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;

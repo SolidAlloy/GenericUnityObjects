@@ -6,13 +6,12 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Extensions;
+    using SolidUtilities;
     using UnityEditor;
     using UnityEngine;
     using Util;
     using Object = UnityEngine.Object;
 #if GENERIC_UNITY_OBJECTS_DEBUG
-    using SolidUtilities.Helpers;
 #endif
 
     /// <summary>

@@ -8,7 +8,8 @@
         "TypeReferences",
         "SolidUtilities",
         "EasyButtons.Editor",
-        "Unity.Settings.Editor"
+        "Unity.Settings.Editor",
+        "UnityDropdown.Editor"
     ],
     "includePlatforms": [
         "Editor"

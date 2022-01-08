@@ -2,7 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Util;
-    using SolidUtilities.SerializableCollections;
+    using SolidUtilities.Collections;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEditor.Events;

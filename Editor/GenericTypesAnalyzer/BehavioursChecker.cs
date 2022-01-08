@@ -3,7 +3,7 @@
     using System;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;

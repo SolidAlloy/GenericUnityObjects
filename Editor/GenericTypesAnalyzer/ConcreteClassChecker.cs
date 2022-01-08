@@ -2,7 +2,7 @@
 {
     using System;
     using GeneratedTypesDatabase;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using Util;
     using Object = UnityEngine.Object;
 

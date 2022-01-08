@@ -7,7 +7,7 @@
     using Editor.ScriptableObjects;
     using Editor.ScriptableObjects.SelectionWindow;
     using NUnit.Framework;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using Util;

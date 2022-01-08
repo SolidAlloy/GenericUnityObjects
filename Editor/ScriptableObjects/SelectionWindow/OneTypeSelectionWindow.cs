@@ -1,10 +1,10 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObjects.SelectionWindow
 {
     using System;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
+    using SolidUtilities.Editor;
+    using SolidUtilities;
     using TypeReferences.Editor.Drawers;
-    using TypeReferences.Editor.TypeDropdown;
+    using UnityDropdown.Editor;
     using UnityEngine;
     using Util;
 
@@ -20,33 +20,25 @@
         {
             var typeOptionsAttribute = new NonGenericAttribute(genericParamConstraints[0]);
             var selectionTree = GetSelectionTree(typeOptionsAttribute, onTypeSelected);
-            var dropdownPosition = GetCenteredPosition(selectionTree);
-            _dropdownWindow = DropdownWindow.Create(selectionTree, typeOptionsAttribute.DropdownHeight, dropdownPosition, DropdownWindowType.Popup);
+            _dropdownWindow = DropdownWindow.Create(selectionTree, DropdownWindowType.Popup, windowHeight: typeOptionsAttribute.DropdownHeight);
         }
 
-        private SelectionTree GetSelectionTree(NonGenericAttribute attribute, Action<Type[]> onTypeSelected)
+        private DropdownTree GetSelectionTree(NonGenericAttribute attribute, Action<Type[]> onTypeSelected)
         {
             var parentDrawer = new TypeDropdownDrawer(null, attribute, null);
             var dropdownItems = parentDrawer.GetDropdownItems();
 
-            var selectionTree = new SelectionTree(dropdownItems, null, type =>
+            var selectionTree = new DropdownTree<Type>(dropdownItems, null, type =>
                 {
                     _dropdownWindow.Close();
                     onTypeSelected(new[] { type });
                 },
-                TypeReferences.Editor.ProjectSettings.SearchbarMinItemsCount, attribute.ExcludeNone);
+                TypeReferences.Editor.ProjectSettings.SearchbarMinItemsCount, true, attribute.ExcludeNone);
 
             if (attribute.ExpandAllFolders)
                 selectionTree.ExpandAllFolders();
 
             return selectionTree;
-        }
-
-        private Vector2 GetCenteredPosition(SelectionTree selectionTree)
-        {
-            Vector2 dropdownPosition = EditorGUIUtilityHelper.GetMainWindowPosition().center;
-            dropdownPosition.x -= DropdownWindow.CalculateOptimalWidth(selectionTree.SelectionPaths) / 2f;
-            return dropdownPosition.RoundUp();
         }
     }
 }

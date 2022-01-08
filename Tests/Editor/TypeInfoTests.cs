@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Editor.GeneratedTypesDatabase;
     using NUnit.Framework;
-    using SolidUtilities.Extensions;
+    using SolidUtilities;
 
     public class TypeInfoTests
     {

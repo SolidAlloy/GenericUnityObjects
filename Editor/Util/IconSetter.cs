@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
     using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEditor.Callbacks;

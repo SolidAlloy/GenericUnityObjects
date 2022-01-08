@@ -3,7 +3,7 @@
     using System;
     using System.Linq;
     using GenericUnityObjects.Util;
-    using SolidUtilities.Helpers;
+    using SolidUtilities;
     using UnityEngine;
 
 #if GENERIC_UNITY_OBJECTS_DEBUG

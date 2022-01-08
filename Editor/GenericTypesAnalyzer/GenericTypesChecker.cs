@@ -7,8 +7,8 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using JetBrains.Annotations;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
+    using SolidUtilities.Editor;
+    using SolidUtilities;
     using UnityEditor;
     using Object = UnityEngine.Object;
 

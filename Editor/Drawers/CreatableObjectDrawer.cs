@@ -4,9 +4,8 @@
     using System.IO;
     using System.Reflection;
     using ScriptableObjects;
-    using SolidUtilities.Editor.Helpers;
-    using SolidUtilities.Extensions;
-    using SolidUtilities.Helpers;
+    using SolidUtilities.Editor;
+    using SolidUtilities;
     using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEngine;

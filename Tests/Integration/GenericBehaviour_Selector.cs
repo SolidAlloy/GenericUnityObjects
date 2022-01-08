@@ -5,7 +5,7 @@
     using System.Linq;
     using JetBrains.Annotations;
     using NUnit.Framework;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.TestTools;
