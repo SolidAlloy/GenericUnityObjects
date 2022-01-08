@@ -73,7 +73,7 @@
       </ProjectReference>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="OpenSesame.Net.Compilers.Toolset" Version="3.7.0">
+      <PackageReference Include="OpenSesame.Net.Compilers.Toolset" Version="4.0.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

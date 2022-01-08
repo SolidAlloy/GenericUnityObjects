@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using SolidUtilities.Helpers;
     using UnityEditor;
     using Util;
     using Object = UnityEngine.Object;

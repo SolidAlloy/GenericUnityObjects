@@ -3,7 +3,6 @@
     using System;
     using System.Reflection;
     using UnityEditor;
-    using UnityEditor.SearchService;
     using UnityEngine;
     using Object = UnityEngine.Object;
     using ObjectSelector = UnityEditor.ObjectSelector;

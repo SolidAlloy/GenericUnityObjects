@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Text;
-    using SolidUtilities.Editor.Helpers;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEditorInternal;
