@@ -13,7 +13,7 @@
         public NonGenericAttribute(Type[] baseTypes)
             : base(baseTypes)
         {
-            ExcludeNone = true;
+            ShowNoneElement = true;
             ShortName = true;
 
             // When type has inheritance constraints, there's usually only a few types available, so expanding all

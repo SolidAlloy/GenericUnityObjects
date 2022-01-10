@@ -1,11 +1,8 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObjects.SelectionWindow
 {
     using System;
-    using SolidUtilities.Editor;
-    using SolidUtilities;
     using TypeReferences.Editor.Drawers;
     using UnityDropdown.Editor;
-    using UnityEngine;
     using Util;
 
     /// <summary>
@@ -19,26 +16,26 @@
         public void OnCreate(Action<Type[]> onTypeSelected, string[] genericArgNames, Type[][] genericParamConstraints)
         {
             var typeOptionsAttribute = new NonGenericAttribute(genericParamConstraints[0]);
-            var selectionTree = GetSelectionTree(typeOptionsAttribute, onTypeSelected);
-            _dropdownWindow = DropdownWindow.Create(selectionTree, DropdownWindowType.Popup, windowHeight: typeOptionsAttribute.DropdownHeight);
+            var dropdownTree = GetDropdownTree(typeOptionsAttribute, onTypeSelected);
+            _dropdownWindow = dropdownTree.ShowDropdown(dropdownTree.GetCenteredPosition(), typeOptionsAttribute.DropdownHeight);
         }
 
-        private DropdownTree GetSelectionTree(NonGenericAttribute attribute, Action<Type[]> onTypeSelected)
+        private DropdownMenu GetDropdownTree(NonGenericAttribute attribute, Action<Type[]> onTypeSelected)
         {
             var parentDrawer = new TypeDropdownDrawer(null, attribute, null);
             var dropdownItems = parentDrawer.GetDropdownItems();
 
-            var selectionTree = new DropdownTree<Type>(dropdownItems, null, type =>
+            var dropdownMenu = new DropdownMenu<Type>(dropdownItems, type =>
                 {
                     _dropdownWindow.Close();
                     onTypeSelected(new[] { type });
                 },
-                TypeReferences.Editor.ProjectSettings.SearchbarMinItemsCount, true, attribute.ExcludeNone);
+                TypeReferences.Editor.ProjectSettings.SearchbarMinItemsCount, true, attribute.ShowNoneElement);
 
             if (attribute.ExpandAllFolders)
-                selectionTree.ExpandAllFolders();
+                dropdownMenu.ExpandAllFolders();
 
-            return selectionTree;
+            return dropdownMenu;
         }
     }
 }
