@@ -16,6 +16,8 @@
             if (PlayerPrefs.GetInt(PackageUpgradedKey, 0) == 1)
                 return;
 
+            Directory.CreateDirectory(Config.AssembliesDirPath);
+
             foreach (string filePath in Directory.EnumerateFiles(Config.AssembliesDirPath))
             {
                 if (filePath.EndsWith(".mdb"))

@@ -122,6 +122,10 @@
             Type genericTypeWithArgs = genericTypeWithoutArgs.MakeGenericType(genericArgs);
 
             var dirInfo = new DirectoryInfo(Config.GetAssemblyPathForType(genericTypeWithArgs));
+
+            if (!dirInfo.Exists)
+                return newAssemblyName;
+
             int identicalFilesCount = dirInfo.GetFiles($"{newAssemblyName}*.dll").Length;
 
             if (identicalFilesCount == 0)
