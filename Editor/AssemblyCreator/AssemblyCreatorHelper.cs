@@ -162,7 +162,7 @@
 
                 _assemblyBuilder = GetAssemblyBuilder(dirPath, assemblyName);
                 ModuleBuilder moduleBuilder = GetModuleBuilder(_assemblyBuilder, assemblyName);
-                TypeBuilder = moduleBuilder.DefineType(className, TypeAttributes.NotPublic, parentType);
+                TypeBuilder = moduleBuilder.DefineType($"GenericUnityObjects.ConcreteClasses.{className}", TypeAttributes.NotPublic, parentType);
             }
 
             public void Dispose()

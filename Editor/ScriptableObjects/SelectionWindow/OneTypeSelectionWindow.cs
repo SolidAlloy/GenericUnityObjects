@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor.ScriptableObjects.SelectionWindow
 {
     using System;
+    using System.Linq;
     using TypeReferences.Editor.Drawers;
     using UnityDropdown.Editor;
     using Util;
@@ -23,7 +24,7 @@
         private DropdownMenu GetDropdownTree(NonGenericAttribute attribute, Action<Type[]> onTypeSelected)
         {
             var parentDrawer = new TypeDropdownDrawer(null, attribute, null);
-            var dropdownItems = parentDrawer.GetDropdownItems();
+            var dropdownItems = parentDrawer.GetDropdownItems().ToList();
 
             var dropdownMenu = new DropdownMenu<Type>(dropdownItems, type =>
                 {
