@@ -1,42 +1,93 @@
-﻿namespace GenericUnityObjects.UnityEditorInternals
+﻿namespace GenericUnityObjects.Editor
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
+    using GenericUnityObjects.Util;
     using UnityEditor;
-    using Util;
+    using UnityEngine;
     using Object = UnityEngine.Object;
+    
+#if ODIN_INSPECTOR
+    using Sirenix.OdinInspector.Editor;
+#endif
 
     /// <summary>
     /// An extension of Editor that changes name of <see cref="GenericScriptableObject"/> assets in the Inspector header.
     /// For all other assets, it draws header like before.
     /// </summary>
-    public class GenericHeaderEditor : Editor
+    public class GenericHeaderEditor : 
+#if ODIN_INSPECTOR
+        OdinEditor
+#else
+        Editor
+#endif
     {
         private static readonly Dictionary<TargetInfo, string> _targetTitlesCache = new Dictionary<TargetInfo, string>();
         private static readonly Dictionary<Type, string> _typeNamesCache = new Dictionary<Type, string>();
 
-        internal override string targetTitle => GetTitle();
+        private static Func<Editor, string, Rect> _drawHeaderGUI;
+
+        private static Func<Editor, string, Rect> DrawHeaderGUI
+        {
+            get
+            {
+                if (_drawHeaderGUI == null)
+                {
+                    var drawHeaderMethod = typeof(Editor).GetMethod("DrawHeaderGUI",
+                        BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof(Editor), typeof(string) },
+                        null);
+
+                    _drawHeaderGUI = (Func<Editor, string, Rect>) Delegate.CreateDelegate(typeof(Func<Editor, string, Rect>), drawHeaderMethod);
+                }
+
+                return _drawHeaderGUI;
+            }
+        }
+
+        private static Func<Object, string> _getTypeName;
+
+        private static Func<Object, string> GetTypeName
+        {
+            get
+            {
+                if (_getTypeName == null)
+                {
+                    var getTypeNameMethod = typeof(ObjectNames).GetMethod("GetTypeName",
+                        BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof(Object) }, null);
+
+                    _getTypeName = (Func<Object, string>) Delegate.CreateDelegate(typeof(Func<Object, string>), getTypeNameMethod);
+                }
+
+                return _getTypeName;
+            }
+        }
+
+        protected override void OnHeaderGUI()
+        {
+            DrawHeaderGUI(this, GetTitle());
+        }
 
         private string GetTitle()
         {
             Type genericType = target.GetType().BaseType;
 
-            if (genericType?.IsGenericType != true)
-                return base.targetTitle;
-
-            return m_Targets.Length == 1 || ! m_AllowMultiObjectAccess
+            return targets.Length == 1
                 ? GetOneTitle(genericType)
                 : GetMixedTitle(genericType);
         }
 
         private string GetOneTitle(Type genericType)
         {
+            if (genericType?.IsGenericType != true)
+                return ObjectNames.GetInspectorTitle(target);
+            
             var targetInfo = new TargetInfo(target);
 
             if (_targetTitlesCache.TryGetValue(targetInfo, out string title))
                 return title;
 
-            string typeName = GetTypeName(genericType);
+            string typeName = GetGenericTypeName(genericType);
 
             // target.name is empty when a new asset is created interactively and has not been named yet.
             if (string.IsNullOrEmpty(target.name))
@@ -49,10 +100,13 @@
 
         private string GetMixedTitle(Type genericType)
         {
-            return $"{m_Targets.Length} objects of type {GetTypeName(genericType)}";
+            if (genericType?.IsGenericType != true)
+                return targets.Length + " " + ObjectNames.NicifyVariableName(GetTypeName(target)) + "s";
+            
+            return $"{targets.Length} objects of type {GetGenericTypeName(genericType)}";
         }
 
-        private static string GetTypeName(Type genericType)
+        private static string GetGenericTypeName(Type genericType)
         {
             if (_typeNamesCache.TryGetValue(genericType, out string typeName))
                 return typeName;
