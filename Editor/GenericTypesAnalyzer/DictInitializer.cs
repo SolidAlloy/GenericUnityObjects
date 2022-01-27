@@ -7,6 +7,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using UnityEditor;
+    using UnityEngine;
     using UnityEngine.Assertions;
     using Object = UnityEngine.Object;
 
@@ -90,12 +91,24 @@
 
             foreach (ConcreteClass concreteClass in concreteClasses)
             {
+                if (!TryGetConcreteClassType(genericTypeInfo, concreteClass, out Type value))
+                    continue;
+
+                // BUG: This somehow happened once. It started throwing exception after I commented out a generic class not related to genericTypeInfo nor the concrete class in question. 
+                // Would be good to have the steps to reproduce.
+                if (value.BaseType?.GetGenericTypeDefinition() != genericTypeInfo.Type)
+                {
+                    Debug.LogWarning($"The concrete class for type {value.BaseType} was added to the generic type {genericTypeInfo.Type.Name}. " +
+                                     "This shouldn't happen. If you have steps to reproduce the bug, please report it.");
+                    
+                    GenerationDatabase<TObject>.RemoveConcreteClass(genericTypeInfo, concreteClass);
+                    continue;
+                }
+             
                 var key = GetConcreteClassArguments(concreteClass);
-
-                if (TryGetConcreteClassType(genericTypeInfo, concreteClass, out Type value))
-                    concreteClassesDict.Add(key, value);
+                concreteClassesDict.Add(key, value);
             }
-
+            
             return concreteClassesDict;
         }
 
