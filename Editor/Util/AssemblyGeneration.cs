@@ -7,7 +7,7 @@
     /// <summary>
     /// A class responsible for importing a generated DLL with appropriate settings.
     /// </summary>
-    internal static class AssemblyGeneration
+    public static class AssemblyGeneration
     {
         public static void ImportAssemblyAsset(string assemblyPath, string assemblyGUID, bool editorOnly = false)
         {
