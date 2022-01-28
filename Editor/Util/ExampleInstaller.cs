@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using Editor.Util;
     using JetBrains.Annotations;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine.Events;
     using Object = UnityEngine.Object;
@@ -18,7 +19,7 @@
         public static void AddConcreteClasses<TObject>(KeyValuePair<Type, Type[]>[] typesToAdd, UnityAction afterAddingTypes)
             where TObject : Object
         {
-            using (new DisabledAssetDatabase(true))
+            using (AssetDatabaseHelper.DisabledScope())
             {
                 foreach (var pair in typesToAdd)
                 {

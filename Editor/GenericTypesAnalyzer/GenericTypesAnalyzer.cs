@@ -6,12 +6,15 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
-    using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Assertions;
     using Util;
     using Object = UnityEngine.Object;
+    
 #if GENERIC_UNITY_OBJECTS_DEBUG
+    using SolidUtilities;
 #endif
 
     /// <summary>
@@ -104,7 +107,9 @@
                 }
 
                 var concreteType = monoScript.GetClass();
-                var genericType = concreteType?.BaseType;
+                Assert.IsNotNull(concreteType);
+                var genericType = concreteType.BaseType;
+                Assert.IsNotNull(genericType);
 
                 Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
                 Type[] genericArgs = genericType.GenericTypeArguments;
@@ -145,7 +150,7 @@
             var behavioursChecker = new BehavioursChecker();
             var scriptableObjectsChecker = new ScriptableObjectsChecker();
 
-            using (new DisabledAssetDatabase(true))
+            using (AssetDatabaseHelper.DisabledScope())
             {
                 behavioursNeedDatabaseRefresh =
                     ArgumentsChecker<MonoBehaviour>.Check(behavioursChecker)

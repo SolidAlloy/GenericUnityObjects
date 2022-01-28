@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using GeneratedTypesDatabase;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using Util;
 
@@ -21,7 +22,7 @@
                 return;
             }
 
-            using (new DisabledAssetDatabase(true))
+            using (AssetDatabaseHelper.DisabledScope())
             {
                 var newFailedAssemblyGuids = new List<string>();
 
@@ -47,7 +48,7 @@
 
         public static void AddMissingSelectors()
         {
-            using var _ = new DisabledAssetDatabase(true);
+            using var _ = new AssetDatabaseHelper.DisabledAssetDatabase(true);
 
             foreach (GenericTypeInfo genericTypeInfo in MissingSelectors)
             {
@@ -64,7 +65,7 @@
                 if (failedAssemblyGuids == null)
                     return;
 
-                using (new DisabledAssetDatabase(true))
+                using(AssetDatabaseHelper.DisabledScope())
                 {
                     var assetPaths = failedAssemblyGuids
                         .SelectMany(assemblyGuid => AssetDatabase.FindAssets($"t:ConcreteClass_{assemblyGuid}"))

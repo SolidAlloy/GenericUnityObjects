@@ -6,6 +6,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using Object = UnityEngine.Object;
 
@@ -81,7 +82,7 @@
 
             string assemblyGUID;
 
-            using (new DisabledAssetDatabase(true))
+            using (AssetDatabaseHelper.DisabledScope())
             {
                 assemblyGUID = AssemblyGeneration.GetUniqueGUID();
                 string assemblyPath = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName, assemblyGUID);

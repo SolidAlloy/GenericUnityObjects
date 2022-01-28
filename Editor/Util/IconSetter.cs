@@ -4,10 +4,8 @@
     using System.Collections.Generic;
     using GenericUnityObjects.Util;
     using SolidUtilities;
-    using SolidUtilities.UnityEditorInternals;
+    using SolidUtilities.Editor;
     using UnityEditor;
-    using UnityEditor.Callbacks;
-    using UnityEditor.Compilation;
     using UnityEngine;
 
     /// <summary>
@@ -57,7 +55,7 @@
                 return;
             }
 
-            using (new DisabledAssetDatabase(true))
+            using (AssetDatabaseHelper.DisabledScope())
             {
                 foreach (var kvp in Instance._dict)
                 {
