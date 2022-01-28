@@ -61,7 +61,7 @@
             // type filter requires unqualified names for built-in types, but will prioritize them over user types, so ensure user types are namespace-qualified
 
             // Set required type throw reflection to avoid ambiguity between m_RequiredType and m_RequiredTypes
-            var requiredTypeStr = GenericTypeHelper.GetConcreteType(requiredType).FullName;
+            var requiredTypeStr = requiredType.IsGenericType ? GenericTypeHelper.GetConcreteType(requiredType).FullName : requiredType.FullName;
             this_.SetRequiredType(requiredTypeStr);
 
             this_.m_SearchFilter = string.Empty;
