@@ -62,6 +62,12 @@
                 return _getTypeName;
             }
         }
+        
+#if ! ODIN_INSPECTOR
+        protected virtual void OnEnable() { }
+        
+        protected virtual void OnDisable() { }
+#endif
 
         protected override void OnHeaderGUI()
         {
