@@ -25,6 +25,8 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 
 ## How To Install
 
+:heavy_exclamation_mark: Before installing the package, please disable the **Assembly Version Validation** option in **Player Settings**.
+
 ### OpenUPM
 
 Once you have the OpenUPM cli, run the following command:
