@@ -42,6 +42,7 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
       "url": "https://package.openupm.com",
       "scopes": [
         "com.solidalloy.util",
+        "com.solidalloy.unity-dropdown",
         "com.solidalloy.type.references",
         "com.solidalloy.generic-unity-objects",
         "com.openupm"
