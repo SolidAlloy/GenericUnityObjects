@@ -6,6 +6,7 @@
     using System.Reflection;
     using GenericUnityObjects.Util;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using Util;
 
@@ -90,7 +91,7 @@
         {
             string assemblyPath = AssemblyCreator.CreateMenuItems(AssemblyName, menuItemMethods);
             PersistentStorage.MenuItemsAssemblyPath = assemblyPath;
-            string assemblyGUID = AssemblyGeneration.GetUniqueGUID();
+            string assemblyGUID = AssetDatabaseHelper.GetUniqueGUID();
             AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID, true);
         }
 

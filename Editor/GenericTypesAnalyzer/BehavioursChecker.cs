@@ -4,6 +4,7 @@
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
@@ -22,7 +23,7 @@
             Assert.IsNotNull(behaviourType);
 
             string assemblyName = GetSelectorAssemblyName(behaviourType);
-            genericTypeInfo.AssemblyGUID = AssemblyGeneration.GetUniqueGUID();
+            genericTypeInfo.AssemblyGUID = AssetDatabaseHelper.GetUniqueGUID();
 
             string assemblyPath = AssemblyCreator.CreateSelectorAssembly(assemblyName, behaviourType, genericTypeInfo.AssemblyGUID);
 

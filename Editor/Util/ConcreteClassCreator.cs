@@ -84,7 +84,7 @@
 
             using (AssetDatabaseHelper.DisabledScope())
             {
-                assemblyGUID = AssemblyGeneration.GetUniqueGUID();
+                assemblyGUID = AssetDatabaseHelper.GetUniqueGUID();
                 string assemblyPath = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes, assemblyName, assemblyGUID);
                 AssemblyGeneration.ImportAssemblyAsset(assemblyPath, assemblyGUID);
             }
