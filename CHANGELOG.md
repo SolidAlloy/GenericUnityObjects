@@ -1,3 +1,25 @@
+# [2.14.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.13.1...2.14.0) (2022-02-03)
+
+
+### Bug Fixes
+
+* Fixed ArgumentException occuring on domain reload ([084605a](https://github.com/SolidAlloy/GenericUnityObjects/commit/084605a43e79daa14896ffcd20cb4672d2101e67))
+* Fixed changes to the database not saved after removing a concrete class ([d3e5314](https://github.com/SolidAlloy/GenericUnityObjects/commit/d3e5314ce61a164fde94eeded02eae008c855529))
+* Fixed directory-not-found exception when using the package for the first time ([629be74](https://github.com/SolidAlloy/GenericUnityObjects/commit/629be746196417763a2b64204a34dc6506cb4c92))
+* Fixed FileNotFound exception when trying to replace an assembly that does not exist ([f090bb0](https://github.com/SolidAlloy/GenericUnityObjects/commit/f090bb08447c7dbe0ff737220abf1142b75e72b1))
+* Fixed generic components not generating and Undo record when being added ([b58e0d8](https://github.com/SolidAlloy/GenericUnityObjects/commit/b58e0d8e353416e67863e325cb043fb47d68b616))
+* Fixed not working custom editor for generic MonoBehaviours with new versions of Odin Inspector ([e3ad7e6](https://github.com/SolidAlloy/GenericUnityObjects/commit/e3ad7e639c2d6e0ba4f561c22efd080ecc862db1))
+* Fixed type exception when drawing a non-generic type object field using GenericObjectField ([74da9ca](https://github.com/SolidAlloy/GenericUnityObjects/commit/74da9cad1dca219ce715f7a4ce679336fd54b7b7))
+* Made GenericObjectDrawer recognize that the current target is generic and show it correctly even if the passed type is not generic ([e16bcf7](https://github.com/SolidAlloy/GenericUnityObjects/commit/e16bcf7b9777daf98ecda006ff0d313933005479))
+
+
+### Features
+
+* Added a namespace to the auto-generated concrete classes ([73af6e8](https://github.com/SolidAlloy/GenericUnityObjects/commit/73af6e8a00cb93c40e87f8328f72e8c92f4e0ce0))
+* Added GenericBehaviourCreator.AddComponent() overload that tells if the domain reload is needed ([a781e1f](https://github.com/SolidAlloy/GenericUnityObjects/commit/a781e1fd490f66afd2c5ee0f5547d5514f303aae))
+* Replaced a centered dropdown window with opening it at the mouse position when creating a generic scriptable object ([2932b77](https://github.com/SolidAlloy/GenericUnityObjects/commit/2932b77c2089934d1cc8201233470bea806bfc86))
+* Started regenerating selector assemblies that were removed ([821c8e2](https://github.com/SolidAlloy/GenericUnityObjects/commit/821c8e2a480cc1e6a298009aaee2c9c780e82ff1))
+
 ## [2.13.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.13.0...2.13.1) (2021-11-21)
 
 
