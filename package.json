@@ -4,8 +4,8 @@
   "displayName": "Generic Unity Objects",
   "description": "A plugin that allows using of generic scriptable objects and monobehaviours, creating assets and components from them, and instantiating them at runtime.",
   "dependencies": {
-    "com.solidalloy.util": "1.34.0",
-    "com.solidalloy.type-references": "2.11.5",
+    "com.solidalloy.util": "1.35.0",
+    "com.solidalloy.type-references": "2.12.0",
     "com.unity.settings-manager": "1.0.3"
   },
   "keywords": [
