@@ -158,6 +158,7 @@
             }
 
             concreteClasses.Remove(concreteClass);
+            EditorUtility.SetDirty(this);
         }
 
         public static bool RemoveGenericType(GenericTypeInfo genericTypeInfo, [CanBeNull] Action<string> removeAssembly)
