@@ -19,14 +19,21 @@
     [CustomEditor(typeof(MonoBehaviour), true)]
     [InitializeOnLoad]
 #endif
-    public class MonoBehaviourEditor : OdinEditor
+    public class MonoBehaviourEditor :
+#if ODIN_INSPECTOR
+        OdinEditor
+#else
+        Editor
+#endif
     {
+#if ODIN_INSPECTOR
         static MonoBehaviourEditor()
         {
             // a workaround for bug https://bitbucket.org/sirenix/odin-inspector/issues/833/customeditor-with-editorforchildclasses
             var odinEditorTypeField = typeof(InspectorTypeDrawingConfig).GetField("odinEditorType", BindingFlags.Static | BindingFlags.NonPublic);
             odinEditorTypeField.SetValue(null, typeof(MonoBehaviourEditor));
         }
+#endif
         
         private GenericUnityObjectHelper _helper;
 
@@ -34,9 +41,15 @@
         private ButtonsDrawer _buttonsDrawer;
 #endif
         
-        protected override void OnEnable()
+        protected
+#if ODIN_INSPECTOR
+            override
+#endif
+            void OnEnable()
         {
+#if ODIN_INSPECTOR
             base.OnEnable();
+#endif
             
             _helper = new GenericUnityObjectHelper(target);
 

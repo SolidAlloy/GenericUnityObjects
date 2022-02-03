@@ -6,16 +6,13 @@
     using System.Linq;
     using GeneratedTypesDatabase;
     using GenericUnityObjects.Util;
+    using SolidUtilities;
     using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Assertions;
     using Util;
     using Object = UnityEngine.Object;
-    
-#if GENERIC_UNITY_OBJECTS_DEBUG
-    using SolidUtilities;
-#endif
 
     /// <summary>
     /// A class that gathers all changes related to generic types and generates/updates/removes DLLs based on the changes.

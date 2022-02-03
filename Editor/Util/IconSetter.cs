@@ -5,6 +5,7 @@
     using GenericUnityObjects.Util;
     using SolidUtilities;
     using SolidUtilities.Editor;
+    using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEngine;
 
