@@ -1,12 +1,15 @@
 ﻿namespace GenericUnityObjects.Editor
 {
-    using EasyButtons.Editor;
     using UnityEditor;
     
 #if ODIN_INSPECTOR
     using Sirenix.OdinInspector;
     using Sirenix.OdinInspector.Editor;
     using Sirenix.Utilities;
+#endif
+    
+#if EASY_BUTTONS
+    using EasyButtons.Editor;
 #endif
 
 #if ! DISABLE_GENERIC_OBJECT_EDITOR
