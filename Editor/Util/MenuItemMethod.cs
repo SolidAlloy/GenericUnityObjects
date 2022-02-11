@@ -2,6 +2,7 @@
 {
     using System;
     using GenericUnityObjects.Util;
+    using SolidUtilities;
     using UnityEngine;
 
     /// <summary>

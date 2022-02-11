@@ -1,7 +1,9 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System.Reflection;
+    using MissingScriptType.Editor;
     using UnityEditor;
+    using UnityEditor.Callbacks;
     using UnityEngine;
 
 #if EASY_BUTTONS
@@ -17,25 +19,29 @@
 #if ! DISABLE_GENERIC_OBJECT_EDITOR
     [CanEditMultipleObjects]
     [CustomEditor(typeof(MonoBehaviour), true)]
-    [InitializeOnLoad]
 #endif
-    public class MonoBehaviourEditor :
+    public class UnityObjectEditor :
 #if ODIN_INSPECTOR
         OdinEditor
 #else
         Editor
 #endif
     {
-#if ODIN_INSPECTOR
-        static MonoBehaviourEditor()
+#if ODIN_INSPECTOR && ! DISABLE_GENERIC_OBJECT_EDITOR
+        [DidReloadScripts(1)]
+        private static void OnScriptsReload()
         {
             // a workaround for bug https://bitbucket.org/sirenix/odin-inspector/issues/833/customeditor-with-editorforchildclasses
             var odinEditorTypeField = typeof(InspectorTypeDrawingConfig).GetField("odinEditorType", BindingFlags.Static | BindingFlags.NonPublic);
-            odinEditorTypeField.SetValue(null, typeof(MonoBehaviourEditor));
+            odinEditorTypeField.SetValue(null, typeof(UnityObjectEditor));
         }
 #endif
         
         private GenericUnityObjectHelper _helper;
+        
+#if MISSING_SCRIPT_TYPE
+        private MissingScriptTypeUtility _missingScriptUtility;
+#endif
 
 #if EASY_BUTTONS
         private ButtonsDrawer _buttonsDrawer;
@@ -52,10 +58,23 @@
 #endif
             
             _helper = new GenericUnityObjectHelper(target);
+            
+#if MISSING_SCRIPT_TYPE
+            try
+            {
+                _missingScriptUtility = new MissingScriptTypeUtility(serializedObject);
+            }
+            catch { }
+#endif
 
 #if EASY_BUTTONS
             _buttonsDrawer = new ButtonsDrawer(target);
 #endif
+        }
+        
+        protected override void OnHeaderGUI()
+        {
+            GenericHeaderUtility.OnHeaderGUI(this);
         }
 
         public override void OnInspectorGUI()
@@ -101,6 +120,10 @@
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
             }
+            
+#if MISSING_SCRIPT_TYPE
+            _missingScriptUtility?.OnInspectorGUI();
+#endif
         }
     }
 }

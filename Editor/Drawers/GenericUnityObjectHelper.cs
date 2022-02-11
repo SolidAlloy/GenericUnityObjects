@@ -1,6 +1,7 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System;
+    using GenericUnityObjects.Util;
     using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
@@ -21,7 +22,12 @@
         /// <param name="target">Target object of custom editor.</param>
         public GenericUnityObjectHelper(Object target)
         {
-            _genericType = target.GetType().BaseType;
+            var targetType = target.GetType();
+
+            if (!targetType.FullName.StartsWith(Config.ConcreteClassNamespace))
+                return;
+            
+            _genericType = targetType.BaseType;
 
             if (_genericType?.IsGenericType != true)
                 return;

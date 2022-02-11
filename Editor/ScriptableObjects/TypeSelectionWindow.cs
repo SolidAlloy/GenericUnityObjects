@@ -2,9 +2,8 @@
 {
     using System;
     using System.Linq;
-    using GenericUnityObjects.Util;
     using SelectionWindow;
-    using UnityEditor;
+    using SolidUtilities;
     using UnityEngine;
 
     /// <summary>
@@ -21,7 +20,7 @@
                 .Select(type => type.GetGenericParameterConstraints())
                 .ToArray();
 
-            var genericArgNames = TypeUtility.GetNiceArgsOfGenericType(genericTypeWithoutArgs);
+            var genericArgNames = TypeHelper.GetNiceArgsOfGenericType(genericTypeWithoutArgs);
 
             ITypeSelectionWindow window;
 

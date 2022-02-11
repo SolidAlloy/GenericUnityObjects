@@ -99,14 +99,15 @@
                 }
 
                 if (registeredGuids.Contains(guid))
-                {
                     continue;
-                }
 
                 var concreteType = monoScript.GetClass();
                 Assert.IsNotNull(concreteType);
                 var genericType = concreteType.BaseType;
-                Assert.IsNotNull(genericType);
+
+                // Happens when the generic script file was removed but the concrete class still exists.
+                if (genericType == null)
+                    return;
 
                 Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
                 Type[] genericArgs = genericType.GenericTypeArguments;

@@ -7,23 +7,14 @@
     using UnityEditor;
     using UnityEngine;
     using Object = UnityEngine.Object;
-    
-#if ODIN_INSPECTOR
-    using Sirenix.OdinInspector.Editor;
-#endif
 
     /// <summary>
     /// An extension of Editor that changes name of <see cref="GenericScriptableObject"/> assets in the Inspector header.
     /// For all other assets, it draws header like before.
     /// </summary>
-    public class GenericHeaderEditor : 
-#if ODIN_INSPECTOR
-        OdinEditor
-#else
-        Editor
-#endif
+    public static class GenericHeaderUtility
     {
-        private static readonly Dictionary<TargetInfo, string> _targetTitlesCache = new Dictionary<TargetInfo, string>();
+        private static readonly Dictionary<Object, string> _targetTitlesCache = new Dictionary<Object, string>();
         private static readonly Dictionary<Type, string> _typeNamesCache = new Dictionary<Type, string>();
 
         private static Func<Editor, string, Rect> _drawHeaderGUI;
@@ -62,35 +53,27 @@
                 return _getTypeName;
             }
         }
-        
-#if ! ODIN_INSPECTOR
-        protected virtual void OnEnable() { }
-        
-        protected virtual void OnDisable() { }
-#endif
 
-        protected override void OnHeaderGUI()
+        public static void OnHeaderGUI(Editor editor)
         {
-            DrawHeaderGUI(this, GetTitle());
+            DrawHeaderGUI(editor, GetTitle(editor));
         }
 
-        private string GetTitle()
+        private static string GetTitle(Editor editor)
         {
-            Type genericType = target.GetType().BaseType;
+            Type genericType = editor.target.GetType().BaseType;
 
-            return targets.Length == 1
-                ? GetOneTitle(genericType)
-                : GetMixedTitle(genericType);
+            return editor.targets.Length == 1
+                ? GetOneTitle(genericType, editor.target)
+                : GetMixedTitle(genericType, editor.targets);
         }
 
-        private string GetOneTitle(Type genericType)
+        private static string GetOneTitle(Type genericType, Object target)
         {
             if (genericType?.IsGenericType != true)
                 return ObjectNames.GetInspectorTitle(target);
-            
-            var targetInfo = new TargetInfo(target);
 
-            if (_targetTitlesCache.TryGetValue(targetInfo, out string title))
+            if (_targetTitlesCache.TryGetValue(target, out string title))
                 return title;
 
             string typeName = GetGenericTypeName(genericType);
@@ -100,14 +83,14 @@
                 return $"({typeName})";
 
             title = $"{ObjectNames.NicifyVariableName(target.name)} ({typeName})";
-            _targetTitlesCache.Add(targetInfo, title);
+            _targetTitlesCache.Add(target, title);
             return title;
         }
 
-        private string GetMixedTitle(Type genericType)
+        private static string GetMixedTitle(Type genericType, Object[] targets)
         {
             if (genericType?.IsGenericType != true)
-                return targets.Length + " " + ObjectNames.NicifyVariableName(GetTypeName(target)) + "s";
+                return targets.Length + " " + ObjectNames.NicifyVariableName(GetTypeName(targets[0])) + "s";
             
             return $"{targets.Length} objects of type {GetGenericTypeName(genericType)}";
         }
@@ -121,40 +104,5 @@
             _typeNamesCache.Add(genericType, typeName);
             return typeName;
         }
-    }
-
-    internal readonly struct TargetInfo : IEquatable<TargetInfo>
-    {
-        public readonly Object Target;
-        public readonly string Name;
-
-        public TargetInfo(Object target)
-        {
-            Target = target;
-            Name = target.name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is TargetInfo info && Equals(info);
-        }
-
-        public bool Equals(TargetInfo p)
-        {
-            return (Target == p.Target) && (Name == p.Name);
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 17;
-            // ReSharper disable once Unity.NoNullPropagation
-            hash = hash * 23 + Target?.GetHashCode() ?? 0;
-            hash = hash * 23 + Name.GetHashCode();
-            return hash;
-        }
-
-        public static bool operator ==(TargetInfo lhs, TargetInfo rhs) => lhs.Equals(rhs);
-
-        public static bool operator !=(TargetInfo lhs, TargetInfo rhs) => ! lhs.Equals(rhs);
     }
 }

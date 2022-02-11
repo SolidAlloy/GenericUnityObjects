@@ -9,7 +9,8 @@
         "SolidUtilities",
         "EasyButtons.Editor",
         "Unity.Settings.Editor",
-        "UnityDropdown.Editor"
+        "UnityDropdown.Editor",
+        "MissingScriptType.Editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -31,6 +32,11 @@
             "name": "com.madsbangh.easybuttons",
             "expression": "",
             "define": "EASY_BUTTONS"
+        },
+        {
+            "name": "com.solidalloy.missing-script-type",
+            "expression": "",
+            "define": "MISSING_SCRIPT_TYPE"
         }
     ],
     "noEngineReferences": false

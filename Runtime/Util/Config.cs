@@ -15,6 +15,7 @@
         public const string MonoBehavioursPath = AssembliesDirPath + "/MonoBehaviours";
         public const string BehaviourSelectorsPath = AssembliesDirPath + "/BehaviourSelectors";
         public const string AssembliesDirPath = MainFolderPath + "/Assemblies";
+        public const string ConcreteClassNamespace = "GenericUnityObjects.ConcreteClasses";
         private const string MainFolderPath = "Assets/Plugins/GenericUnityObjects";
 
         public static string GetAssemblyPathForType(Type parentType)

@@ -7,6 +7,7 @@
     using System.Reflection;
     using System.Reflection.Emit;
     using GenericUnityObjects.Util;
+    using SolidUtilities;
     using UnityEngine;
     using Util;
 
@@ -126,7 +127,7 @@
 
             if ( ! componentName.Contains("<"))
             {
-                componentName = $"{componentName}{TypeUtility.GetNiceArgsOfGenericType(type)}";
+                componentName = $"{componentName}{TypeHelper.GetNiceArgsOfGenericType(type)}";
             }
 
             return (componentName, order);
@@ -162,7 +163,7 @@
 
                 _assemblyBuilder = GetAssemblyBuilder(dirPath, assemblyName);
                 ModuleBuilder moduleBuilder = GetModuleBuilder(_assemblyBuilder, assemblyName);
-                TypeBuilder = moduleBuilder.DefineType($"GenericUnityObjects.ConcreteClasses.{className}", TypeAttributes.NotPublic, parentType);
+                TypeBuilder = moduleBuilder.DefineType($"{Config.ConcreteClassNamespace}.{className}", TypeAttributes.NotPublic, parentType);
             }
 
             public void Dispose()

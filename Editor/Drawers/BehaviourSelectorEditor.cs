@@ -3,8 +3,8 @@
     using System.Linq;
     using GenericUnityObjects.Util;
     using MonoBehaviours;
-    using SolidUtilities.Editor;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEngine;
 
@@ -27,7 +27,7 @@
             _typesArray = serializedObject.FindProperty(nameof(BehaviourSelector.TypeRefs));
             _genericTypeNameWithoutSuffix = _targetSelector.GenericBehaviourType.Name.StripGenericSuffix();
             _argumentNames = new string[_targetSelector.TypeRefs.Length];
-            _genericArgNames = TypeUtility.GetNiceArgsOfGenericType(_targetSelector.GenericBehaviourType);
+            _genericArgNames = TypeHelper.GetNiceArgsOfGenericType(_targetSelector.GenericBehaviourType);
             _drawer = new TypeReferenceWithBaseTypesDrawer();
         }
 
