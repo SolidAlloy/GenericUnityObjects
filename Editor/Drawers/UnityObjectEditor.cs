@@ -2,6 +2,7 @@
 {
     using System.Reflection;
     using MissingScriptType.Editor;
+    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
@@ -64,7 +65,7 @@
             {
                 _missingScriptUtility = new MissingScriptTypeUtility(serializedObject);
             }
-            catch { }
+            catch { } // SerializedObjectNotCreatableException is internal, so we can't catch it directly.
 #endif
 
 #if EASY_BUTTONS
@@ -79,14 +80,14 @@
 
         public override void OnInspectorGUI()
         {
+            serializedObject.UpdateIfRequiredOrScript();
+            
             if (target == null)
             {
                 DrawMissingScript();
                 return;
             }
 
-            serializedObject.UpdateIfRequiredOrScript();
-            
 #if ODIN_INSPECTOR
             if (target == null || GlobalConfig<GeneralDrawerConfig>.Instance.ShowMonoScriptInEditor && !target.GetType().IsDefined(typeof(HideMonoScriptAttribute), true))
 #endif
@@ -116,13 +117,10 @@
 
         private void DrawMissingScript()
         {
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
-            }
-            
 #if MISSING_SCRIPT_TYPE
-            _missingScriptUtility?.OnInspectorGUI();
+            _missingScriptUtility?.Draw();
+#else
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
 #endif
         }
     }

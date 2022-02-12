@@ -49,7 +49,7 @@
                     $"Expected a MonoScript property but {monoScriptProperty.propertyPath} was passed as an argument instead.");
             }
 
-            using (new EditorGUI.DisabledScope(true))
+            using (new EditorGUI.DisabledScope(monoScriptProperty.objectReferenceValue != null))
             {
                 if (_drawForGeneric && ! (_monoScript is null))
                 {
