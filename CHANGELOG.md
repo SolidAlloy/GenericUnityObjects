@@ -1,3 +1,10 @@
+## [2.14.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.14.0...2.14.1) (2022-02-03)
+
+
+### Bug Fixes
+
+* Fixed the error in console regarding the immutable Changelog file ([d6df2ae](https://github.com/SolidAlloy/GenericUnityObjects/commit/d6df2ae6527eb15eff94c4aea3ff1c66a7b6db2d))
+
 # [2.14.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.13.1...2.14.0) (2022-02-03)
 
 
