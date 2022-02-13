@@ -1,3 +1,16 @@
+# [2.15.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.14.1...2.15.0) (2022-02-13)
+
+
+### Bug Fixes
+
+* Fixed missing dependency on EasyButtons ([cdee47c](https://github.com/SolidAlloy/GenericUnityObjects/commit/cdee47c28a7c25f6e4200676e112ef33449e1407))
+
+
+### Features
+
+* Added integration with MissingScriptType ([274fd76](https://github.com/SolidAlloy/GenericUnityObjects/commit/274fd7669da460f01512e7798a557f30ca08ef6a))
+* Made ProjectSettings public ([31d9bdc](https://github.com/SolidAlloy/GenericUnityObjects/commit/31d9bdc275f37a6b8b1f4e672ac51dbacfdf82cb))
+
 ## [2.14.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.14.0...2.14.1) (2022-02-03)
 
 
