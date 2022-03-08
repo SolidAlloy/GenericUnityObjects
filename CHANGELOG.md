@@ -1,3 +1,10 @@
+## [2.15.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.0...2.15.1) (2022-03-08)
+
+
+### Bug Fixes
+
+* Fixed the missing reference to MissingScriptType ([1f9483b](https://github.com/SolidAlloy/GenericUnityObjects/commit/1f9483baa99a8deb4b1bfb76b2b7cd322a89f065))
+
 # [2.15.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.14.1...2.15.0) (2022-02-13)
 
 
