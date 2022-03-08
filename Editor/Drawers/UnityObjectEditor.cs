@@ -1,11 +1,14 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System.Reflection;
-    using MissingScriptType.Editor;
     using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
+    
+#if MISSING_SCRIPT_TYPE
+    using MissingScriptType.Editor;
+#endif
 
 #if EASY_BUTTONS
     using EasyButtons.Editor;
