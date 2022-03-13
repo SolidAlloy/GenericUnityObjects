@@ -1,3 +1,10 @@
+## [2.15.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.1...2.15.2) (2022-03-13)
+
+
+### Bug Fixes
+
+* Fixed generic scriptable object not being created through the Creatable attribute for the first time ([b3be59f](https://github.com/SolidAlloy/GenericUnityObjects/commit/b3be59fb404b642a1ab61e8620292d3b4b3afc0e))
+
 ## [2.15.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.0...2.15.1) (2022-03-08)
 
 
