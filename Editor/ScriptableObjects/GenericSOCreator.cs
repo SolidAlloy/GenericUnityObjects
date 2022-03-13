@@ -126,7 +126,7 @@
             }
 
             PersistentStorage.SaveData(GenericSOTypeKey, new TypeReference(genericType));
-            PersistentStorage.SaveData(PathKey, new TypeReference(path));
+            PersistentStorage.SaveData(PathKey, path);
             SaveProperty(property);
             PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationAtPath);
 
