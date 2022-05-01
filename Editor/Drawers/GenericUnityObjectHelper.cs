@@ -33,7 +33,7 @@
                 return;
 
             _drawForGeneric = true;
-            _monoScript = AssetSearcher.GetMonoScriptFromType(_genericType);
+            _monoScript = AssetHelper.GetMonoScriptFromType(_genericType);
         }
 
         /// <summary>

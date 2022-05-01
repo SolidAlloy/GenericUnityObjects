@@ -49,7 +49,7 @@
             if (TypeCannotHaveGUID())
                 return string.Empty;
 
-            return AssetSearcher.GetClassGUID(type);
+            return AssetHelper.GetClassGUID(type);
         }
 
         public string TypeNameAndAssembly => _typeNameAndAssembly;
@@ -182,7 +182,7 @@
             if (TypeAtGUIDIsSame())
                 return;
 
-            string newGUID = AssetSearcher.GetClassGUID(Type);
+            string newGUID = AssetHelper.GetClassGUID(Type);
 
             if (string.IsNullOrEmpty(newGUID) || GUID == newGUID)
                 return;
