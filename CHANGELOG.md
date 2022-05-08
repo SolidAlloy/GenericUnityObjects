@@ -1,3 +1,10 @@
+## [2.15.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.2...2.15.3) (2022-05-08)
+
+
+### Bug Fixes
+
+* Fixed errors in dependencies and updated them ([0eb43b1](https://github.com/SolidAlloy/GenericUnityObjects/commit/0eb43b1e3ef65221dfd014da4d953eb4ed13011f))
+
 ## [2.15.2](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.1...2.15.2) (2022-03-13)
 
 
