@@ -1,4 +1,12 @@
-﻿namespace GenericUnityObjects.Editor
+﻿#if UNITY_2020_3 && ! (UNITY_2020_3_0 || UNITY_2020_3_1 || UNITY_2020_3_2 || UNITY_2020_3_3 || UNITY_2020_3_4 || UNITY_2020_3_5 || UNITY_2020_3_6 || UNITY_2020_3_7 || UNITY_2020_3_8 || UNITY_2020_3_9 || UNITY_2020_3_10 || UNITY_2020_3_11 || UNITY_2020_3_12 || UNITY_2020_3_13 || UNITY_2020_3_14 || UNITY_2020_3_15)
+    #define UNITY_2020_3_16_OR_NEWER
+#endif
+
+#if UNITY_2021_1 && ! (UNITY_2021_1_0 || UNITY_2021_1_1 || UNITY_2021_1_2 || UNITY_2021_1_3 || UNITY_2021_1_4 || UNITY_2021_1_5 || UNITY_2021_1_6 || UNITY_2021_1_7 || UNITY_2021_1_8 || UNITY_2021_1_9 || UNITY_2021_1_10 || UNITY_2021_1_11 || UNITY_2021_1_12 || UNITY_2021_1_13 || UNITY_2021_1_14 || UNITY_2021_1_15 || UNITY_2021_1_16)
+    #define UNITY_2021_1_17_OR_NEWER
+#endif
+
+namespace GenericUnityObjects.Editor
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -166,8 +174,8 @@
 
         private static void FlushConfigChangesToDisk()
         {
-            // AssetDatabase.SaveAssetIfDirty was added in Unity 2020.3.16
-#if UNITY_2020_3_OR_NEWER && ! (UNITY_2020_3_0 || UNITY_2020_3_1 || UNITY_2020_3_2 || UNITY_2020_3_3 || UNITY_2020_3_4 || UNITY_2020_3_5 || UNITY_2020_3_6 || UNITY_2020_3_7 || UNITY_2020_3_8 || UNITY_2020_3_9 || UNITY_2020_3_10 || UNITY_2020_3_11 || UNITY_2020_3_12 || UNITY_2020_3_13 || UNITY_2020_3_14 || UNITY_2020_3_15)
+            // AssetDatabase.SaveAssetIfDirty was added in Unity 2020.3.16 and Unity 2021.1.17
+#if UNITY_2020_3_16_OR_NEWER || UNITY_2021_1_17_OR_NEWER || UNITY_2021_2_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(GenerationDatabase<MonoBehaviour>.Instance);
             AssetDatabase.SaveAssetIfDirty(GenerationDatabase<GenericScriptableObject>.Instance);
             AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<MonoBehaviour>.Instance);
