@@ -1,4 +1,8 @@
-﻿namespace GenericUnityObjects.Util
+﻿#if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP && !NET_STANDARD_2_0
+#define CAN_EMIT
+#endif
+
+namespace GenericUnityObjects.Util
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +12,7 @@
     using System.Reflection;
     using UnityEngine.Assertions;
 
-#if ! ENABLE_IL2CPP
+#if CAN_EMIT
     using System.Reflection.Emit;
 #endif
 
@@ -30,7 +34,7 @@
         {
             public Type GetClass(Type genericTypeWithArgs)
             {
-#if ENABLE_IL2CPP
+#if !CAN_EMIT
                 return null;
             }
 #else
