@@ -163,7 +163,7 @@
 
                 _assemblyBuilder = GetAssemblyBuilder(dirPath, assemblyName);
                 ModuleBuilder moduleBuilder = GetModuleBuilder(_assemblyBuilder, assemblyName);
-                TypeBuilder = moduleBuilder.DefineType($"{Config.ConcreteClassNamespace}.{className}", TypeAttributes.NotPublic, parentType);
+                TypeBuilder = moduleBuilder.DefineType($"{Config.ConcreteClassNamespace}.{className}", TypeAttributes.Public, parentType);
             }
 
             public void Dispose()
