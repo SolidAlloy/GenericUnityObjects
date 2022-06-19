@@ -19,7 +19,7 @@ This package allows to create and use generic ScriptableObjects and MonoBehaviou
 
 - Unity 2020.2 or higher
 
-- .NET 4.x :heavy_exclamation_mark:
+- .NET 4.x :heavy_exclamation_mark: (when using Unity 2021.1 or lower)
 
   
 
@@ -52,11 +52,9 @@ Or if you don't have it, add the scoped registry to manifest.json with the desir
     }
   ],
   "dependencies": {
-    "com.solidalloy.generic-unity-objects": "1.1.5"
+    "com.solidalloy.generic-unity-objects": "2.16.0"
   },
 ```
-
-
 
 ### Git URL
 
@@ -65,7 +63,8 @@ Project supports Unity Package Manager. To install it as a Git package do the fo
 1. In Unity, open **Window** -> **Package Manager**.
 2. Press the **+** button, choose "**Add package from git URL...**"
 3. Enter "https://github.com/SolidAlloy/SolidUtilities.git" and press **Add**.
-4. Do the same with two more packages:
+4. Do the same with three more packages:
+   - https://github.com/SolidAlloy/UnityDropdown.git
    - https://github.com/SolidAlloy/ClassTypeReference-for-Unity.git
    - https://github.com/SolidAlloy/GenericUnityObjects.git
 
@@ -92,6 +91,8 @@ public class WarriorStats<TClass> : GenericScriptableObject
     }
 }
 ```
+
+(Actually, you can inherit from plain ScriptableObject but it's not recommended. Read more here.)
 
 If you use Unity 2020, you need to specify the `Serializable` attribute explicitly. Otherwise, fields of type `WarriorStats<TClass>` will not be serialized. If you use Unity 2021, this bug is fixed and Unity automatically marks generic UnityEngine.Objects as serializable.
 
@@ -297,6 +298,23 @@ In theory, it can be implemented, but it will add more complexity to the system 
 #### Generic UnityEngine.Object cannot be internal.
 
 Otherwise, when a concrete class is generated, it cannot access the constructor of the internal generic class. [IgnoreAccessCheckTo](https://www.strathweb.com/2018/10/no-internalvisibleto-no-problem-bypassing-c-visibility-rules-with-roslyn/) should work but in Unity it doesn't for some reason. You will be able to create assets and add components of internal generic types, and see their fields in the inspector just fine, but every time you instantiate a generic UnityEngine.Object, an error will show up in the Console.
+
+## Inheriting from plain ScriptableObject
+
+Although it is recommended to inherit from GenericScriptableObject, you can derive your generic class just from ScriptableObject. There may be cases when inheriting from GenericScriptableObject is not possible, for example, when you also need to inherit from [SerializedScriptableObject](https://odininspector.com/documentation/sirenix.odininspector.serializedscriptableobject) or other class which inheritance you can't change.
+
+The inheritance from GenericScriptableObject is recommended due to the fact that `CreateInstance` is implemented in both ScriptableObject and GenericScriptableObject. When inheriting from ScriptableObject, you may forget which version is used for creating instances:
+```csharp
+public class GenericSO<T> : ScriptableObject
+{
+    public static GenericSO<T> Create()
+    {
+        return CreateInstance<GenericSO<T>>(); // this will trigger an error because the default CreateInstance method does not accept generic types. You need to use GenericScriptableObject.CreateInstance() instead.
+    }
+}
+```
+
+When inheriting from GenericScriptableObject, you protect yourself from such problems because it ensures that when you use `CreateInstance()`, it will use the GenericScriptableObject version of the method.
 
 ## Custom Editors
 
