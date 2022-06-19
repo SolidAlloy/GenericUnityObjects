@@ -1,3 +1,18 @@
+# [2.16.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.3...2.16.0) (2022-06-19)
+
+
+### Bug Fixes
+
+* Fixed compilation error related to AssetDatabase.SaveAssetIfDirty() in Unity 2021.1.16 and older ([4c2ac45](https://github.com/SolidAlloy/GenericUnityObjects/commit/4c2ac45058aeaad6e9a6afe8bc6a750178cb0e51))
+* Improved the way the package detects if the platform can emit code at runtime ([47877e7](https://github.com/SolidAlloy/GenericUnityObjects/commit/47877e75f0c8f7afc5ebbe47495c112008219340))
+* Removed a warning regarding pdb files in Unity on non-Windows platforms ([7686dbe](https://github.com/SolidAlloy/GenericUnityObjects/commit/7686dbe06baebc52733f84a69dc964e684aad024))
+
+
+### Features
+
+* Made auto-generated classes public so that they can be referenced by code generation plugins ([0bd4e67](https://github.com/SolidAlloy/GenericUnityObjects/commit/0bd4e673547f6b3514e791efb85473050325ef33))
+* Made possible to inherit from simple ScriptableObject instead of GenericScriptableObject to create generic assets ([0c4ac2d](https://github.com/SolidAlloy/GenericUnityObjects/commit/0c4ac2d9b1b63e3313639d7c02296c23421337e8))
+
 ## [2.15.3](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.2...2.15.3) (2022-05-08)
 
 
