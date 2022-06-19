@@ -9,7 +9,7 @@
     using Object = UnityEngine.Object;
 
     /// <summary>
-    /// An extension of Editor that changes name of <see cref="GenericScriptableObject"/> assets in the Inspector header.
+    /// An extension of Editor that changes name of generic <see cref="ScriptableObject"/> assets in the Inspector header.
     /// For all other assets, it draws header like before.
     /// </summary>
     public static class GenericHeaderUtility
@@ -91,7 +91,7 @@
         {
             if (genericType?.IsGenericType != true)
                 return targets.Length + " " + ObjectNames.NicifyVariableName(GetTypeName(targets[0])) + "s";
-            
+
             return $"{targets.Length} objects of type {GetGenericTypeName(genericType)}";
         }
 

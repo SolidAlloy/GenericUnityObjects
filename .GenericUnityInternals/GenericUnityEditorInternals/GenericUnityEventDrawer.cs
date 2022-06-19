@@ -296,7 +296,7 @@
                 {
                     shortName = unityObject is MonoBehaviour
                         ? GetBehaviourShortName(unityObjectType)
-                        : GetScriptableObjectShortName(unityObject, unityObjectType);
+                        : GetScriptableObjectShortName(unityObjectType);
 
                     _typeNameCache.Add(unityObjectType, shortName);
                 }
@@ -320,9 +320,9 @@
                     componentAttribute.componentMenu.Split('/').Last();
             }
 
-            private static string GetScriptableObjectShortName(Object unityObject, Type unityObjectType)
+            private static string GetScriptableObjectShortName(Type unityObjectType)
             {
-                return unityObject is GenericScriptableObject ? TypeUtility.GetNiceNameOfGenericType(unityObjectType.BaseType) : unityObjectType.Name;
+                return ((unityObjectType is GenericScriptableObject) || unityObjectType.BaseType.IsGenericType) ? TypeUtility.GetNiceNameOfGenericType(unityObjectType.BaseType) : unityObjectType.Name;
             }
         }
     }

@@ -20,7 +20,7 @@
 
         public static string GetAssemblyPathForType(Type parentType)
         {
-            if (typeof(GenericScriptableObject).IsAssignableFrom(parentType))
+            if (typeof(ScriptableObject).IsAssignableFrom(parentType))
             {
                 return ScriptableObjectsPath;
             }

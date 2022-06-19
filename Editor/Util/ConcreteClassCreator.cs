@@ -8,6 +8,7 @@
     using SolidUtilities;
     using SolidUtilities.Editor;
     using UnityEditor;
+    using UnityEngine;
     using Object = UnityEngine.Object;
 
     /// <summary>
@@ -30,7 +31,7 @@
             string assemblyGUID = CreateConcreteClassAssembly(genericTypeWithoutArgs, argumentTypes);
             var genericTypeInfo = GenericTypeInfo.Instantiate<TObject>(genericTypeWithoutArgs);
 
-            IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, assemblyGUID, typeof(TObject) == typeof(GenericScriptableObject));
+            IconSetter.AddAssemblyForIconChange(genericTypeInfo.GUID, assemblyGUID, typeof(TObject) == typeof(ScriptableObject));
 
             AddToDatabase(genericTypeInfo, argumentTypes, assemblyGUID);
 
@@ -60,10 +61,8 @@
             string newAssemblyPath = CreateConcreteClassAssembly(genericType, argumentTypes, newAssemblyName, concreteClass.AssemblyGUID);
             assemblyReplacer.FinishReplacement(newAssemblyPath);
 
-            IconSetter.AddAssemblyForIconChange(genericTypeGUID, concreteClass.AssemblyGUID, typeof(TObject) == typeof(GenericScriptableObject));
+            IconSetter.AddAssemblyForIconChange(genericTypeGUID, concreteClass.AssemblyGUID, typeof(TObject) == typeof(ScriptableObject));
         }
-
-
 
         private static string CreateConcreteClassAssembly(Type genericTypeWithoutArgs, Type[] argumentTypes,
             string newAssemblyName, string assemblyGUID)

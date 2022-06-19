@@ -4,8 +4,8 @@
     using System.IO;
     using System.Reflection;
     using ScriptableObjects;
-    using SolidUtilities.Editor;
     using SolidUtilities;
+    using SolidUtilities.Editor;
     using SolidUtilities.UnityEditorInternals;
     using UnityEditor;
     using UnityEngine;
@@ -66,7 +66,7 @@
         {
             var folderPath = ProjectWindowUtilProxy.GetActiveFolderPath();
 
-            bool isGeneric = type.InheritsFrom(typeof(GenericScriptableObject));
+            bool isGeneric = type.InheritsFrom(typeof(ScriptableObject)) && type.IsGenericType && !type.IsAbstract;
 
             string fileName = isGeneric
                 ? type.GetCustomAttribute<CreateGenericAssetMenuAttribute>()?.FileName

@@ -2,13 +2,14 @@
 {
     using System;
     using JetBrains.Annotations;
+    using UnityEngine;
 
     /// <summary>
-    /// Marks a GenericScriptableObject-derived type to be automatically listed in the Assets/Create submenu, so that
+    /// Marks a ScriptableObject-derived type to be automatically listed in the Assets/Create submenu, so that
     /// instances of the type can be easily created and stored in the project as ".asset" files.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    [BaseTypeRequired(typeof(GenericScriptableObject))]
+    [BaseTypeRequired(typeof(ScriptableObject))]
     public class CreateGenericAssetMenuAttribute : Attribute
     {
         /// <summary>The default file name used by newly created instances of this type.</summary>

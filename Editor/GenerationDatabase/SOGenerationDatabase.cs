@@ -7,7 +7,7 @@
     /// <summary>
     /// All the work is done in the parent class. This is implemented just to create a ScriptableObject asset.
     /// </summary>
-    internal class SOGenerationDatabase : GenerationDatabase<GenericScriptableObject>
+    internal class SOGenerationDatabase : GenerationDatabase<ScriptableObject>
     {
         [SerializeField] private Collection<GenericTypeInfo>[] _genericTypeValues;
         [SerializeField] private GenericTypeInfo[] _genericTypeKeys;

@@ -16,7 +16,7 @@
     /// </summary>
     /// <typeparam name="TUnityObject">
     /// Type derived from <see cref="UnityEngine.Object"/>. Currently supports only
-    /// <see cref="GenericScriptableObject"/> and <see cref="MonoBehaviour"/>.
+    /// <see cref="ScriptableObject"/> and <see cref="MonoBehaviour"/>.
     /// </typeparam>
     /// <remarks>
     /// The database utilizes two dictionaries: [Argument, List{GenericType}] and [GenericType, List{Argument[]}].

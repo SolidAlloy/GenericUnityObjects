@@ -48,14 +48,14 @@ namespace GenericUnityObjects.Editor
                 UpdateGeneratedAssemblies();
                 // We don't check missing selector assemblies because a new one would be created in
                 // UpdateGeneratedAssemblies anyway if a generic type exists in the project and is missing from the database.
-                AddMissingConcreteClassesToDatabase<GenericScriptableObject>();
+                AddMissingConcreteClassesToDatabase<ScriptableObject>();
                 AddMissingConcreteClassesToDatabase<MonoBehaviour>();
             }
 
             if (FailedAssembliesChecker.FailedAssemblyPaths.Count == 0)
             {
                 DictInitializer<MonoBehaviour>.Initialize();
-                DictInitializer<GenericScriptableObject>.Initialize();
+                DictInitializer<ScriptableObject>.Initialize();
             }
 
             CompilationHelper.CompilationNotNeeded();
@@ -163,7 +163,7 @@ namespace GenericUnityObjects.Editor
                     | behavioursChecker.Check();
 
                 scriptableObjectsNeedDatabaseRefresh =
-                    ArgumentsChecker<GenericScriptableObject>.Check(scriptableObjectsChecker)
+                    ArgumentsChecker<ScriptableObject>.Check(scriptableObjectsChecker)
                     | scriptableObjectsChecker.Check()
                     | MenuItemsChecker.Check();
             }
@@ -177,9 +177,9 @@ namespace GenericUnityObjects.Editor
             // AssetDatabase.SaveAssetIfDirty was added in Unity 2020.3.16 and Unity 2021.1.17
 #if UNITY_2020_3_16_OR_NEWER || UNITY_2021_1_17_OR_NEWER || UNITY_2021_2_OR_NEWER
             AssetDatabase.SaveAssetIfDirty(GenerationDatabase<MonoBehaviour>.Instance);
-            AssetDatabase.SaveAssetIfDirty(GenerationDatabase<GenericScriptableObject>.Instance);
+            AssetDatabase.SaveAssetIfDirty(GenerationDatabase<ScriptableObject>.Instance);
             AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<MonoBehaviour>.Instance);
-            AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<GenericScriptableObject>.Instance);
+            AssetDatabase.SaveAssetIfDirty(GenericTypesDatabase<ScriptableObject>.Instance);
 #else
             AssetDatabase.SaveAssets();
 #endif

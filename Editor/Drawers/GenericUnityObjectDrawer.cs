@@ -14,8 +14,8 @@
             GenericObjectDrawer.ObjectField(position, property, label);
         }
     }
-    
-    [CustomPropertyDrawer(typeof(GenericScriptableObject), true)]
+
+    [CustomPropertyDrawer(typeof(ScriptableObject), true)]
 #if ODIN_INSPECTOR
     [DrawerPriority(0, 0, 2)]
 #endif

@@ -34,7 +34,7 @@
                     : genericType;
             }
 
-            if (typeof(GenericScriptableObject).IsAssignableFrom(genericType))
+            if (typeof(ScriptableObject).IsAssignableFrom(genericType))
             {
                 return ScriptableObjectsDatabase.TryGetConcreteType(genericType, out Type concreteType)
                     ? concreteType
@@ -42,7 +42,7 @@
             }
 
             throw new ArgumentException(
-                $"Expected a type derived from MonoBehaviour or GenericScriptableObject. Got {genericType} instead.");
+                $"Expected a type derived from MonoBehaviour or ScriptableObject. Got {genericType} instead.");
         }
     }
 }

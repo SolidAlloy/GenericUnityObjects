@@ -8,10 +8,11 @@
     using SolidUtilities;
     using SolidUtilities.Editor;
     using UnityEditor;
+    using UnityEngine;
     using Util;
 
     /// <summary>
-    /// Gathers types that inherit from <see cref="GenericScriptableObject"/> and have
+    /// Gathers types that inherit from <see cref="ScriptableObject"/> and have
     /// <see cref="CreateGenericAssetMenuAttribute"/>, then generates a class with methods marked as
     /// <see cref="MenuItemMethod"/> so that they appear in the Assets/Create menu.
     /// </summary>
@@ -21,7 +22,7 @@
 
         public static bool Check()
         {
-            var newScriptableObjects = TypeCache.GetTypesDerivedFrom<GenericScriptableObject>()
+            var newScriptableObjects = TypeCache.GetTypesDerivedFrom<ScriptableObject>()
                 .Where(type => type.IsGenericType && ! type.IsAbstract)
                 .ToArray();
 

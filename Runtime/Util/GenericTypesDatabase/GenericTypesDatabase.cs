@@ -15,7 +15,7 @@
     /// </summary>
     /// <typeparam name="TObject">
     /// A class derived from <see cref="UnityEngine.Object"/>. Currently supports only
-    /// <see cref="GenericScriptableObject"/> and <see cref="MonoBehaviour"/>.
+    /// <see cref="ScriptableObject"/> and <see cref="MonoBehaviour"/>.
     /// </typeparam>
     internal abstract class GenericTypesDatabase<TObject> : SingletonScriptableObject<GenericTypesDatabase<TObject>>, ISerializationCallbackReceiver, ICanBeInitialized
     where TObject : Object

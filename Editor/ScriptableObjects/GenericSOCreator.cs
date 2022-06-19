@@ -114,7 +114,7 @@
             PersistentStorage.SaveData(FileNameKey, fileName);
             PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationInteractively);
 
-            ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
+            ConcreteClassCreator<ScriptableObject>.CreateConcreteClass(genericTypeWithoutArgs, genericArgs);
             AssetDatabase.Refresh();
         }
 
@@ -130,7 +130,7 @@
             SaveProperty(property);
             PersistentStorage.ExecuteOnScriptsReload(FinishSOCreationAtPath);
 
-            ConcreteClassCreator<GenericScriptableObject>.CreateConcreteClass(genericType.GetGenericTypeDefinition(), genericType.GenericTypeArguments);
+            ConcreteClassCreator<ScriptableObject>.CreateConcreteClass(genericType.GetGenericTypeDefinition(), genericType.GenericTypeArguments);
             AssetDatabase.Refresh();
             // At this point the domain is reloaded, so the method doesn't return.
             return null;
