@@ -2,9 +2,9 @@
     "name": "GenericUnityObjects.IntegrationTests",
     "rootNamespace": "GenericUnityObjects.IntegrationTests",
     "references": [
-        "GUID:9168b41b563c2d84b94cfe84212541a9",
-        "GUID:2e5fb71161fa6f74f958f989fbdbb839",
-        "GUID:48d58eaab94e1de429344393b7653b1f"
+        "GenericUnityObjects",
+        "GenericUnityObjects.Editor",
+        "SolidUtilities.Editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -20,7 +20,7 @@
         "UNITY_INCLUDE_TESTS",
         "TEST_FRAMEWORK"
     ],
-	"versionDefines": [
+    "versionDefines": [
         {
             "name": "com.unity.test-framework",
             "expression": "",
