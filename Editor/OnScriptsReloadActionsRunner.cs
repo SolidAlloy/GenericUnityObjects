@@ -17,7 +17,6 @@
                 return;
             }
 
-
             // 1. GenericTypesAnalyzer finds a new generic MonoBehaviour and generates a DLL.
             // 2. Scripts are recompiled because of the DLL addition.
             // 3. This event is fired before GenericTypesAnalyzer is called again, and sets the custom icon.

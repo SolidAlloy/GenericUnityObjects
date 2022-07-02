@@ -87,12 +87,8 @@ namespace GenericUnityObjects.Editor
 
             // Have to use the extension method explicitly to avoid ambiguous reference error between SolidUtilities.ToHashSet and NetStandard 2.1 Enumerable.ToHashSet
             var registeredGuids = EnumerableExtensions.ToHashSet(GenerationDatabase<TObject>.GenericTypeArguments.Values
-                    .Aggregate((allConcreteClasses, thisClasses) =>
-                    {
-                        allConcreteClasses.AddRange(thisClasses);
-                        return allConcreteClasses;
-                    })
-                    .Select(concreteClass => concreteClass.AssemblyGUID));
+                .SelectMany(classesList => classesList)
+                .Select(concreteClass => concreteClass.AssemblyGUID));
 
             // If there are assemblies that exist in the folder but are missing from the database, add them to the database.
             foreach (string guid in guids)
@@ -115,7 +111,7 @@ namespace GenericUnityObjects.Editor
 
                 // Happens when the generic script file was removed but the concrete class still exists.
                 if (genericType == null)
-                    return;
+                    continue;
 
                 Type genericTypeWithoutArgs = genericType.GetGenericTypeDefinition();
                 Type[] genericArgs = genericType.GenericTypeArguments;
