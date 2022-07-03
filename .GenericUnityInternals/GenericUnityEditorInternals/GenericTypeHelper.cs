@@ -29,14 +29,14 @@
         {
             if (typeof(MonoBehaviour).IsAssignableFrom(genericType))
             {
-                return BehavioursDatabase.TryGetConcreteType(genericType, out Type concreteType)
+                return GenericTypesDatabase<MonoBehaviour>.TryGetConcreteType(genericType, out Type concreteType)
                     ? concreteType
                     : genericType;
             }
 
             if (typeof(ScriptableObject).IsAssignableFrom(genericType))
             {
-                return ScriptableObjectsDatabase.TryGetConcreteType(genericType, out Type concreteType)
+                return GenericTypesDatabase<ScriptableObject>.TryGetConcreteType(genericType, out Type concreteType)
                     ? concreteType
                     : genericType;
             }

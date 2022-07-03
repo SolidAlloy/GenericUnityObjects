@@ -322,7 +322,7 @@
 
             private static string GetScriptableObjectShortName(Type unityObjectType)
             {
-                return ((unityObjectType is GenericScriptableObject) || unityObjectType.BaseType.IsGenericType) ? TypeUtility.GetNiceNameOfGenericType(unityObjectType.BaseType) : unityObjectType.Name;
+                return unityObjectType.BaseType.IsGenericType ? TypeUtility.GetNiceNameOfGenericType(unityObjectType.BaseType) : unityObjectType.Name;
             }
         }
     }
