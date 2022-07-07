@@ -6,7 +6,6 @@
     using JetBrains.Annotations;
     using SolidUtilities.Editor;
     using UnityEditor;
-    using UnityEngine.Events;
     using Object = UnityEngine.Object;
 
     /// <summary>
@@ -16,7 +15,7 @@
     public static class ExampleInstaller
     {
         [UsedImplicitly]
-        public static void AddConcreteClasses<TObject>(KeyValuePair<Type, Type[]>[] typesToAdd, UnityAction afterAddingTypes)
+        public static void AddConcreteClasses<TObject>(KeyValuePair<Type, Type[]>[] typesToAdd, Action afterAddingTypes)
             where TObject : Object
         {
             using (AssetDatabaseHelper.DisabledScope())

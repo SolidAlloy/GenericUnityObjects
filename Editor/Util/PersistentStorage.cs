@@ -1,13 +1,18 @@
 ﻿namespace GenericUnityObjects.Editor.Util
 {
     using System;
+    using System.Reflection;
+    using ExtEvents;
     using GenericUnityObjects.Util;
+    using NUnit.Framework.Internal;
     using SolidUtilities.Collections;
     using UnityEditor;
     using UnityEditor.Callbacks;
+    using UnityEditor.Compilation;
     using UnityEditor.Events;
     using UnityEngine;
     using UnityEngine.Events;
+    using Object = UnityEngine.Object;
 
     /// <summary>
     /// A class used to hold serialized values that need to survive assemblies reload. It is mainly used for asset
@@ -75,13 +80,18 @@
 
         #region InvokeEventsOnScriptsReload
 
-        [SerializeField] private UnityEvent _afterReloadEvent = new UnityEvent();
+        [SerializeField] private ExtEvent _afterReloadEvent;
 
-        public static void ExecuteOnScriptsReload(UnityAction action)
+        public static void ExecuteOnScriptsReload(Action action)
         {
-            UnityEventTools.AddVoidPersistentListener(Instance._afterReloadEvent, action);
-            int lastListener = Instance._afterReloadEvent.GetPersistentEventCount() - 1;
-            Instance._afterReloadEvent.SetPersistentListenerState(lastListener, UnityEventCallState.EditorAndRuntime);
+            MethodInfo method = action.Method;
+
+            PersistentListener listener = method.IsStatic
+                ? PersistentListener.FromStatic(method, UnityEventCallState.EditorAndRuntime)
+                : PersistentListener.FromInstance(method, (Object) action.Target, UnityEventCallState.EditorAndRuntime);
+
+            Instance._afterReloadEvent.AddPersistentListener(listener);
+
             EditorUtility.SetDirty(Instance);
         }
 
@@ -156,8 +166,10 @@
             }
             finally
             {
-                if (Instance._afterReloadEvent.GetPersistentEventCount() != 0)
-                    Instance._afterReloadEvent = new UnityEvent();
+                for (int i = Instance._afterReloadEvent.PersistentListeners.Count - 1; i >= 0; i--)
+                {
+                    Instance._afterReloadEvent.RemovePersistentListenerAt(i);
+                }
             }
         }
 

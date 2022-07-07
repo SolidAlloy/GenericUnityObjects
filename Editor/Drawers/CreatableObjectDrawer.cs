@@ -3,12 +3,16 @@
     using System;
     using System.IO;
     using System.Reflection;
+    using MonoBehaviours;
     using ScriptableObjects;
     using SolidUtilities;
     using SolidUtilities.Editor;
     using SolidUtilities.UnityEditorInternals;
+    using TypeReferences;
     using UnityEditor;
     using UnityEngine;
+    using Util;
+    using Object = UnityEngine.Object;
 
 #if ODIN_INSPECTOR
     using Sirenix.OdinInspector.Editor;
@@ -24,6 +28,9 @@
         private static readonly string _assetsPath;
         private static readonly string _packagesPath;
 
+        private static CreatableObjectDrawer _instance;
+        public static CreatableObjectDrawer Instance => _instance ??= new CreatableObjectDrawer();
+
         static CreatableObjectDrawer()
         {
             _projectPath = Directory.GetCurrentDirectory();
@@ -35,9 +42,15 @@
         {
             (_, Type type) = property.GetFieldInfoAndType();
 
-            if (!type.InheritsFrom(typeof(ScriptableObject)))
+            if (!type.InheritsFrom(typeof(ScriptableObject)) && !type.InheritsFrom(typeof(MonoBehaviour)))
             {
-                EditorGUILayoutHelper.DrawErrorMessage("Creatable attribute can only be used on ScriptableObjects.");
+                EditorGUILayoutHelper.DrawErrorMessage("Creatable attribute can only be used on ScriptableObjects and MonoBehaviours.");
+                return;
+            }
+
+            if (type.IsAbstract)
+            {
+                EditorGUILayoutHelper.DrawErrorMessage("Creatable attribute can only be used on fields of non-abstract type.");
                 return;
             }
 
@@ -57,6 +70,21 @@
             if ( ! GUI.Button(buttonRect, "+"))
                 return;
 
+            // this is for scriptable objects
+            if (type.InheritsFrom(typeof(ScriptableObject)))
+            {
+                CreateScriptableObject(property, type);
+            }
+            else
+            {
+                CreateMonoBehaviour(property, type);
+            }
+        }
+
+        #region Create Scriptable Object
+
+        private void CreateScriptableObject(SerializedProperty property, Type type)
+        {
             var asset = CreateAsset(property, type);
             property.objectReferenceValue = asset;
             EditorGUIUtility.PingObject(asset);
@@ -66,7 +94,7 @@
         {
             var folderPath = ProjectWindowUtilProxy.GetActiveFolderPath();
 
-            bool isGeneric = type.InheritsFrom(typeof(ScriptableObject)) && type.IsGenericType && !type.IsAbstract;
+            bool isGeneric = type.IsGenericType;
 
             string fileName = isGeneric
                 ? type.GetCustomAttribute<CreateGenericAssetMenuAttribute>()?.FileName
@@ -114,6 +142,76 @@
 
             Debug.LogError("The file must have the '.asset' extension.");
             return false;
+        }
+
+        #endregion
+
+        #region Create MonoBehaviour
+
+        private const string TargetComponentKey = "CreatableObjectDrawer_TargetComponent";
+        private const string PropertyPathKey = "CreatableObjectDrawer_PropertyPath";
+        private const string AddedComponentTypeKey = "CreatableObjectDrawer_AddedComponent";
+
+        private void CreateMonoBehaviour(SerializedProperty property, Type type)
+        {
+            var parentComponent = property.serializedObject.targetObject as MonoBehaviour;
+
+            if (parentComponent == null)
+                return;
+
+            var gameObject = parentComponent.gameObject;
+
+            var component = AddComponentHelper.AddComponent(gameObject, type, out bool reloadRequired);
+
+            if (reloadRequired)
+            {
+                PersistentStorage.SaveData(TargetComponentKey, property.serializedObject.targetObject);
+                PersistentStorage.SaveData(PropertyPathKey, property.propertyPath);
+                PersistentStorage.SaveData(AddedComponentTypeKey, new TypeReference(type));
+                PersistentStorage.ExecuteOnScriptsReload(OnAfterComponentAdded);
+                AssetDatabase.Refresh();
+            }
+            else
+            {
+                property.objectReferenceValue = component;
+            }
+        }
+
+        private static void OnAfterComponentAdded()
+        {
+            try
+            {
+                var targetComponent = PersistentStorage.GetData<Object>(TargetComponentKey);
+                var propertyPath = PersistentStorage.GetData<string>(PropertyPathKey);
+                var componentType = PersistentStorage.GetData<TypeReference>(AddedComponentTypeKey).Type;
+
+                var addedComponent = ((MonoBehaviour)targetComponent).gameObject.GetComponent(componentType);
+                var property = Editor.CreateEditor(targetComponent).serializedObject.FindProperty(propertyPath);
+                property.objectReferenceValue = addedComponent;
+                property.serializedObject.ApplyModifiedProperties();
+            }
+            finally
+            {
+                PersistentStorage.DeleteData(TargetComponentKey);
+                PersistentStorage.DeleteData(PropertyPathKey);
+                PersistentStorage.DeleteData(AddedComponentTypeKey);
+            }
+        }
+
+        #endregion
+    }
+
+    public static class AddComponentHelper
+    {
+        public static Component AddComponent(GameObject gameObject, Type componentType, out bool reloadRequired)
+        {
+            if (!componentType.IsGenericType)
+            {
+                reloadRequired = false;
+                return Undo.AddComponent(gameObject, componentType);
+            }
+
+            return GenericBehaviourCreator.AddComponent(null, gameObject, componentType.GetGenericTypeDefinition(), componentType.GetGenericArguments(), out reloadRequired);
         }
     }
 }

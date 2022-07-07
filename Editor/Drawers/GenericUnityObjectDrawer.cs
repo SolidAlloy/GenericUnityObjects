@@ -7,11 +7,21 @@
     using Sirenix.OdinInspector.Editor;
 #endif
 
-    internal class GenericUnityObjectDrawer : PropertyDrawer
+    internal abstract class GenericUnityObjectDrawer : PropertyDrawer
     {
+        protected abstract bool AlwaysCreatable { get; }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            GenericObjectDrawer.ObjectField(position, property, label);
+            if (AlwaysCreatable)
+            {
+                CreatableObjectDrawer.Instance.OnGUI(position, property, label);
+            }
+            else
+            {
+                // ReSharper disable once Unity.PropertyDrawerOnGUIBase
+                GenericObjectDrawer.ObjectField(position, property, label);
+            }
         }
     }
 
@@ -21,26 +31,15 @@
 #endif
     internal class GenericSODrawer : GenericUnityObjectDrawer
     {
-        private static CreatableObjectDrawer _creatableObjectDrawer;
-
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        {
-            if (ProjectSettings.AlwaysCreatable)
-            {
-                _creatableObjectDrawer ??= new CreatableObjectDrawer();
-                _creatableObjectDrawer.OnGUI(position, property, label);
-            }
-            else
-            {
-                // ReSharper disable once Unity.PropertyDrawerOnGUIBase
-                base.OnGUI(position, property, label);
-            }
-        }
+        protected override bool AlwaysCreatable => ProjectSettings.AlwaysCreatableScriptableObject;
     }
 
     [CustomPropertyDrawer(typeof(MonoBehaviour), true)]
 #if ODIN_INSPECTOR
     [DrawerPriority(0, 0, 2)]
 #endif
-    internal class GenericBehaviourDrawer : GenericUnityObjectDrawer { }
+    internal class GenericBehaviourDrawer : GenericUnityObjectDrawer
+    {
+        protected override bool AlwaysCreatable => ProjectSettings.AlwaysCreatableMonoBehaviour;
+    }
 }

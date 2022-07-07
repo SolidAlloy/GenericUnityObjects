@@ -10,7 +10,8 @@
         "EasyButtons.Editor",
         "Unity.Settings.Editor",
         "UnityDropdown.Editor",
-        "MissingScriptType.Editor"
+        "MissingScriptType.Editor",
+        "ExtEvents"
     ],
     "includePlatforms": [
         "Editor"

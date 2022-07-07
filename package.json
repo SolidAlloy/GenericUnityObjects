@@ -6,7 +6,8 @@
   "dependencies": {
     "com.solidalloy.util": "1.39.0",
     "com.solidalloy.type-references": "2.15.1",
-    "com.unity.settings-manager": "1.0.3"
+    "com.unity.settings-manager": "1.0.3",
+	"com.solidalloy.extevents": "1.6.0"
   },
   "keywords": [
     "scriptable",
