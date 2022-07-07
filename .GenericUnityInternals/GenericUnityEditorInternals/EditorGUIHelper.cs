@@ -14,7 +14,7 @@
         [PublicAPI]
         public static Object GenericObjectField(Rect position, GUIContent label, Object currentTarget, Type objType, bool allowSceneObjects)
         {
-            return ObjectFieldInternal(position, label, currentTarget, allowSceneObjects, new ObjectFieldHelper(currentTarget, objType));
+            return GenericObjectField(position, label, currentTarget, allowSceneObjects, new ObjectFieldHelper(currentTarget, objType));
         }
 
         /// <summary>
@@ -25,24 +25,20 @@
         {
             GUIContent propertyLabel = EditorGUI.BeginProperty(position, label, property);
 
-            ObjectFieldInternal(position, property, label == null ? null : propertyLabel);
-
-            EditorGUI.EndProperty();
-        }
-
-        private static void ObjectFieldInternal(Rect position, SerializedProperty property, [CanBeNull] GUIContent label)
-        {
             Object objectBeingEdited = property.serializedObject.targetObject;
 
             // Allow scene objects if the object being edited is NOT persistent
             bool allowSceneObjects = ! (objectBeingEdited == null || EditorUtility.IsPersistent(objectBeingEdited));
 
-            property.objectReferenceValue = ObjectFieldInternal(position, label, property.objectReferenceValue,
+            property.objectReferenceValue = GenericObjectField(position, label == null ? null : propertyLabel, property.objectReferenceValue,
                 allowSceneObjects, new ObjectFieldHelper(property));
+
+            EditorGUI.EndProperty();
         }
 
-        private static Object ObjectFieldInternal(Rect position, [CanBeNull] GUIContent label, Object currentTarget,
-            bool allowSceneObjects, ObjectFieldHelper helper)
+        [PublicAPI]
+        public static Object GenericObjectField(Rect position, [CanBeNull] GUIContent label, Object currentTarget,
+            bool allowSceneObjects, in ObjectFieldHelper helper)
         {
             const EditorGUI.ObjectFieldVisualType visualType = EditorGUI.ObjectFieldVisualType.IconAndText;
 

@@ -40,15 +40,15 @@
 
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
-            (_, Type type) = property.GetFieldInfoAndType();
+            Type propertyType = property.GetObjectType();
 
-            if (!type.InheritsFrom(typeof(ScriptableObject)) && !type.InheritsFrom(typeof(MonoBehaviour)))
+            if (!propertyType.InheritsFrom(typeof(ScriptableObject)) && !propertyType.InheritsFrom(typeof(MonoBehaviour)))
             {
                 EditorGUILayoutHelper.DrawErrorMessage("Creatable attribute can only be used on ScriptableObjects and MonoBehaviours.");
                 return;
             }
 
-            if (type.IsAbstract)
+            if (propertyType.IsAbstract)
             {
                 EditorGUILayoutHelper.DrawErrorMessage("Creatable attribute can only be used on fields of non-abstract type.");
                 return;
@@ -65,32 +65,37 @@
             (var objectRect, var buttonRect) = rect.CutVertically(buttonWidth, true);
             objectRect.width -= paddingBetween;
 
-            GenericObjectDrawer.ObjectField(objectRect, property, label);
+            DrawObjectField(objectRect, property, label);
 
             if ( ! GUI.Button(buttonRect, "+"))
                 return;
 
             // this is for scriptable objects
-            if (type.InheritsFrom(typeof(ScriptableObject)))
+            if (propertyType.InheritsFrom(typeof(ScriptableObject)))
             {
-                CreateScriptableObject(property, type);
+                CreateScriptableObject(property, propertyType);
             }
             else
             {
-                CreateMonoBehaviour(property, type);
+                CreateMonoBehaviour(property, propertyType);
             }
+        }
+
+        protected virtual void DrawObjectField(Rect objectRect, SerializedProperty property, GUIContent label)
+        {
+            GenericObjectDrawer.ObjectField(objectRect, property, label);
         }
 
         #region Create Scriptable Object
 
-        private void CreateScriptableObject(SerializedProperty property, Type type)
+        private static void CreateScriptableObject(SerializedProperty property, Type type)
         {
             var asset = CreateAsset(property, type);
             property.objectReferenceValue = asset;
             EditorGUIUtility.PingObject(asset);
         }
 
-        private ScriptableObject CreateAsset(SerializedProperty property, Type type)
+        private static ScriptableObject CreateAsset(SerializedProperty property, Type type)
         {
             var folderPath = ProjectWindowUtilProxy.GetActiveFolderPath();
 
@@ -121,12 +126,12 @@
             return asset;
         }
 
-        private bool IsValidPath(string path)
+        private static bool IsValidPath(string path)
         {
             return ! string.IsNullOrEmpty(path) && IsInProject(path) && HasCorrectExtension(path);
         }
 
-        private bool IsInProject(string path)
+        private static bool IsInProject(string path)
         {
             if (PathHelper.IsSubPathOf(path, _assetsPath) || PathHelper.IsSubPathOf(path, _packagesPath))
                 return true;
@@ -135,7 +140,7 @@
             return false;
         }
 
-        private bool HasCorrectExtension(string path)
+        private static bool HasCorrectExtension(string path)
         {
             if (path.EndsWith(".asset"))
                 return true;
@@ -152,7 +157,7 @@
         private const string PropertyPathKey = "CreatableObjectDrawer_PropertyPath";
         private const string AddedComponentTypeKey = "CreatableObjectDrawer_AddedComponent";
 
-        private void CreateMonoBehaviour(SerializedProperty property, Type type)
+        public static void CreateMonoBehaviour(SerializedProperty property, Type type, Action<Component, bool> onComponentAdded = null)
         {
             var parentComponent = property.serializedObject.targetObject as MonoBehaviour;
 
@@ -162,6 +167,8 @@
             var gameObject = parentComponent.gameObject;
 
             var component = AddComponentHelper.AddComponent(gameObject, type, out bool reloadRequired);
+
+            onComponentAdded?.Invoke(component, reloadRequired);
 
             if (reloadRequired)
             {

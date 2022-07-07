@@ -10,7 +10,7 @@
     /// When drawing ObjectField, there are things that need to be done differently for <see cref="Type"/> and <see cref="SerializedProperty"/>.
     /// This helper encapsulates such parts of the code so that the main method contains the same logic for Type and SerializedProperty.
     /// </summary>
-    internal readonly struct ObjectFieldHelper
+    public readonly struct ObjectFieldHelper
     {
         public readonly Type ObjType;
         public readonly Object CurrentTarget;
@@ -19,21 +19,25 @@
 
         private readonly SerializedProperty _property;
 
+        private readonly Func<Object, bool> _validateObjectCustom;
+
         public ObjectFieldHelper(Object currentTarget, Type type)
         {
             ObjType = type;
             CurrentTarget = currentTarget;
             _property = null;
+            _validateObjectCustom = null;
         }
 
-        public ObjectFieldHelper(SerializedProperty property)
+        public ObjectFieldHelper(SerializedProperty property, Func<Object, bool> validateObjectCustom = null)
         {
             _property = property;
             ObjType = GenericTypeHelper.GetGenericType(property);
             CurrentTarget = property.objectReferenceValue;
+            _validateObjectCustom = validateObjectCustom;
         }
 
-        public Object ValidateObjectFieldAssignment(Object[] references, EditorGUI.ObjectFieldValidatorOptions options)
+        internal Object ValidateObjectFieldAssignment(Object[] references, EditorGUI.ObjectFieldValidatorOptions options)
         {
             if (references.Length == 0)
                 return null;
@@ -113,8 +117,19 @@
 
         private Object ValidateAssignmentForProperty(Object[] references, EditorGUI.ObjectFieldValidatorOptions options)
         {
-            if (references[0] == null || ! EditorGUI.ValidateObjectReferenceValue(_property, references[0], options))
+            if (references[0] == null)
                 return null;
+
+            if (options == EditorGUI.ObjectFieldValidatorOptions.None && _validateObjectCustom != null)
+            {
+                if ( ! _validateObjectCustom(references[0]))
+                    return null;
+            }
+            else
+            {
+                if ( ! EditorGUI.ValidateObjectReferenceValue(_property, references[0], options))
+                    return null;
+            }
 
             if (EditorSceneManager.preventCrossSceneReferences &&
                 EditorGUI.CheckForCrossSceneReferencing(references[0], _property.serializedObject.targetObject))
