@@ -166,9 +166,12 @@
             }
             finally
             {
-                for (int i = Instance._afterReloadEvent.PersistentListeners.Count - 1; i >= 0; i--)
+                if (Instance._afterReloadEvent.PersistentListeners != null)
                 {
-                    Instance._afterReloadEvent.RemovePersistentListenerAt(i);
+                    for (int i = Instance._afterReloadEvent.PersistentListeners.Count - 1; i >= 0; i--)
+                    {
+                        Instance._afterReloadEvent.RemovePersistentListenerAt(i);
+                    }
                 }
             }
         }
