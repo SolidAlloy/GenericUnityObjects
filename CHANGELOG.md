@@ -1,3 +1,17 @@
+# [2.17.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.16.0...2.17.0) (2022-07-24)
+
+
+### Bug Fixes
+
+* Fixed concrete classes of a different type added to type database after a generic unity-object class is removed ([4d07108](https://github.com/SolidAlloy/GenericUnityObjects/commit/4d07108faecf28241d9ffa42a500c469068d3f83))
+* Fixed exception in Reference property drawer ([1602288](https://github.com/SolidAlloy/GenericUnityObjects/commit/16022888149db226df01c610875ebb5bd400c6c3))
+
+
+### Features
+
+* Implemented Creatable attribute for generic MonoBehaviours ([d3420ac](https://github.com/SolidAlloy/GenericUnityObjects/commit/d3420ac50647dfc1f23f1e1144856baabbb89803))
+* Switched from GUID to assembly names in asmdefs ([349d9c1](https://github.com/SolidAlloy/GenericUnityObjects/commit/349d9c13c117a4041fa54661e3f26ce6c387dffa))
+
 # [2.16.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.15.3...2.16.0) (2022-06-19)
 
 
