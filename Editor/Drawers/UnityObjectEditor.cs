@@ -1,11 +1,10 @@
 ﻿namespace GenericUnityObjects.Editor
 {
     using System.Reflection;
-    using SolidUtilities.Editor;
     using UnityEditor;
     using UnityEditor.Callbacks;
     using UnityEngine;
-    
+
 #if MISSING_SCRIPT_TYPE
     using MissingScriptType.Editor;
 #endif
@@ -13,7 +12,7 @@
 #if EASY_BUTTONS
     using EasyButtons.Editor;
 #endif
-    
+
 #if ODIN_INSPECTOR
     using Sirenix.OdinInspector;
     using Sirenix.OdinInspector.Editor;
@@ -40,9 +39,9 @@
             odinEditorTypeField.SetValue(null, typeof(UnityObjectEditor));
         }
 #endif
-        
+
         private GenericUnityObjectHelper _helper;
-        
+
 #if MISSING_SCRIPT_TYPE
         private MissingScriptTypeUtility _missingScriptUtility;
 #endif
@@ -50,7 +49,7 @@
 #if EASY_BUTTONS
         private ButtonsDrawer _buttonsDrawer;
 #endif
-        
+
         protected
 #if ODIN_INSPECTOR
             override
@@ -60,9 +59,9 @@
 #if ODIN_INSPECTOR
             base.OnEnable();
 #endif
-            
+
             _helper = new GenericUnityObjectHelper(target);
-            
+
 #if MISSING_SCRIPT_TYPE
             try
             {
@@ -75,7 +74,7 @@
             _buttonsDrawer = new ButtonsDrawer(target);
 #endif
         }
-        
+
         protected override void OnHeaderGUI()
         {
             GenericHeaderUtility.OnHeaderGUI(this);
@@ -84,7 +83,7 @@
         public override void OnInspectorGUI()
         {
             serializedObject.UpdateIfRequiredOrScript();
-            
+
             if (target == null)
             {
                 DrawMissingScript();
