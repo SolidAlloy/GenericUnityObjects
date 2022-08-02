@@ -1,3 +1,11 @@
+## [2.17.1](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.17.0...2.17.1) (2022-08-02)
+
+
+### Bug Fixes
+
+* Fixed exception when creating a new unity object through Creatable attribute ([99ce2de](https://github.com/SolidAlloy/GenericUnityObjects/commit/99ce2de964c97b68221d75b94238fcda9268e8ce))
+* Fixed incorrect concrete types used for creating generic scriptable objects ([07c73ae](https://github.com/SolidAlloy/GenericUnityObjects/commit/07c73ae737869aae22e9b65667d303276b4b0b0a))
+
 # [2.17.0](https://github.com/SolidAlloy/GenericUnityObjects/compare/2.16.0...2.17.0) (2022-07-24)
 
 
