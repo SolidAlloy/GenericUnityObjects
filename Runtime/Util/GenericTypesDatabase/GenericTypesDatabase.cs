@@ -123,7 +123,7 @@
 
         private bool TryGetEmptyDerivedType(Type genericType, out Type derivedType)
         {
-            derivedType = TypeUtility.GetEmptyTypeDerivedFrom(genericType);
+            derivedType = TypeUtility.GetEmptyTypeDerivedDirectlyFrom(genericType);
 
             if (derivedType == null)
                 return false;

@@ -10,6 +10,18 @@
 
     internal static class TypeUtility
     {
+        public static Type GetEmptyTypeDerivedDirectlyFrom(Type parentType)
+        {
+#if UNITY_EDITOR
+            return TypeCache.GetTypesDerivedFrom(parentType)
+                .FirstOrDefault(type => type.IsEmpty() && type.BaseType == parentType);
+#else
+            return parentType.Assembly.GetTypes()
+                .Where(parentType.IsAssignableFrom)
+                .FirstOrDefault(type => type.IsEmpty() && type.BaseType == parentType);
+#endif
+        }
+
         [CanBeNull]
         public static Type GetEmptyTypeDerivedFrom(Type parentType)
         {
