@@ -70,7 +70,24 @@
             if ( ! GUI.Button(buttonRect, "+"))
                 return;
 
-            // this is for scriptable objects
+            // If we create a new concrete type, we will force domain reload in the middle of OnGUI call. This will create an exception in the UnityEditor code.
+            // To avoid that, we execute the creation on editor application update instead.
+            _propertyForCreation = property;
+            _propertyTypeForCreation = propertyType;
+            EditorApplication.update += OneTimeUpdate;
+        }
+
+        private SerializedProperty _propertyForCreation;
+        private Type _propertyTypeForCreation;
+
+        private void OneTimeUpdate()
+        {
+            CreateUnityObject(_propertyForCreation, _propertyTypeForCreation);
+            EditorApplication.update -= OneTimeUpdate;
+        }
+
+        private static void CreateUnityObject(SerializedProperty property, Type propertyType)
+        {
             if (propertyType.InheritsFrom(typeof(ScriptableObject)))
             {
                 CreateScriptableObject(property, propertyType);
